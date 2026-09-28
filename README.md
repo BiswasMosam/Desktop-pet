@@ -151,6 +151,5 @@ C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD13
 
 ## Next
 
-
 - The ESP-01 for time and weather when the PC is off, and a link to Aminal over WiFi
 - A real touch sensor (TTP223) in place of the KEY button
