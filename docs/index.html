@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="The Desktop-pet handbook: a little OLED face for the desk that is Aminal's face, with real captures of every mood, trick and screen, and how it all works inside.">
+<meta name="theme-color" content="#07090b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E%3Crect x='5' y='10' width='9' height='12' rx='3' fill='%233de8ff'/%3E%3Crect x='18' y='10' width='9' height='12' rx='3' fill='%233de8ff'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://www.mosambiswas.com/Desktop-pet/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Desktop-pet Handbook">
+<meta property="og:description" content="The Desktop-pet handbook: a little OLED face for the desk that is Aminal's face, with real captures of every mood, trick and screen, and how it all works inside.">
+<meta property="og:url" content="https://www.mosambiswas.com/Desktop-pet/">
+<meta property="og:image" content="https://www.mosambiswas.com/Desktop-pet/og.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<title>Desktop-pet Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Mono&family=Syne:wght@600;700;800&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#07090b;
+  --bg2:#0e1317;
+  --bg3:#151c22;
+  --ink:#e3eaee;
+  --dim:rgba(227,234,238,.68);
+  --faint:rgba(227,234,238,.42);
+  --line:rgba(227,234,238,.13);
+  --line2:rgba(227,234,238,.24);
+  --lit:#3de8ff;
+  --lit2:rgba(61,232,255,.14);
+  --pcb:#1f4fa3;
+  --pcb2:#16397a;
+  --gold:#d6b25e;
+  --warm:#ff8a5c;
+  --gnd:#8593a0;
+  --sans:'Manrope','Segoe UI',system-ui,sans-serif;
+  --display:'Syne','Segoe UI',system-ui,sans-serif;
+  --mono:'Space Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+  font-size:16.5px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--lit);text-decoration-thickness:1px;text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--lit);outline-offset:3px;border-radius:2px}
+strong,b{color:var(--ink);font-weight:600}
+code,.k{font-family:var(--mono);font-size:.86em;color:var(--ink);letter-spacing:-.01em}
+
+/* ---------- type ---------- */
+.lbl{display:block;font-family:var(--mono);font-size:12px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--lit);margin-bottom:14px}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(32px,4.4vw,50px);
+  line-height:1;letter-spacing:-.022em;text-transform:uppercase;margin:0 0 22px;
+  text-wrap:balance}
+h3{font-family:var(--mono);font-weight:400;font-size:13px;letter-spacing:.17em;
+  text-transform:uppercase;color:var(--ink);margin:44px 0 14px}
+p{color:var(--dim);max-width:66ch;margin:0 0 16px}
+.lede{font-size:1.14em;color:var(--dim);max-width:58ch}
+ul.tick,ol.steps,ol.ladder{margin:0 0 18px;padding:0;list-style:none;max-width:70ch}
+ul.tick li{position:relative;padding-left:26px;margin-bottom:10px;color:var(--dim)}
+ul.tick li::before{content:'';position:absolute;left:0;top:.8em;width:12px;height:2px;background:var(--lit)}
+ol.steps{counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding-left:40px;margin-bottom:12px;color:var(--dim)}
+ol.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:0;top:.1em;
+  font-family:var(--mono);font-size:.82em;color:var(--lit)}
+
+/* ---------- layout ---------- */
+.shell{display:grid;grid-template-columns:236px minmax(0,1fr)}
+.rail{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;overflow:auto;
+  border-right:1px solid var(--line);padding:30px 22px 40px;display:flex;flex-direction:column;gap:26px}
+.rail .wordmark{width:150px;height:auto;fill:var(--lit)}
+.rail nav{display:flex;flex-direction:column;gap:3px}
+.rail nav span{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--faint);margin:14px 0 6px}
+.rail nav a{color:var(--dim);text-decoration:none;font-size:14.5px;padding:3px 0;display:flex;gap:10px}
+.rail nav a i{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--faint);min-width:18px;padding-top:2px}
+.rail nav a:hover{color:var(--ink)}
+.rail .files{display:flex;flex-direction:column;gap:6px;font-size:14px}
+main{padding-inline:clamp(16px,5vw,76px);padding-block:56px 120px;max-width:1140px;min-width:0}
+section.ch{padding-block:80px 8px;border-top:1px solid var(--line);margin-top:72px}
+.grid{display:grid;gap:26px 22px;margin:26px 0 8px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 48px;align-items:start}
+
+/* ---------- the OLED captures ---------- */
+.fig{margin:0;display:flex;flex-direction:column;gap:12px;min-width:0}
+.oled{background:#000;border:1px solid var(--line);border-radius:10px;padding:8px}
+.oled img,.oled svg{display:block;width:100%;height:auto;aspect-ratio:2/1;image-rendering:pixelated}
+.px-off{fill:#000}
+.px-on{fill:var(--lit)}
+.fig figcaption{font-size:14.5px;line-height:1.55;color:var(--dim)}
+.fig figcaption b{display:block;font-weight:700;color:var(--ink);margin-bottom:2px;font-size:15px}
+.fig.small figcaption{font-size:13.5px}
+.fig.small figcaption b{font-size:14px}
+.fig.wide{max-width:640px}
+
+/* ---------- cover ---------- */
+.cover{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px 56px;align-items:center}
+.cover__top{grid-column:1/-1;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+.cover .wordmark{width:100%;max-width:560px;height:auto;fill:var(--lit);display:block}
+.cover__sub{font-family:var(--mono);font-size:13px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--lit);margin:22px 0 18px}
+.cover__grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;
+  border-top:1px solid var(--line);padding-top:22px}
+.cover__grid .lbl{font-size:11px;margin-bottom:6px}
+.cover__grid div div{font-size:14.5px;color:var(--ink);line-height:1.5}
+
+/* the 0.96" module the pet's face lives on */
+.module{position:relative;background:var(--pcb);border-radius:12px;padding:44px 26px 34px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.module .hole{position:absolute;width:15px;height:15px;border-radius:50%;background:var(--bg);
+  box-shadow:0 0 0 3px #c9ccd1}
+.module .hole:nth-of-type(1){left:10px;top:10px}
+.module .hole:nth-of-type(2){right:10px;top:10px}
+.module .hole:nth-of-type(3){left:10px;bottom:10px}
+.module .hole:nth-of-type(4){right:10px;bottom:10px}
+.module .pins{position:absolute;top:9px;left:50%;transform:translateX(-50%);display:flex;gap:9px}
+.module .pins span{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--mono);
+  font-size:8px;letter-spacing:.06em;color:rgba(255,255,255,.75)}
+.module .pins span::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--gold)}
+.module .glass{background:#000;border-radius:3px;padding:7% 5% 11%;position:relative}
+.module .glass::after{content:'';position:absolute;left:0;right:0;bottom:0;height:8%;background:#0b0b0d}
+.module .glass img,.module .glass svg{display:block;width:100%;height:auto;aspect-ratio:2/1;image-rendering:pixelated}
+
+/* ---------- tables, code, notes ---------- */
+.tscroll{overflow-x:auto;margin:18px 0 12px}
+table{width:100%;border-collapse:collapse}
+th{font-family:var(--mono);font-weight:400;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);text-align:left;border-bottom:1px solid var(--line2);padding:0 16px 10px 0}
+td{font-size:15px;color:var(--dim);border-bottom:1px solid var(--line);padding:11px 16px 11px 0;vertical-align:top}
+td.f{font-family:var(--mono);font-size:13px;color:var(--ink);white-space:nowrap;letter-spacing:-.01em}
+td.n{font-family:var(--mono);font-size:13px;color:var(--lit);white-space:nowrap}
+td b{font-weight:600}
+pre{font-family:var(--mono);font-size:13px;line-height:1.7;color:var(--ink);background:var(--bg2);
+  border-left:2px solid var(--lit);padding:16px 18px;margin:16px 0 20px;overflow-x:auto;letter-spacing:-.01em}
+pre .c{color:var(--faint)}
+pre .a{color:var(--lit)}
+.note{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:20px 0;max-width:78ch}
+.note p{margin:0;max-width:none}
+.note p + p{margin-top:10px}
+.note .lbl{margin-bottom:8px}
+.note.warn .lbl{color:var(--warm)}
+
+/* ---------- ladder ---------- */
+ol.ladder{counter-reset:l;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:none}
+ol.ladder li{counter-increment:l;background:var(--bg2);border:1px solid var(--line);border-radius:6px;
+  padding:10px 12px;color:var(--ink);font-size:14.5px;display:flex;gap:10px;align-items:baseline}
+ol.ladder li::before{content:counter(l);font-family:var(--mono);font-size:12px;color:var(--lit)}
+
+/* ---------- things to try ---------- */
+.tries{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 48px}
+.tries h3{margin-top:28px}
+.tries dl{margin:0}
+.tries dt{color:var(--ink);font-weight:600;margin-top:12px}
+.tries dd{margin:2px 0 0;color:var(--dim)}
+
+/* ---------- diagrams ---------- */
+.dwrap{overflow-x:auto;margin:24px 0 16px}
+.diagram{display:block;width:100%;height:auto;min-width:620px}
+.d-box{fill:var(--bg2);stroke:var(--line2);stroke-width:1}
+.d-box2{fill:var(--bg3);stroke:var(--line2);stroke-width:1}
+.d-pcb{fill:var(--pcb);stroke:none}
+.d-group{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:4 4}
+.d-litbox{fill:var(--lit2);stroke:var(--lit);stroke-width:1.2}
+.d-dash{fill:none;stroke:var(--faint);stroke-width:1;stroke-dasharray:4 3}
+.d-line{fill:none;stroke:var(--line2);stroke-width:1.2}
+.d-arrow{fill:none;stroke:var(--dim);stroke-width:1.4}
+.d-lit{fill:none;stroke:var(--lit);stroke-width:2}
+.d-warm{fill:none;stroke:var(--warm);stroke-width:2}
+.d-gnd{fill:none;stroke:var(--gnd);stroke-width:2}
+.d-press{fill:var(--lit)}
+.d-pin{fill:var(--gold)}
+.d-dot{fill:var(--warm)}
+.d-t{fill:var(--ink);font-family:var(--sans);font-weight:700;font-size:15px}
+.d-s{fill:var(--dim);font-family:var(--mono);font-size:11.5px}
+.d-f{fill:var(--faint);font-family:var(--mono);font-size:11px;letter-spacing:.14em}
+.d-p{fill:var(--ink);font-family:var(--mono);font-size:12.5px}
+.d-l{fill:var(--lit);font-family:var(--mono);font-size:11.5px}
+.d-headfill{fill:var(--dim)}
+.wires{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 32px}
+.wires .fig .dwrap{margin:0}
+.wires .diagram{min-width:0}
+
+footer.end{margin-top:96px;padding-top:24px;border-top:1px solid var(--line);display:flex;
+  justify-content:space-between;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+
+@media screen and (max-width:1000px){
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cover{grid-template-columns:1fr}
+  .cover__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  ol.ladder{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media screen and (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:22px 16px}
+  .rail .wordmark{display:none}
+  .rail nav{flex-direction:row;flex-wrap:wrap;gap:4px 16px}
+  .rail nav span{width:100%;margin:8px 0 0}
+  .rail nav a i{display:none}
+  .g3,.g2,.tries,.cols,.wires{grid-template-columns:1fr}
+}
+@media screen and (max-width:560px){
+  .g4.icons{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g4:not(.icons){grid-template-columns:1fr}
+  ol.ladder{grid-template-columns:1fr}
+  .cover__grid{grid-template-columns:1fr}
+  .module{padding:36px 16px 26px}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+html{scroll-behavior:smooth}
+
+/* ================= PAPER (A4) ================= */
+@media print{
+  @page{size:A4;margin:15mm 15mm 17mm;background:#07090b;
+    @bottom-left{content:"Desktop-pet  ·  Handbook  ·  Rev. 1";font-family:'Space Mono',monospace;
+      font-size:6.2pt;letter-spacing:.16em;color:rgba(227,234,238,.42);text-transform:uppercase}
+    @bottom-right{content:counter(page, decimal-leading-zero);font-family:'Space Mono',monospace;
+      font-size:6.8pt;color:#3de8ff}}
+  @page :first{@bottom-left{content:none}@bottom-right{content:none}}
+  html{scroll-behavior:auto}
+  body{font-size:8.9pt;line-height:1.55}
+  .shell{display:block}
+  .rail{display:none}
+  main{padding:0;max-width:none}
+  section.ch{break-before:page;border:0;margin:0;padding:0}
+  .pb{break-before:page}
+  .lbl{font-size:6.8pt;margin-bottom:2.6mm}
+  h2{font-size:25pt;margin-bottom:4.6mm;max-width:150mm}
+  h3{font-size:7pt;margin:5.8mm 0 2.3mm;break-after:avoid}
+  .pb > .lbl + h3{margin-top:0}
+  p{max-width:122mm;margin-bottom:2.6mm}
+  .lede{font-size:10pt;max-width:120mm}
+  ul.tick,ol.steps{max-width:130mm;margin-bottom:3mm}
+  ul.tick li{padding-left:5mm;margin-bottom:1.6mm}
+  ul.tick li::before{width:2.2mm;height:.6pt;top:.78em}
+  ol.steps li{padding-left:7mm;margin-bottom:1.8mm}
+  .grid{gap:4.2mm 4.5mm;margin:4mm 0 2mm}
+  .fig{gap:1.8mm;break-inside:avoid}
+  .oled{border-radius:1.6mm;padding:1.3mm;border-width:.5pt}
+  .fig figcaption{font-size:7.6pt;line-height:1.45}
+  .fig figcaption b{font-size:7.9pt;margin-bottom:.4mm}
+  .fig.small figcaption{font-size:7pt}
+  .fig.small figcaption b{font-size:7.3pt}
+  .fig.wide{max-width:none}
+  .films{display:flex;flex-direction:column;gap:4.2mm;margin:4mm 0 2mm}
+  .film{display:grid;grid-template-columns:128mm minmax(0,1fr);gap:5mm;align-items:start}
+  .film .frames{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:1.8mm}
+  .film .cell{display:flex;flex-direction:column;gap:.8mm}
+  .film .tc{font-family:var(--mono);font-size:5.6pt;letter-spacing:.08em;color:var(--faint)}
+  .film figcaption{padding-top:.4mm}
+  .tscroll{overflow:visible;margin:3mm 0 2mm}
+  table{break-inside:auto}
+  tr{break-inside:avoid}
+  th{font-size:6pt;padding:0 2.4mm 1.6mm 0;border-bottom-width:.5pt}
+  td{font-size:7.9pt;padding:1.5mm 2.4mm 1.5mm 0;border-bottom-width:.5pt}
+  td.f,td.n{font-size:7pt}
+  pre{font-size:6.8pt;padding:3mm 3.4mm;margin:2.5mm 0 3mm;border-left-width:1.2pt;white-space:pre-wrap;overflow:visible;break-inside:avoid}
+  .note{padding:3.4mm 4mm;margin:3mm 0;border-radius:1.4mm;max-width:none;border-width:.5pt;break-inside:avoid}
+  ol.ladder{gap:1.6mm;margin-bottom:3mm}
+  ol.ladder li{padding:1.8mm 2.4mm;font-size:8pt;border-radius:1.2mm;border-width:.5pt}
+  ol.ladder li::before{font-size:6.8pt}
+  .tries{gap:0 9mm}
+  .tries h3{margin-top:5mm}
+  .tries dt{margin-top:2.2mm;font-size:8.6pt}
+  .tries dd{font-size:8.3pt}
+  .dwrap{overflow:visible;margin:4mm 0 3mm;break-inside:avoid}
+  .diagram{min-width:0}
+  .wires{gap:3mm 7mm}
+  .cols{gap:2mm 9mm}
+  a{color:var(--lit);text-decoration:none}
+  footer.end{margin-top:10mm;padding-top:3mm;font-size:6.2pt;border-top-width:.5pt}
+
+  .cover{display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;height:265mm;gap:0}
+  .cover__top{font-size:6.6pt}
+  .cover .wordmark{max-width:none;width:100%}
+  .cover__sub{font-size:7.6pt;margin:6mm 0 4mm}
+  .cover .lede{font-size:10.4pt;max-width:125mm}
+  .cover__art{width:128mm;align-self:flex-end}
+  .cover__grid{padding-top:4.5mm;gap:6mm}
+  .cover__grid .lbl{font-size:5.8pt;margin-bottom:1.6mm}
+  .cover__grid div div{font-size:8pt}
+  .module{border-radius:3mm;padding:10mm 6mm 8mm}
+  .module .hole{width:3.4mm;height:3.4mm;box-shadow:0 0 0 .7mm #c9ccd1}
+  .module .hole:nth-of-type(1){left:2.4mm;top:2.4mm}
+  .module .hole:nth-of-type(2){right:2.4mm;top:2.4mm}
+  .module .hole:nth-of-type(3){left:2.4mm;bottom:2.4mm}
+  .module .hole:nth-of-type(4){right:2.4mm;bottom:2.4mm}
+  .module .pins{top:2mm;gap:2.2mm}
+  .module .pins span{font-size:4.6pt;gap:.6mm}
+  .module .pins span::before{width:2.1mm;height:2.1mm}
+
+  .toc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10mm;margin:5mm 0 4mm}
+  .toc h3{margin-top:2mm}
+  .toc ol{list-style:none;margin:0;padding:0}
+  .toc li{display:flex;gap:3mm;padding:1.7mm 0;border-bottom:.5pt solid var(--line)}
+  .toc li i{font-style:normal;font-family:var(--mono);font-size:7pt;color:var(--lit);min-width:6mm;padding-top:.4mm}
+  .toc li b{display:block;font-size:8.8pt}
+  .toc li span{display:block;font-size:7.6pt;color:var(--dim)}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+<aside class="rail" aria-label="Contents">
+  <svg class="wordmark" viewBox="0 0 65 8" role="img" aria-label="Desktop-pet"><rect x="0.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="1.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="1.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="2.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="2.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="3.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="3.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="10.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="10.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="19.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="20.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="20.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="21.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="21.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="22.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="22.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="24.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="24.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="25.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="27.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="28.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="28.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="31.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="31.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="32.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="32.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="33.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="33.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="37.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="37.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="38.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="38.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="39.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="39.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="40.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="40.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="42.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="43.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="44.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="45.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="46.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="49.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="49.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="50.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="50.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="51.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="51.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="52.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="52.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="58.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="58.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="60.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="60.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="61.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="63.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="64.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="64.08" y="1.08" width="0.84" height="0.84" rx="0.185"/></svg>
+  <nav>
+    <span>Guide</span>
+    <a href="#meet"><i>01</i>Meet the pet</a>
+    <a href="#button"><i>02</i>One button</a>
+    <a href="#moods"><i>03</i>Left to itself</a>
+    <a href="#aminal"><i>04</i>Aminal's face</a>
+    <a href="#media"><i>05</i>Music and films</a>
+    <a href="#screens"><i>06</i>Screens and cards</a>
+    <a href="#tries"><i>07</i>Things to try</a>
+    <span>Inside</span>
+    <a href="#system"><i>08</i>How it fits together</a>
+    <a href="#wiring"><i>09</i>Wiring</a>
+    <a href="#firmware"><i>10</i>The firmware</a>
+    <a href="#protocol"><i>11</i>The protocol</a>
+    <a href="#hearing"><i>12</i>How it hears music</a>
+    <a href="#wifi"><i>13</i>WiFi</a>
+    <a href="#build"><i>14</i>Building and uploading</a>
+    <a href="#trouble"><i>15</i>When something's off</a>
+  </nav>
+  <div class="files">
+    <a href="Desktop-pet-Handbook.pdf">PDF edition</a>
+    <a href="https://github.com/BiswasMosam/Desktop-pet">Source on GitHub</a>
+  </div>
+</aside>
+
+<main>
+
+<!-- ============================ COVER ============================ -->
+<header class="cover" id="top">
+  <div class="cover__top"><span>Handbook · Rev. 1 · 29 Sep 2026</span><span>Firmware v6</span></div>
+  <div>
+    <svg class="wordmark" viewBox="0 0 65 8" role="img" aria-label="Desktop-pet"><rect x="0.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="1.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="1.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="2.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="2.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="3.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="3.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="10.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="10.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="19.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="20.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="20.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="21.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="21.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="22.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="22.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="24.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="24.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="25.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="27.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="28.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="28.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="31.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="31.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="32.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="32.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="33.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="33.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="37.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="37.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="38.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="38.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="39.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="39.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="40.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="40.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="42.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="43.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="44.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="45.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="46.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="49.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="49.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="50.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="50.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="51.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="51.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="52.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="52.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="58.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="58.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="60.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="60.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="61.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="63.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="64.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="64.08" y="1.08" width="0.84" height="0.84" rx="0.185"/></svg>
+    <div class="cover__sub">User guide and technical notes</div>
+    <p class="lede">A small face that lives on the desk. Two rounded eyes on a 0.96 inch OLED glance around, blink, cheer up when you pet it and fall asleep when you ignore it. Plugged into the PC it becomes the face of Aminal, my voice assistant, and it keeps the time, shows the weather, runs timers and dances to your music.</p>
+  </div>
+  <div class="cover__art">
+    <div class="module" aria-label="The pet's OLED module">
+      <span class="hole"></span><span class="hole"></span><span class="hole"></span><span class="hole"></span>
+      <div class="pins"><span>GND</span><span>VCC</span><span>SCL</span><span>SDA</span></div>
+      <div class="glass"><img src="shots/idle.gif" alt="The pet, idle: real capture" width="512" height="256"></div>
+    </div>
+  </div>
+  <div class="cover__grid">
+    <div><span class="lbl">Board</span><div>WeAct Black Pill, STM32F401CC or F411CE</div></div>
+    <div><span class="lbl">Display</span><div>SSD1306 OLED, 128 × 64 pixels, I2C</div></div>
+    <div><span class="lbl">Input</span><div>One button, KEY</div></div>
+    <div><span class="lbl">Links</span><div>USB, Bluetooth (HC-05), WiFi (ESP-01)</div></div>
+  </div>
+</header>
+
+
+
+<!-- ============================ 01 MEET ============================ -->
+<section class="ch" id="meet">
+  <span class="lbl">Guide · 01</span>
+  <h2>Meet the pet</h2>
+  <p>Desktop-pet is a face for the desk. It runs on a WeAct Black Pill, a thumb-sized board with an STM32 chip on it, and draws on a 128 × 64 OLED about the size of a postage stamp. It has one button, called KEY, and that is the only way to touch it.</p>
+  <p>On its own it behaves like a small animal: it looks around, blinks, fidgets, enjoys being petted and dozes off when nobody pays attention. Connected to the PC it also becomes the face of Aminal, my voice assistant, and a small dashboard for the time, the weather, timers, reminders, and whatever music or film is playing.</p>
+  <div class="tscroll"><table>
+    <thead><tr><th>How it's connected</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td class="f">USB cable to the PC</td><td>Everything. The fastest link, and the one Aminal always prefers.</td></tr>
+      <tr><td class="f">Bluetooth, on a charger</td><td>Everything, a little slower. Aminal finds it within 15 seconds of the cable coming out.</td></tr>
+      <tr><td class="f">A charger, PC off</td><td>Still a pet, still keeping the clock it was last given. With the WiFi module working, it fetches its own time and weather.</td></tr>
+    </tbody>
+  </table></div>
+  
+  <div class="note">
+    <span class="lbl">About the pictures</span>
+    <p>Every screen on this page is a real capture. The pet was asked for its frame buffer 28 times a second over USB (the <code>SN</code> command, chapter 11), and the frames became these animations, pixel for pixel. The time, the weather and the timers are example values sent to the pet for the pictures.</p>
+  </div>
+  
+</section>
+
+<!-- ============================ 02 BUTTON ============================ -->
+<section class="ch" id="button">
+  <span class="lbl">Guide · 02</span>
+  <h2>One button</h2>
+  <p>KEY is the small button beside the USB socket. The other one, NRST, restarts the board. What a press does depends on what is on the screen.</p>
+  <div class="tscroll"><table>
+    <thead><tr><th>Press</th><th>On the face</th><th>On any other screen</th></tr></thead>
+    <tbody>
+      <tr><td class="f">Tap</td><td>Pets it: happy for 2.5 seconds</td><td>Next screen</td></tr>
+      <tr><td class="f">Three taps</td><td>Falls in love: two beating hearts. Each tap within 1.5 s of the last.</td><td>Three screens on</td></tr>
+      <tr><td class="f">Double tap</td><td>Pets it, then flips to the next screen. Second tap within 0.35 s.</td><td>Two screens on</td></tr>
+      <tr><td class="f">Hold, 0.7 s</td><td>Back to the face</td><td>On the timer: pause or carry on. Anywhere else: back to the face.</td></tr>
+    </tbody>
+  </table></div>
+  <p>A tap also puts away a card. The screens come round in this order: face, clock, weather, timer (only while one is running) and status. A screen you flip to goes back to the face by itself after 20 seconds.</p>
+  <div class="dwrap">
+    <svg class="diagram" viewBox="0 0 660 200" role="img" aria-label="Button timing for a tap, a double tap and a hold">
+      <text class="d-p" x="0" y="46">Tap</text>
+      <text class="d-p" x="0" y="100">Double tap</text>
+      <text class="d-p" x="0" y="154">Hold</text>
+      <line class="d-line" x1="130" y1="178" x2="650" y2="178"/>
+      <g class="d-line">
+        <line x1="130" y1="174" x2="130" y2="182"/><line x1="270" y1="174" x2="270" y2="182"/>
+        <line x1="410" y1="174" x2="410" y2="182"/><line x1="530" y1="174" x2="530" y2="182"/>
+      </g>
+      <text class="d-s" x="130" y="196" text-anchor="middle">0</text>
+      <text class="d-s" x="270" y="196" text-anchor="middle">0.35 s</text>
+      <text class="d-s" x="410" y="196" text-anchor="middle">0.7 s</text>
+      <text class="d-s" x="530" y="196" text-anchor="middle">1 s</text>
+      <rect class="d-press" x="130" y="36" width="56" height="14" rx="3"/>
+      <text class="d-s" x="198" y="47">pets it the moment you let go</text>
+      <rect class="d-press" x="130" y="90" width="46" height="14" rx="3"/>
+      <rect class="d-press" x="236" y="90" width="46" height="14" rx="3"/>
+      <path class="d-dash" d="M176 84 V78 H316 V84"/>
+      <text class="d-s" x="246" y="72" text-anchor="middle">second tap within 0.35 s</text>
+      <text class="d-s" x="294" y="101">next screen</text>
+      <rect class="d-press" x="130" y="144" width="400" height="14" rx="3"/>
+      <line class="d-lit" x1="410" y1="132" x2="410" y2="166"/>
+      <text class="d-l" x="416" y="138">acts here, still held</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============================ 03 MOODS ============================ -->
+<section class="ch" id="moods">
+  <span class="lbl">Guide · 03</span>
+  <h2>Left to itself</h2>
+  <p>The pet is never quite still. Every 1.5 to 4 seconds it glances somewhere new, and it blinks every 2.5 to 6 seconds. Every 15 to 40 seconds it also does one small habit, picked at random: a good look left and then right, a little hop, a suspicious squint, or a double blink.</p>
+  <div class="films">
+    <figure class="fig wide"><div class="oled"><img src="shots/idle.gif" alt="Idle: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Idle</b> Glancing right, blinking, looking up to the left, then down. Four moments from 15 seconds of doing nothing.</figcaption></figure>
+  </div>
+  <div class="grid g3">
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Happy" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M27 12h22.03v1.04h-22.03zM79 12h22.03v1.04h-22.03zM25 13h26.03v1.04h-26.03zM77 13h26.03v1.04h-26.03zM24 14h28.03v1.04h-28.03zM76 14h28.03v1.04h-28.03zM23 15h30.03v1.04h-30.03zM75 15h30.03v1.04h-30.03zM22 16h32.03v1.04h-32.03zM74 16h32.03v1.04h-32.03zM21 17h34.03v1.04h-34.03zM73 17h34.03v1.04h-34.03zM21 18h34.03v1.04h-34.03zM73 18h34.03v1.04h-34.03zM20 19h36.03v1.04h-36.03zM72 19h36.03v1.04h-36.03zM20 20h36.03v1.04h-36.03zM72 20h36.03v1.04h-36.03zM20 21h36.03v1.04h-36.03zM72 21h36.03v1.04h-36.03zM20 22h36.03v1.04h-36.03zM72 22h36.03v1.04h-36.03zM20 23h36.03v1.04h-36.03zM72 23h36.03v1.04h-36.03zM20 24h36.03v1.04h-36.03zM72 24h36.03v1.04h-36.03zM20 25h36.03v1.04h-36.03zM72 25h36.03v1.04h-36.03zM20 26h36.03v1.04h-36.03zM72 26h36.03v1.04h-36.03zM20 27h36.03v1.04h-36.03zM72 27h36.03v1.04h-36.03zM20 28h36.03v1.04h-36.03zM72 28h36.03v1.04h-36.03zM20 29h36.03v1.04h-36.03zM72 29h36.03v1.04h-36.03zM20 30h36.03v1.04h-36.03zM72 30h36.03v1.04h-36.03zM20 31h36.03v1.04h-36.03zM72 31h36.03v1.04h-36.03zM20 32h36.03v1.04h-36.03zM72 32h36.03v1.04h-36.03zM20 33h36.03v1.04h-36.03zM72 33h36.03v1.04h-36.03zM20 34h36.03v1.04h-36.03zM72 34h36.03v1.04h-36.03zM20 35h14.03v1.04h-14.03zM43 35h13.03v1.04h-13.03zM72 35h14.03v1.04h-14.03zM95 35h13.03v1.04h-13.03zM20 36h11.03v1.04h-11.03zM46 36h10.03v1.04h-10.03zM72 36h11.03v1.04h-11.03zM98 36h10.03v1.04h-10.03zM20 37h9.03v1.04h-9.03zM48 37h8.03v1.04h-8.03zM72 37h9.03v1.04h-9.03zM100 37h8.03v1.04h-8.03zM20 38h7.03v1.04h-7.03zM50 38h6.03v1.04h-6.03zM72 38h7.03v1.04h-7.03zM102 38h6.03v1.04h-6.03zM20 39h6.03v1.04h-6.03zM51 39h5.03v1.04h-5.03zM72 39h6.03v1.04h-6.03zM103 39h5.03v1.04h-5.03zM21 40h3.03v1.04h-3.03zM53 40h2.03v1.04h-2.03zM73 40h3.03v1.04h-3.03zM105 40h2.03v1.04h-2.03zM21 41h2.03v1.04h-2.03zM54 41h1.03v1.04h-1.03zM73 41h2.03v1.04h-2.03zM106 41h1.03v1.04h-1.03z"/></svg></div><figcaption><b>Happy</b> Tap once. The eyes lift and curve into arcs for 2.5 seconds.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/em_love.gif" alt="In love: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>In love</b> Tap three times, each within 1.5 s of the last. Two hearts beat for 2.5 seconds.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/sleepy.gif" alt="Asleep: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Asleep</b> Ignore it for 30 seconds, or 10 after 11 pm. The eyes droop to slits, z's float up and the time shows in the corner.</figcaption></figure>
+  </div>
+  <h3>Faces Aminal can ask for</h3>
+  <p>Aminal can make the pet pull any of seven faces for as long as it likes, 3 seconds unless it says otherwise: happy, love, surprised, sad, angry, wink and sleepy. The pet also looks surprised by itself when a timer runs out or a film suddenly gets loud.</p>
+  <div class="grid g4">
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Surprised" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M29 11h18.03v1.04h-18.03zM81 11h18.03v1.04h-18.03zM27 12h22.03v1.04h-22.03zM79 12h22.03v1.04h-22.03zM26 13h24.03v1.04h-24.03zM78 13h24.03v1.04h-24.03zM25 14h26.03v1.04h-26.03zM77 14h26.03v1.04h-26.03zM24 15h28.03v1.04h-28.03zM76 15h28.03v1.04h-28.03zM23 16h30.03v1.04h-30.03zM75 16h30.03v1.04h-30.03zM23 17h30.03v1.04h-30.03zM75 17h30.03v1.04h-30.03zM22 18h32.03v1.04h-32.03zM74 18h32.03v1.04h-32.03zM22 19h32.03v1.04h-32.03zM74 19h32.03v1.04h-32.03zM22 20h32.03v1.04h-32.03zM74 20h32.03v1.04h-32.03zM22 21h32.03v1.04h-32.03zM74 21h32.03v1.04h-32.03zM22 22h32.03v1.04h-32.03zM74 22h32.03v1.04h-32.03zM22 23h32.03v1.04h-32.03zM74 23h32.03v1.04h-32.03zM22 24h32.03v1.04h-32.03zM74 24h32.03v1.04h-32.03zM22 25h32.03v1.04h-32.03zM74 25h32.03v1.04h-32.03zM22 26h32.03v1.04h-32.03zM74 26h32.03v1.04h-32.03zM22 27h32.03v1.04h-32.03zM74 27h32.03v1.04h-32.03zM22 28h32.03v1.04h-32.03zM74 28h32.03v1.04h-32.03zM22 29h32.03v1.04h-32.03zM74 29h32.03v1.04h-32.03zM22 30h32.03v1.04h-32.03zM74 30h32.03v1.04h-32.03zM22 31h32.03v1.04h-32.03zM74 31h32.03v1.04h-32.03zM22 32h32.03v1.04h-32.03zM74 32h32.03v1.04h-32.03zM22 33h32.03v1.04h-32.03zM74 33h32.03v1.04h-32.03zM22 34h32.03v1.04h-32.03zM74 34h32.03v1.04h-32.03zM22 35h32.03v1.04h-32.03zM74 35h32.03v1.04h-32.03zM22 36h32.03v1.04h-32.03zM74 36h32.03v1.04h-32.03zM22 37h32.03v1.04h-32.03zM74 37h32.03v1.04h-32.03zM22 38h32.03v1.04h-32.03zM74 38h32.03v1.04h-32.03zM22 39h32.03v1.04h-32.03zM74 39h32.03v1.04h-32.03zM22 40h32.03v1.04h-32.03zM74 40h32.03v1.04h-32.03zM22 41h32.03v1.04h-32.03zM74 41h32.03v1.04h-32.03zM22 42h32.03v1.04h-32.03zM74 42h32.03v1.04h-32.03zM22 43h32.03v1.04h-32.03zM74 43h32.03v1.04h-32.03zM22 44h32.03v1.04h-32.03zM74 44h32.03v1.04h-32.03zM23 45h30.03v1.04h-30.03zM75 45h30.03v1.04h-30.03zM23 46h30.03v1.04h-30.03zM75 46h30.03v1.04h-30.03zM24 47h28.03v1.04h-28.03zM76 47h28.03v1.04h-28.03zM25 48h26.03v1.04h-26.03zM77 48h26.03v1.04h-26.03zM26 49h24.03v1.04h-24.03zM78 49h24.03v1.04h-24.03zM27 50h22.03v1.04h-22.03zM79 50h22.03v1.04h-22.03zM29 51h18.03v1.04h-18.03zM81 51h18.03v1.04h-18.03zM63 54h3.03v1.04h-3.03zM62 55h5.03v1.04h-5.03zM61 56h7.03v1.04h-7.03zM61 57h7.03v1.04h-7.03zM61 58h7.03v1.04h-7.03zM62 59h5.03v1.04h-5.03zM63 60h3.03v1.04h-3.03z"/></svg></div><figcaption><b>Surprised</b> Tall eyes and a small round mouth.</figcaption></figure>
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Sad" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M45 22h4.03v1.04h-4.03zM80 22h4.03v1.04h-4.03zM43 23h8.03v1.04h-8.03zM78 23h8.03v1.04h-8.03zM42 24h10.03v1.04h-10.03zM77 24h10.03v1.04h-10.03zM40 25h13.03v1.04h-13.03zM76 25h13.03v1.04h-13.03zM39 26h15.03v1.04h-15.03zM75 26h15.03v1.04h-15.03zM37 27h18.03v1.04h-18.03zM74 27h18.03v1.04h-18.03zM36 28h19.03v1.04h-19.03zM74 28h19.03v1.04h-19.03zM34 29h22.03v1.04h-22.03zM73 29h22.03v1.04h-22.03zM32 30h24.03v1.04h-24.03zM73 30h24.03v1.04h-24.03zM31 31h25.03v1.04h-25.03zM73 31h25.03v1.04h-25.03zM29 32h27.03v1.04h-27.03zM73 32h27.03v1.04h-27.03zM28 33h28.03v1.04h-28.03zM73 33h28.03v1.04h-28.03zM26 34h30.03v1.04h-30.03zM73 34h30.03v1.04h-30.03zM25 35h31.03v1.04h-31.03zM73 35h31.03v1.04h-31.03zM23 36h33.03v1.04h-33.03zM73 36h33.03v1.04h-33.03zM21 37h35.03v1.04h-35.03zM73 37h35.03v1.04h-35.03zM21 38h35.03v1.04h-35.03zM73 38h35.03v1.04h-35.03zM21 39h35.03v1.04h-35.03zM73 39h35.03v1.04h-35.03zM21 40h35.03v1.04h-35.03zM73 40h35.03v1.04h-35.03zM21 41h35.03v1.04h-35.03zM73 41h35.03v1.04h-35.03zM21 42h35.03v1.04h-35.03zM73 42h35.03v1.04h-35.03zM21 43h35.03v1.04h-35.03zM73 43h35.03v1.04h-35.03zM21 44h35.03v1.04h-35.03zM73 44h35.03v1.04h-35.03zM22 45h33.03v1.04h-33.03zM74 45h33.03v1.04h-33.03zM22 46h33.03v1.04h-33.03zM74 46h33.03v1.04h-33.03zM23 47h31.03v1.04h-31.03zM75 47h31.03v1.04h-31.03zM24 48h29.03v1.04h-29.03zM76 48h29.03v1.04h-29.03zM25 49h27.03v1.04h-27.03zM77 49h27.03v1.04h-27.03zM26 50h25.03v1.04h-25.03zM78 50h25.03v1.04h-25.03zM28 51h21.03v1.04h-21.03zM80 51h21.03v1.04h-21.03z"/></svg></div><figcaption><b>Sad</b> The outer corners droop.</figcaption></figure>
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Angry" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M27 20h5.03v1.04h-5.03zM97 20h5.03v1.04h-5.03zM25 21h9.03v1.04h-9.03zM95 21h9.03v1.04h-9.03zM24 22h12.03v1.04h-12.03zM93 22h12.03v1.04h-12.03zM23 23h14.03v1.04h-14.03zM92 23h14.03v1.04h-14.03zM22 24h17.03v1.04h-17.03zM90 24h17.03v1.04h-17.03zM21 25h20.03v1.04h-20.03zM88 25h20.03v1.04h-20.03zM21 26h22.03v1.04h-22.03zM86 26h22.03v1.04h-22.03zM20 27h24.03v1.04h-24.03zM85 27h24.03v1.04h-24.03zM20 28h26.03v1.04h-26.03zM83 28h26.03v1.04h-26.03zM20 29h28.03v1.04h-28.03zM81 29h28.03v1.04h-28.03zM20 30h30.03v1.04h-30.03zM79 30h30.03v1.04h-30.03zM20 31h31.03v1.04h-31.03zM78 31h31.03v1.04h-31.03zM20 32h33.03v1.04h-33.03zM76 32h33.03v1.04h-33.03zM20 33h35.03v1.04h-35.03zM74 33h35.03v1.04h-35.03zM20 34h37.03v1.04h-37.03zM72 34h37.03v1.04h-37.03zM20 35h37.03v1.04h-37.03zM72 35h37.03v1.04h-37.03zM20 36h37.03v1.04h-37.03zM72 36h37.03v1.04h-37.03zM20 37h37.03v1.04h-37.03zM72 37h37.03v1.04h-37.03zM20 38h37.03v1.04h-37.03zM72 38h37.03v1.04h-37.03zM20 39h37.03v1.04h-37.03zM72 39h37.03v1.04h-37.03zM20 40h37.03v1.04h-37.03zM72 40h37.03v1.04h-37.03zM21 41h35.03v1.04h-35.03zM73 41h35.03v1.04h-35.03zM21 42h35.03v1.04h-35.03zM73 42h35.03v1.04h-35.03zM22 43h33.03v1.04h-33.03zM74 43h33.03v1.04h-33.03zM23 44h31.03v1.04h-31.03zM75 44h31.03v1.04h-31.03zM24 45h29.03v1.04h-29.03zM76 45h29.03v1.04h-29.03zM25 46h27.03v1.04h-27.03zM77 46h27.03v1.04h-27.03zM27 47h23.03v1.04h-23.03zM79 47h23.03v1.04h-23.03z"/></svg></div><figcaption><b>Angry</b> The inner corners pull down.</figcaption></figure>
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Wink" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M27 14h22.03v1.04h-22.03zM25 15h26.03v1.04h-26.03zM24 16h28.03v1.04h-28.03zM23 17h30.03v1.04h-30.03zM22 18h32.03v1.04h-32.03zM21 19h34.03v1.04h-34.03zM21 20h34.03v1.04h-34.03zM20 21h36.03v1.04h-36.03zM20 22h36.03v1.04h-36.03zM20 23h36.03v1.04h-36.03zM20 24h36.03v1.04h-36.03zM20 25h36.03v1.04h-36.03zM20 26h36.03v1.04h-36.03zM20 27h36.03v1.04h-36.03zM20 28h36.03v1.04h-36.03zM20 29h36.03v1.04h-36.03zM20 30h36.03v1.04h-36.03zM20 31h36.03v1.04h-36.03zM20 32h36.03v1.04h-36.03zM20 33h36.03v1.04h-36.03zM20 34h36.03v1.04h-36.03zM20 35h36.03v1.04h-36.03zM20 36h36.03v1.04h-36.03zM20 37h36.03v1.04h-36.03zM73 37h34.03v1.04h-34.03zM20 38h36.03v1.04h-36.03zM72 38h36.03v1.04h-36.03zM20 39h36.03v1.04h-36.03zM72 39h36.03v1.04h-36.03zM20 40h36.03v1.04h-36.03zM73 40h34.03v1.04h-34.03zM20 41h36.03v1.04h-36.03zM21 42h34.03v1.04h-34.03zM21 43h34.03v1.04h-34.03zM22 44h32.03v1.04h-32.03zM23 45h30.03v1.04h-30.03zM24 46h28.03v1.04h-28.03zM25 47h26.03v1.04h-26.03zM27 48h22.03v1.04h-22.03z"/></svg></div><figcaption><b>Wink</b> One eye closes to a line.</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============================ 04 AMINAL ============================ -->
+<section class="ch" id="aminal">
+  <span class="lbl">Guide · 04</span>
+  <h2>Aminal's face</h2>
+  <p>While Aminal runs, the pet shows what it is doing. The bridge (chapter 08) sends Aminal's state and the loudness of the voice up to 20 times a second, so the eyes keep up with speech.</p>
+  <div class="films grid g3">
+    <figure class="fig"><div class="oled"><img src="shots/listening.gif" alt="Listening: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Listening</b> Eyes wide open, swelling with the loudness of your voice.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/thinking.gif" alt="Thinking: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Thinking</b> Looking up and off to one side, switching sides every second or so, while three dots fill in.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/speaking.gif" alt="Speaking: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Speaking</b> The eyes lift to make room for a mouth that opens with Aminal's voice.</figcaption></figure>
+  </div>
+  <h3>It follows the conversation</h3>
+  <ul class="tick">
+    <li>Start talking to Aminal while the clock or the weather is up, and the pet flips back to the face to listen.</li>
+    <li>Ask for the weather or a timer, and it shows that screen while Aminal answers.</li>
+    <li>Answers that carry a reminder, mail or what's next on the calendar arrive as a card (chapter 06).</li>
+    <li>When Aminal connects, the pet greets it with a happy face. When Aminal closes, the pet waits 8 seconds for another message and then carries on by itself.</li>
+  </ul>
+</section>
+
+<!-- ============================ 05 MEDIA ============================ -->
+<section class="ch" id="media">
+  <span class="lbl">Guide · 05</span>
+  <h2>Music and films</h2>
+  <p>When music plays, the pet joins in with one of three moods, picked at random and changed every 25 to 45 seconds. It rarely picks the same mood twice in a row.</p>
+  <div class="films grid g3">
+    <figure class="fig"><div class="oled"><img src="shots/headphones.gif" alt="Headphones: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Headphones</b> Headphones on, eyes shut and happy, nodding on every beat. Every nine seconds or so it opens its eyes for a look around (third frame).</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/dance.gif" alt="Dancing: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Dancing</b> Sways from side to side and hops on the beat. A note floats up on every second beat.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/bars.gif" alt="Visualizer: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Visualizer</b> The whole screen turns into 16 bars of what the speakers are playing, low notes on the left, with peak marks that fall back slowly. Captured with test bars sent over USB.</figcaption></figure>
+  </div>
+  <h3>Films</h3>
+  <p>Put on Netflix, Prime Video or Hotstar and it looks up at the screen with a striped bucket of popcorn.</p>
+  <div class="films grid g2">
+    <figure class="fig"><div class="oled"><img src="shots/watch.gif" alt="Popcorn: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Popcorn</b> Every 3.5 to 7 seconds it flicks a kernel out of the bucket, catches it and chews.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/jump.gif" alt="A loud scene: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>A loud scene</b> When the sound suddenly jumps, so does the pet: surprised eyes, and four kernels fly out of the bucket.</figcaption></figure>
+  </div>
+  <h3>How it tells them apart</h3>
+  <p>Aminal decides from the app and the window title, never from the sound itself. Spotify is music. A browser tab that says Netflix is a film. A video player showing an .mp3 is music. Anything it can't name for certain, such as a game, a video call or a YouTube video, gets no reaction at all.</p>
+  <ul class="tick">
+    <li>A new kind of sound has to play for 2 seconds before the pet reacts, so a notification chime is not a song.</li>
+    <li>Silence has to last 6 seconds before it stops, so the gap between two tracks doesn't end the dance.</li>
+    <li>When several apps make sound, the loudest one it can name wins, so a chime during a film doesn't take the popcorn away.</li>
+    <li>Without beats from the PC, it dances to a steady 115 beats a minute of its own.</li>
+  </ul>
+</section>
+
+<!-- ============================ 06 SCREENS ============================ -->
+<section class="ch" id="screens">
+  <span class="lbl">Guide · 06</span>
+  <h2>Screens and cards</h2>
+  <div class="grid g4">
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Clock" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M0 0h5.03v1.04h-5.03zM25 0h3.03v1.04h-3.03zM31 0h3.03v1.04h-3.03zM43 0h3.03v1.04h-3.03zM110 0h1.03v1.04h-1.03zM114 0h1.03v1.04h-1.03zM117 0h3.03v1.04h-3.03zM122 0h4.03v1.04h-4.03zM0 1h1.03v1.04h-1.03zM2 1h1.03v1.04h-1.03zM4 1h1.03v1.04h-1.03zM24 1h1.03v1.04h-1.03zM28 1h1.03v1.04h-1.03zM30 1h1.03v1.04h-1.03zM34 1h1.03v1.04h-1.03zM42 1h1.03v1.04h-1.03zM46 1h1.03v1.04h-1.03zM110 1h1.03v1.04h-1.03zM114 1h1.03v1.04h-1.03zM116 1h1.03v1.04h-1.03zM120 1h1.03v1.04h-1.03zM122 1h1.03v1.04h-1.03zM126 1h1.03v1.04h-1.03zM2 2h1.03v1.04h-1.03zM6 2h1.03v1.04h-1.03zM10 2h1.03v1.04h-1.03zM13 2h3.03v1.04h-3.03zM28 2h1.03v1.04h-1.03zM30 2h1.03v1.04h-1.03zM34 2h1.03v1.04h-1.03zM42 2h1.03v1.04h-1.03zM49 2h3.03v1.04h-3.03zM54 2h1.03v1.04h-1.03zM56 2h2.03v1.04h-2.03zM110 2h1.03v1.04h-1.03zM114 2h1.03v1.04h-1.03zM116 2h1.03v1.04h-1.03zM122 2h1.03v1.04h-1.03zM126 2h1.03v1.04h-1.03zM2 3h1.03v1.04h-1.03zM6 3h1.03v1.04h-1.03zM10 3h1.03v1.04h-1.03zM12 3h1.03v1.04h-1.03zM16 3h1.03v1.04h-1.03zM25 3h3.03v1.04h-3.03zM31 3h4.03v1.04h-4.03zM43 3h3.03v1.04h-3.03zM48 3h1.03v1.04h-1.03zM52 3h1.03v1.04h-1.03zM54 3h2.03v1.04h-2.03zM58 3h1.03v1.04h-1.03zM110 3h1.03v1.04h-1.03zM114 3h1.03v1.04h-1.03zM117 3h3.03v1.04h-3.03zM122 3h4.03v1.04h-4.03zM2 4h1.03v1.04h-1.03zM6 4h1.03v1.04h-1.03zM10 4h1.03v1.04h-1.03zM12 4h5.03v1.04h-5.03zM24 4h1.03v1.04h-1.03zM34 4h1.03v1.04h-1.03zM46 4h1.03v1.04h-1.03zM48 4h5.03v1.04h-5.03zM54 4h2.03v1.04h-2.03zM58 4h1.03v1.04h-1.03zM110 4h1.03v1.04h-1.03zM114 4h1.03v1.04h-1.03zM120 4h1.03v1.04h-1.03zM122 4h1.03v1.04h-1.03zM126 4h1.03v1.04h-1.03zM2 5h1.03v1.04h-1.03zM6 5h1.03v1.04h-1.03zM9 5h2.03v1.04h-2.03zM12 5h1.03v1.04h-1.03zM24 5h1.03v1.04h-1.03zM33 5h1.03v1.04h-1.03zM42 5h1.03v1.04h-1.03zM46 5h1.03v1.04h-1.03zM48 5h1.03v1.04h-1.03zM54 5h1.03v1.04h-1.03zM56 5h2.03v1.04h-2.03zM110 5h1.03v1.04h-1.03zM114 5h1.03v1.04h-1.03zM116 5h1.03v1.04h-1.03zM120 5h1.03v1.04h-1.03zM122 5h1.03v1.04h-1.03zM126 5h1.03v1.04h-1.03zM2 6h1.03v1.04h-1.03zM7 6h2.03v1.04h-2.03zM10 6h1.03v1.04h-1.03zM13 6h3.03v1.04h-3.03zM24 6h5.03v1.04h-5.03zM30 6h3.03v1.04h-3.03zM43 6h3.03v1.04h-3.03zM49 6h3.03v1.04h-3.03zM54 6h1.03v1.04h-1.03zM111 6h3.03v1.04h-3.03zM117 6h3.03v1.04h-3.03zM122 6h4.03v1.04h-4.03zM54 7h1.03v1.04h-1.03zM25 18h3.03v1.04h-3.03zM40 18h7.03v1.04h-7.03zM72 18h6.03v1.04h-6.03zM87 18h7.03v1.04h-7.03zM24 19h4.03v1.04h-4.03zM38 19h11.03v1.04h-11.03zM72 19h6.03v1.04h-6.03zM85 19h11.03v1.04h-11.03zM24 20h4.03v1.04h-4.03zM37 20h13.03v1.04h-13.03zM71 20h7.03v1.04h-7.03zM84 20h13.03v1.04h-13.03zM23 21h5.03v1.04h-5.03zM37 21h13.03v1.04h-13.03zM71 21h7.03v1.04h-7.03zM83 21h15.03v1.04h-15.03zM21 22h7.03v1.04h-7.03zM36 22h6.03v1.04h-6.03zM45 22h6.03v1.04h-6.03zM70 22h8.03v1.04h-8.03zM83 22h6.03v1.04h-6.03zM92 22h6.03v1.04h-6.03zM18 23h10.03v1.04h-10.03zM36 23h5.03v1.04h-5.03zM46 23h5.03v1.04h-5.03zM69 23h3.03v1.04h-3.03zM73 23h5.03v1.04h-5.03zM82 23h6.03v1.04h-6.03zM93 23h6.03v1.04h-6.03zM18 24h10.03v1.04h-10.03zM36 24h5.03v1.04h-5.03zM46 24h5.03v1.04h-5.03zM69 24h3.03v1.04h-3.03zM73 24h5.03v1.04h-5.03zM82 24h5.03v1.04h-5.03zM94 24h5.03v1.04h-5.03zM18 25h10.03v1.04h-10.03zM35 25h5.03v1.04h-5.03zM47 25h5.03v1.04h-5.03zM55 25h5.03v1.04h-5.03zM68 25h3.03v1.04h-3.03zM73 25h5.03v1.04h-5.03zM82 25h5.03v1.04h-5.03zM94 25h5.03v1.04h-5.03zM23 26h5.03v1.04h-5.03zM35 26h5.03v1.04h-5.03zM47 26h5.03v1.04h-5.03zM55 26h5.03v1.04h-5.03zM68 26h3.03v1.04h-3.03zM73 26h5.03v1.04h-5.03zM82 26h5.03v1.04h-5.03zM94 26h5.03v1.04h-5.03zM23 27h5.03v1.04h-5.03zM35 27h5.03v1.04h-5.03zM47 27h5.03v1.04h-5.03zM55 27h5.03v1.04h-5.03zM67 27h3.03v1.04h-3.03zM73 27h5.03v1.04h-5.03zM94 27h5.03v1.04h-5.03zM23 28h5.03v1.04h-5.03zM35 28h5.03v1.04h-5.03zM47 28h5.03v1.04h-5.03zM55 28h5.03v1.04h-5.03zM67 28h2.03v1.04h-2.03zM73 28h5.03v1.04h-5.03zM93 28h6.03v1.04h-6.03zM23 29h5.03v1.04h-5.03zM35 29h5.03v1.04h-5.03zM47 29h5.03v1.04h-5.03zM55 29h5.03v1.04h-5.03zM66 29h3.03v1.04h-3.03zM73 29h5.03v1.04h-5.03zM93 29h5.03v1.04h-5.03zM23 30h5.03v1.04h-5.03zM35 30h5.03v1.04h-5.03zM47 30h5.03v1.04h-5.03zM65 30h3.03v1.04h-3.03zM73 30h5.03v1.04h-5.03zM92 30h6.03v1.04h-6.03zM23 31h5.03v1.04h-5.03zM35 31h5.03v1.04h-5.03zM47 31h5.03v1.04h-5.03zM65 31h2.03v1.04h-2.03zM73 31h5.03v1.04h-5.03zM91 31h6.03v1.04h-6.03zM23 32h5.03v1.04h-5.03zM35 32h5.03v1.04h-5.03zM47 32h5.03v1.04h-5.03zM64 32h3.03v1.04h-3.03zM73 32h5.03v1.04h-5.03zM89 32h7.03v1.04h-7.03zM23 33h5.03v1.04h-5.03zM35 33h5.03v1.04h-5.03zM47 33h5.03v1.04h-5.03zM64 33h16.03v1.04h-16.03zM88 33h7.03v1.04h-7.03zM23 34h5.03v1.04h-5.03zM35 34h5.03v1.04h-5.03zM47 34h5.03v1.04h-5.03zM64 34h16.03v1.04h-16.03zM87 34h6.03v1.04h-6.03zM23 35h5.03v1.04h-5.03zM35 35h5.03v1.04h-5.03zM47 35h5.03v1.04h-5.03zM64 35h16.03v1.04h-16.03zM86 35h6.03v1.04h-6.03zM23 36h5.03v1.04h-5.03zM36 36h5.03v1.04h-5.03zM46 36h5.03v1.04h-5.03zM64 36h16.03v1.04h-16.03zM85 36h5.03v1.04h-5.03zM103 36h2.03v1.04h-2.03zM108 36h2.03v1.04h-2.03zM111 36h1.03v1.04h-1.03zM23 37h5.03v1.04h-5.03zM36 37h5.03v1.04h-5.03zM46 37h5.03v1.04h-5.03zM73 37h5.03v1.04h-5.03zM84 37h5.03v1.04h-5.03zM105 37h1.03v1.04h-1.03zM108 37h1.03v1.04h-1.03zM110 37h1.03v1.04h-1.03zM112 37h1.03v1.04h-1.03zM23 38h5.03v1.04h-5.03zM36 38h6.03v1.04h-6.03zM45 38h6.03v1.04h-6.03zM55 38h5.03v1.04h-5.03zM73 38h5.03v1.04h-5.03zM84 38h5.03v1.04h-5.03zM103 38h3.03v1.04h-3.03zM108 38h1.03v1.04h-1.03zM110 38h1.03v1.04h-1.03zM112 38h1.03v1.04h-1.03zM23 39h5.03v1.04h-5.03zM37 39h13.03v1.04h-13.03zM55 39h5.03v1.04h-5.03zM73 39h5.03v1.04h-5.03zM83 39h16.03v1.04h-16.03zM102 39h1.03v1.04h-1.03zM105 39h1.03v1.04h-1.03zM108 39h1.03v1.04h-1.03zM110 39h1.03v1.04h-1.03zM112 39h1.03v1.04h-1.03zM23 40h5.03v1.04h-5.03zM37 40h13.03v1.04h-13.03zM55 40h5.03v1.04h-5.03zM73 40h5.03v1.04h-5.03zM83 40h16.03v1.04h-16.03zM103 40h4.03v1.04h-4.03zM108 40h1.03v1.04h-1.03zM110 40h1.03v1.04h-1.03zM112 40h1.03v1.04h-1.03zM23 41h5.03v1.04h-5.03zM38 41h11.03v1.04h-11.03zM55 41h5.03v1.04h-5.03zM73 41h5.03v1.04h-5.03zM83 41h16.03v1.04h-16.03zM23 42h5.03v1.04h-5.03zM40 42h7.03v1.04h-7.03zM55 42h5.03v1.04h-5.03zM73 42h5.03v1.04h-5.03zM83 42h16.03v1.04h-16.03zM0 60h76.03v1.04h-76.03zM0 61h76.03v1.04h-76.03zM0 62h128.03v1.04h-128.03z"/></svg></div><figcaption><b>Clock</b> The time in big digits, the date above it, and a bar that fills across each minute.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/wx_partly.gif" alt="Weather: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Weather</b> An animated icon, the temperature, today's high and low, and the place. After three hours without news it adds "(old)".</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/timer.gif" alt="Timer: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Timer</b> Counts down by itself between updates, over a bar that drains. Paused, it blinks like an oven.</figcaption></figure>
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Status" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M0 0h4.03v1.04h-4.03zM18 0h1.03v1.04h-1.03zM26 0h1.03v1.04h-1.03zM62 0h1.03v1.04h-1.03zM110 0h1.03v1.04h-1.03zM114 0h1.03v1.04h-1.03zM117 0h3.03v1.04h-3.03zM122 0h4.03v1.04h-4.03zM0 1h1.03v1.04h-1.03zM4 1h1.03v1.04h-1.03zM18 1h1.03v1.04h-1.03zM26 1h1.03v1.04h-1.03zM62 1h1.03v1.04h-1.03zM110 1h1.03v1.04h-1.03zM114 1h1.03v1.04h-1.03zM116 1h1.03v1.04h-1.03zM120 1h1.03v1.04h-1.03zM122 1h1.03v1.04h-1.03zM126 1h1.03v1.04h-1.03zM0 2h1.03v1.04h-1.03zM4 2h1.03v1.04h-1.03zM7 2h3.03v1.04h-3.03zM13 2h4.03v1.04h-4.03zM18 2h1.03v1.04h-1.03zM21 2h1.03v1.04h-1.03zM24 2h5.03v1.04h-5.03zM31 2h3.03v1.04h-3.03zM36 2h1.03v1.04h-1.03zM38 2h2.03v1.04h-2.03zM48 2h1.03v1.04h-1.03zM50 2h2.03v1.04h-2.03zM55 2h3.03v1.04h-3.03zM60 2h5.03v1.04h-5.03zM110 2h1.03v1.04h-1.03zM114 2h1.03v1.04h-1.03zM116 2h1.03v1.04h-1.03zM122 2h1.03v1.04h-1.03zM126 2h1.03v1.04h-1.03zM0 3h1.03v1.04h-1.03zM4 3h1.03v1.04h-1.03zM6 3h1.03v1.04h-1.03zM10 3h1.03v1.04h-1.03zM12 3h1.03v1.04h-1.03zM18 3h1.03v1.04h-1.03zM20 3h1.03v1.04h-1.03zM26 3h1.03v1.04h-1.03zM30 3h1.03v1.04h-1.03zM34 3h1.03v1.04h-1.03zM36 3h2.03v1.04h-2.03zM40 3h1.03v1.04h-1.03zM48 3h2.03v1.04h-2.03zM52 3h1.03v1.04h-1.03zM54 3h1.03v1.04h-1.03zM58 3h1.03v1.04h-1.03zM62 3h1.03v1.04h-1.03zM110 3h1.03v1.04h-1.03zM114 3h1.03v1.04h-1.03zM117 3h3.03v1.04h-3.03zM122 3h4.03v1.04h-4.03zM0 4h1.03v1.04h-1.03zM4 4h1.03v1.04h-1.03zM6 4h5.03v1.04h-5.03zM13 4h3.03v1.04h-3.03zM18 4h2.03v1.04h-2.03zM26 4h1.03v1.04h-1.03zM30 4h1.03v1.04h-1.03zM34 4h1.03v1.04h-1.03zM36 4h2.03v1.04h-2.03zM40 4h1.03v1.04h-1.03zM48 4h2.03v1.04h-2.03zM52 4h1.03v1.04h-1.03zM54 4h5.03v1.04h-5.03zM62 4h1.03v1.04h-1.03zM110 4h1.03v1.04h-1.03zM114 4h1.03v1.04h-1.03zM120 4h1.03v1.04h-1.03zM122 4h1.03v1.04h-1.03zM126 4h1.03v1.04h-1.03zM0 5h1.03v1.04h-1.03zM4 5h1.03v1.04h-1.03zM6 5h1.03v1.04h-1.03zM16 5h1.03v1.04h-1.03zM18 5h1.03v1.04h-1.03zM20 5h1.03v1.04h-1.03zM26 5h1.03v1.04h-1.03zM28 5h1.03v1.04h-1.03zM30 5h1.03v1.04h-1.03zM34 5h1.03v1.04h-1.03zM36 5h1.03v1.04h-1.03zM38 5h2.03v1.04h-2.03zM48 5h1.03v1.04h-1.03zM50 5h2.03v1.04h-2.03zM54 5h1.03v1.04h-1.03zM62 5h1.03v1.04h-1.03zM64 5h1.03v1.04h-1.03zM110 5h1.03v1.04h-1.03zM114 5h1.03v1.04h-1.03zM116 5h1.03v1.04h-1.03zM120 5h1.03v1.04h-1.03zM122 5h1.03v1.04h-1.03zM126 5h1.03v1.04h-1.03zM0 6h4.03v1.04h-4.03zM7 6h3.03v1.04h-3.03zM12 6h4.03v1.04h-4.03zM18 6h1.03v1.04h-1.03zM21 6h1.03v1.04h-1.03zM27 6h1.03v1.04h-1.03zM31 6h3.03v1.04h-3.03zM36 6h1.03v1.04h-1.03zM48 6h1.03v1.04h-1.03zM55 6h3.03v1.04h-3.03zM63 6h1.03v1.04h-1.03zM111 6h3.03v1.04h-3.03zM117 6h3.03v1.04h-3.03zM122 6h4.03v1.04h-4.03zM36 7h1.03v1.04h-1.03zM48 7h1.03v1.04h-1.03zM0 10h1.03v1.04h-1.03zM8 10h1.03v1.04h-1.03zM18 10h1.03v1.04h-1.03zM48 10h1.03v1.04h-1.03zM52 10h1.03v1.04h-1.03zM55 10h3.03v1.04h-3.03zM60 10h4.03v1.04h-4.03zM0 11h1.03v1.04h-1.03zM18 11h1.03v1.04h-1.03zM48 11h1.03v1.04h-1.03zM52 11h1.03v1.04h-1.03zM54 11h1.03v1.04h-1.03zM58 11h1.03v1.04h-1.03zM60 11h1.03v1.04h-1.03zM64 11h1.03v1.04h-1.03zM0 12h1.03v1.04h-1.03zM7 12h2.03v1.04h-2.03zM12 12h1.03v1.04h-1.03zM14 12h2.03v1.04h-2.03zM18 12h1.03v1.04h-1.03zM21 12h1.03v1.04h-1.03zM48 12h1.03v1.04h-1.03zM52 12h1.03v1.04h-1.03zM54 12h1.03v1.04h-1.03zM60 12h1.03v1.04h-1.03zM64 12h1.03v1.04h-1.03zM0 13h1.03v1.04h-1.03zM8 13h1.03v1.04h-1.03zM12 13h2.03v1.04h-2.03zM16 13h1.03v1.04h-1.03zM18 13h1.03v1.04h-1.03zM20 13h1.03v1.04h-1.03zM48 13h1.03v1.04h-1.03zM52 13h1.03v1.04h-1.03zM55 13h3.03v1.04h-3.03zM60 13h4.03v1.04h-4.03zM0 14h1.03v1.04h-1.03zM8 14h1.03v1.04h-1.03zM12 14h1.03v1.04h-1.03zM16 14h1.03v1.04h-1.03zM18 14h2.03v1.04h-2.03zM48 14h1.03v1.04h-1.03zM52 14h1.03v1.04h-1.03zM58 14h1.03v1.04h-1.03zM60 14h1.03v1.04h-1.03zM64 14h1.03v1.04h-1.03zM0 15h1.03v1.04h-1.03zM8 15h1.03v1.04h-1.03zM12 15h1.03v1.04h-1.03zM16 15h1.03v1.04h-1.03zM18 15h1.03v1.04h-1.03zM20 15h1.03v1.04h-1.03zM48 15h1.03v1.04h-1.03zM52 15h1.03v1.04h-1.03zM54 15h1.03v1.04h-1.03zM58 15h1.03v1.04h-1.03zM60 15h1.03v1.04h-1.03zM64 15h1.03v1.04h-1.03zM0 16h5.03v1.04h-5.03zM7 16h3.03v1.04h-3.03zM12 16h1.03v1.04h-1.03zM16 16h1.03v1.04h-1.03zM18 16h1.03v1.04h-1.03zM21 16h1.03v1.04h-1.03zM49 16h3.03v1.04h-3.03zM55 16h3.03v1.04h-3.03zM60 16h4.03v1.04h-4.03zM2 19h1.03v1.04h-1.03zM14 19h1.03v1.04h-1.03zM31 19h2.03v1.04h-2.03zM50 19h1.03v1.04h-1.03zM58 19h1.03v1.04h-1.03zM61 19h2.03v1.04h-2.03zM1 20h1.03v1.04h-1.03zM3 20h1.03v1.04h-1.03zM32 20h1.03v1.04h-1.03zM58 20h1.03v1.04h-1.03zM62 20h1.03v1.04h-1.03zM0 21h1.03v1.04h-1.03zM4 21h1.03v1.04h-1.03zM6 21h2.03v1.04h-2.03zM9 21h1.03v1.04h-1.03zM13 21h2.03v1.04h-2.03zM18 21h1.03v1.04h-1.03zM20 21h2.03v1.04h-2.03zM25 21h2.03v1.04h-2.03zM32 21h1.03v1.04h-1.03zM49 21h2.03v1.04h-2.03zM55 21h2.03v1.04h-2.03zM58 21h1.03v1.04h-1.03zM62 21h1.03v1.04h-1.03zM67 21h3.03v1.04h-3.03zM0 22h1.03v1.04h-1.03zM4 22h1.03v1.04h-1.03zM6 22h1.03v1.04h-1.03zM8 22h1.03v1.04h-1.03zM10 22h1.03v1.04h-1.03zM14 22h1.03v1.04h-1.03zM18 22h2.03v1.04h-2.03zM22 22h1.03v1.04h-1.03zM27 22h1.03v1.04h-1.03zM32 22h1.03v1.04h-1.03zM50 22h1.03v1.04h-1.03zM54 22h1.03v1.04h-1.03zM57 22h2.03v1.04h-2.03zM62 22h1.03v1.04h-1.03zM66 22h1.03v1.04h-1.03zM70 22h1.03v1.04h-1.03zM0 23h5.03v1.04h-5.03zM6 23h1.03v1.04h-1.03zM8 23h1.03v1.04h-1.03zM10 23h1.03v1.04h-1.03zM14 23h1.03v1.04h-1.03zM18 23h1.03v1.04h-1.03zM22 23h1.03v1.04h-1.03zM25 23h3.03v1.04h-3.03zM32 23h1.03v1.04h-1.03zM50 23h1.03v1.04h-1.03zM54 23h1.03v1.04h-1.03zM58 23h1.03v1.04h-1.03zM62 23h1.03v1.04h-1.03zM66 23h5.03v1.04h-5.03zM0 24h1.03v1.04h-1.03zM4 24h1.03v1.04h-1.03zM6 24h1.03v1.04h-1.03zM8 24h1.03v1.04h-1.03zM10 24h1.03v1.04h-1.03zM14 24h1.03v1.04h-1.03zM18 24h1.03v1.04h-1.03zM22 24h1.03v1.04h-1.03zM24 24h1.03v1.04h-1.03zM27 24h1.03v1.04h-1.03zM32 24h1.03v1.04h-1.03zM50 24h1.03v1.04h-1.03zM54 24h1.03v1.04h-1.03zM57 24h2.03v1.04h-2.03zM62 24h1.03v1.04h-1.03zM66 24h1.03v1.04h-1.03zM0 25h1.03v1.04h-1.03zM4 25h1.03v1.04h-1.03zM6 25h1.03v1.04h-1.03zM8 25h1.03v1.04h-1.03zM10 25h1.03v1.04h-1.03zM13 25h3.03v1.04h-3.03zM18 25h1.03v1.04h-1.03zM22 25h1.03v1.04h-1.03zM25 25h4.03v1.04h-4.03zM31 25h3.03v1.04h-3.03zM49 25h3.03v1.04h-3.03zM55 25h2.03v1.04h-2.03zM58 25h1.03v1.04h-1.03zM61 25h3.03v1.04h-3.03zM67 25h3.03v1.04h-3.03zM0 28h1.03v1.04h-1.03zM4 28h1.03v1.04h-1.03zM8 28h1.03v1.04h-1.03zM12 28h5.03v1.04h-5.03zM20 28h1.03v1.04h-1.03zM57 28h1.03v1.04h-1.03zM63 28h1.03v1.04h-1.03zM67 28h2.03v1.04h-2.03zM74 28h1.03v1.04h-1.03zM0 29h1.03v1.04h-1.03zM4 29h1.03v1.04h-1.03zM12 29h1.03v1.04h-1.03zM56 29h1.03v1.04h-1.03zM58 29h1.03v1.04h-1.03zM62 29h1.03v1.04h-1.03zM64 29h1.03v1.04h-1.03zM68 29h1.03v1.04h-1.03zM0 30h1.03v1.04h-1.03zM4 30h1.03v1.04h-1.03zM7 30h2.03v1.04h-2.03zM12 30h1.03v1.04h-1.03zM19 30h2.03v1.04h-2.03zM49 30h3.03v1.04h-3.03zM56 30h1.03v1.04h-1.03zM62 30h1.03v1.04h-1.03zM68 30h1.03v1.04h-1.03zM73 30h2.03v1.04h-2.03zM78 30h1.03v1.04h-1.03zM80 30h2.03v1.04h-2.03zM85 30h3.03v1.04h-3.03zM0 31h1.03v1.04h-1.03zM2 31h1.03v1.04h-1.03zM4 31h1.03v1.04h-1.03zM8 31h1.03v1.04h-1.03zM12 31h4.03v1.04h-4.03zM20 31h1.03v1.04h-1.03zM48 31h1.03v1.04h-1.03zM52 31h1.03v1.04h-1.03zM55 31h3.03v1.04h-3.03zM61 31h3.03v1.04h-3.03zM68 31h1.03v1.04h-1.03zM74 31h1.03v1.04h-1.03zM78 31h2.03v1.04h-2.03zM82 31h1.03v1.04h-1.03zM84 31h1.03v1.04h-1.03zM88 31h1.03v1.04h-1.03zM0 32h1.03v1.04h-1.03zM2 32h1.03v1.04h-1.03zM4 32h1.03v1.04h-1.03zM8 32h1.03v1.04h-1.03zM12 32h1.03v1.04h-1.03zM20 32h1.03v1.04h-1.03zM48 32h1.03v1.04h-1.03zM52 32h1.03v1.04h-1.03zM56 32h1.03v1.04h-1.03zM62 32h1.03v1.04h-1.03zM68 32h1.03v1.04h-1.03zM74 32h1.03v1.04h-1.03zM78 32h1.03v1.04h-1.03zM82 32h1.03v1.04h-1.03zM84 32h5.03v1.04h-5.03zM0 33h1.03v1.04h-1.03zM2 33h1.03v1.04h-1.03zM4 33h1.03v1.04h-1.03zM8 33h1.03v1.04h-1.03zM12 33h1.03v1.04h-1.03zM20 33h1.03v1.04h-1.03zM48 33h1.03v1.04h-1.03zM52 33h1.03v1.04h-1.03zM56 33h1.03v1.04h-1.03zM62 33h1.03v1.04h-1.03zM68 33h1.03v1.04h-1.03zM74 33h1.03v1.04h-1.03zM78 33h1.03v1.04h-1.03zM82 33h1.03v1.04h-1.03zM84 33h1.03v1.04h-1.03zM1 34h1.03v1.04h-1.03zM3 34h1.03v1.04h-1.03zM7 34h3.03v1.04h-3.03zM12 34h1.03v1.04h-1.03zM19 34h3.03v1.04h-3.03zM49 34h3.03v1.04h-3.03zM56 34h1.03v1.04h-1.03zM62 34h1.03v1.04h-1.03zM67 34h3.03v1.04h-3.03zM73 34h3.03v1.04h-3.03zM78 34h1.03v1.04h-1.03zM82 34h1.03v1.04h-1.03zM85 34h3.03v1.04h-3.03zM0 37h5.03v1.04h-5.03zM8 37h1.03v1.04h-1.03zM51 37h1.03v1.04h-1.03zM0 38h1.03v1.04h-1.03zM2 38h1.03v1.04h-1.03zM4 38h1.03v1.04h-1.03zM50 38h2.03v1.04h-2.03zM2 39h1.03v1.04h-1.03zM7 39h2.03v1.04h-2.03zM12 39h2.03v1.04h-2.03zM15 39h1.03v1.04h-1.03zM19 39h3.03v1.04h-3.03zM49 39h1.03v1.04h-1.03zM51 39h1.03v1.04h-1.03zM55 39h4.03v1.04h-4.03zM67 39h2.03v1.04h-2.03zM73 39h3.03v1.04h-3.03zM79 39h3.03v1.04h-3.03zM2 40h1.03v1.04h-1.03zM8 40h1.03v1.04h-1.03zM12 40h1.03v1.04h-1.03zM14 40h1.03v1.04h-1.03zM16 40h1.03v1.04h-1.03zM18 40h1.03v1.04h-1.03zM22 40h1.03v1.04h-1.03zM48 40h1.03v1.04h-1.03zM51 40h1.03v1.04h-1.03zM54 40h1.03v1.04h-1.03zM69 40h1.03v1.04h-1.03zM72 40h1.03v1.04h-1.03zM75 40h2.03v1.04h-2.03zM78 40h1.03v1.04h-1.03zM82 40h1.03v1.04h-1.03zM2 41h1.03v1.04h-1.03zM8 41h1.03v1.04h-1.03zM12 41h1.03v1.04h-1.03zM14 41h1.03v1.04h-1.03zM16 41h1.03v1.04h-1.03zM18 41h5.03v1.04h-5.03zM48 41h5.03v1.04h-5.03zM55 41h3.03v1.04h-3.03zM67 41h3.03v1.04h-3.03zM72 41h1.03v1.04h-1.03zM75 41h2.03v1.04h-2.03zM78 41h1.03v1.04h-1.03zM82 41h1.03v1.04h-1.03zM2 42h1.03v1.04h-1.03zM8 42h1.03v1.04h-1.03zM12 42h1.03v1.04h-1.03zM14 42h1.03v1.04h-1.03zM16 42h1.03v1.04h-1.03zM18 42h1.03v1.04h-1.03zM51 42h1.03v1.04h-1.03zM58 42h1.03v1.04h-1.03zM66 42h1.03v1.04h-1.03zM69 42h1.03v1.04h-1.03zM73 42h2.03v1.04h-2.03zM76 42h1.03v1.04h-1.03zM78 42h1.03v1.04h-1.03zM82 42h1.03v1.04h-1.03zM2 43h1.03v1.04h-1.03zM7 43h3.03v1.04h-3.03zM12 43h1.03v1.04h-1.03zM14 43h1.03v1.04h-1.03zM16 43h1.03v1.04h-1.03zM19 43h3.03v1.04h-3.03zM51 43h1.03v1.04h-1.03zM54 43h4.03v1.04h-4.03zM67 43h4.03v1.04h-4.03zM76 43h1.03v1.04h-1.03zM79 43h3.03v1.04h-3.03zM73 44h3.03v1.04h-3.03zM0 46h1.03v1.04h-1.03zM4 46h1.03v1.04h-1.03zM20 46h1.03v1.04h-1.03zM24 46h1.03v1.04h-1.03zM51 46h1.03v1.04h-1.03zM0 47h1.03v1.04h-1.03zM4 47h1.03v1.04h-1.03zM20 47h1.03v1.04h-1.03zM24 47h1.03v1.04h-1.03zM50 47h2.03v1.04h-2.03zM0 48h1.03v1.04h-1.03zM4 48h1.03v1.04h-1.03zM7 48h3.03v1.04h-3.03zM13 48h2.03v1.04h-2.03zM18 48h5.03v1.04h-5.03zM24 48h1.03v1.04h-1.03zM26 48h2.03v1.04h-2.03zM31 48h3.03v1.04h-3.03zM36 48h1.03v1.04h-1.03zM38 48h2.03v1.04h-2.03zM49 48h1.03v1.04h-1.03zM51 48h1.03v1.04h-1.03zM55 48h4.03v1.04h-4.03zM67 48h2.03v1.04h-2.03zM73 48h3.03v1.04h-3.03zM79 48h3.03v1.04h-3.03zM0 49h1.03v1.04h-1.03zM2 49h1.03v1.04h-1.03zM4 49h1.03v1.04h-1.03zM6 49h1.03v1.04h-1.03zM10 49h1.03v1.04h-1.03zM15 49h1.03v1.04h-1.03zM20 49h1.03v1.04h-1.03zM24 49h2.03v1.04h-2.03zM28 49h1.03v1.04h-1.03zM30 49h1.03v1.04h-1.03zM34 49h1.03v1.04h-1.03zM36 49h2.03v1.04h-2.03zM40 49h1.03v1.04h-1.03zM48 49h1.03v1.04h-1.03zM51 49h1.03v1.04h-1.03zM54 49h1.03v1.04h-1.03zM69 49h1.03v1.04h-1.03zM72 49h1.03v1.04h-1.03zM75 49h2.03v1.04h-2.03zM78 49h1.03v1.04h-1.03zM82 49h1.03v1.04h-1.03zM0 50h1.03v1.04h-1.03zM2 50h1.03v1.04h-1.03zM4 50h1.03v1.04h-1.03zM6 50h5.03v1.04h-5.03zM13 50h3.03v1.04h-3.03zM20 50h1.03v1.04h-1.03zM24 50h1.03v1.04h-1.03zM28 50h1.03v1.04h-1.03zM30 50h5.03v1.04h-5.03zM36 50h1.03v1.04h-1.03zM48 50h5.03v1.04h-5.03zM55 50h3.03v1.04h-3.03zM67 50h3.03v1.04h-3.03zM72 50h1.03v1.04h-1.03zM75 50h2.03v1.04h-2.03zM78 50h1.03v1.04h-1.03zM82 50h1.03v1.04h-1.03zM0 51h1.03v1.04h-1.03zM2 51h1.03v1.04h-1.03zM4 51h1.03v1.04h-1.03zM6 51h1.03v1.04h-1.03zM12 51h1.03v1.04h-1.03zM15 51h1.03v1.04h-1.03zM20 51h1.03v1.04h-1.03zM22 51h1.03v1.04h-1.03zM24 51h1.03v1.04h-1.03zM28 51h1.03v1.04h-1.03zM30 51h1.03v1.04h-1.03zM36 51h1.03v1.04h-1.03zM51 51h1.03v1.04h-1.03zM58 51h1.03v1.04h-1.03zM66 51h1.03v1.04h-1.03zM69 51h1.03v1.04h-1.03zM73 51h2.03v1.04h-2.03zM76 51h1.03v1.04h-1.03zM78 51h1.03v1.04h-1.03zM82 51h1.03v1.04h-1.03zM1 52h1.03v1.04h-1.03zM3 52h1.03v1.04h-1.03zM7 52h3.03v1.04h-3.03zM13 52h4.03v1.04h-4.03zM21 52h1.03v1.04h-1.03zM24 52h1.03v1.04h-1.03zM28 52h1.03v1.04h-1.03zM31 52h3.03v1.04h-3.03zM36 52h1.03v1.04h-1.03zM51 52h1.03v1.04h-1.03zM54 52h4.03v1.04h-4.03zM67 52h4.03v1.04h-4.03zM76 52h1.03v1.04h-1.03zM79 52h3.03v1.04h-3.03zM73 53h3.03v1.04h-3.03zM0 55h1.03v1.04h-1.03zM4 55h1.03v1.04h-1.03zM49 55h3.03v1.04h-3.03zM54 55h1.03v1.04h-1.03zM66 55h5.03v1.04h-5.03zM73 55h3.03v1.04h-3.03zM0 56h1.03v1.04h-1.03zM4 56h1.03v1.04h-1.03zM48 56h1.03v1.04h-1.03zM52 56h1.03v1.04h-1.03zM54 56h1.03v1.04h-1.03zM66 56h1.03v1.04h-1.03zM72 56h1.03v1.04h-1.03zM76 56h1.03v1.04h-1.03zM0 57h1.03v1.04h-1.03zM4 57h1.03v1.04h-1.03zM6 57h1.03v1.04h-1.03zM8 57h2.03v1.04h-2.03zM48 57h1.03v1.04h-1.03zM51 57h2.03v1.04h-2.03zM54 57h1.03v1.04h-1.03zM56 57h2.03v1.04h-2.03zM66 57h4.03v1.04h-4.03zM76 57h1.03v1.04h-1.03zM78 57h2.03v1.04h-2.03zM81 57h1.03v1.04h-1.03zM0 58h1.03v1.04h-1.03zM4 58h1.03v1.04h-1.03zM6 58h2.03v1.04h-2.03zM10 58h1.03v1.04h-1.03zM48 58h1.03v1.04h-1.03zM50 58h1.03v1.04h-1.03zM52 58h1.03v1.04h-1.03zM54 58h2.03v1.04h-2.03zM58 58h1.03v1.04h-1.03zM70 58h1.03v1.04h-1.03zM73 58h3.03v1.04h-3.03zM78 58h1.03v1.04h-1.03zM80 58h1.03v1.04h-1.03zM82 58h1.03v1.04h-1.03zM0 59h1.03v1.04h-1.03zM4 59h1.03v1.04h-1.03zM6 59h2.03v1.04h-2.03zM10 59h1.03v1.04h-1.03zM48 59h2.03v1.04h-2.03zM52 59h1.03v1.04h-1.03zM54 59h1.03v1.04h-1.03zM58 59h1.03v1.04h-1.03zM70 59h1.03v1.04h-1.03zM72 59h1.03v1.04h-1.03zM78 59h1.03v1.04h-1.03zM80 59h1.03v1.04h-1.03zM82 59h1.03v1.04h-1.03zM0 60h1.03v1.04h-1.03zM4 60h1.03v1.04h-1.03zM6 60h1.03v1.04h-1.03zM8 60h2.03v1.04h-2.03zM48 60h1.03v1.04h-1.03zM52 60h1.03v1.04h-1.03zM54 60h1.03v1.04h-1.03zM58 60h1.03v1.04h-1.03zM66 60h1.03v1.04h-1.03zM70 60h1.03v1.04h-1.03zM72 60h1.03v1.04h-1.03zM78 60h1.03v1.04h-1.03zM80 60h1.03v1.04h-1.03zM82 60h1.03v1.04h-1.03zM1 61h3.03v1.04h-3.03zM6 61h1.03v1.04h-1.03zM49 61h3.03v1.04h-3.03zM54 61h1.03v1.04h-1.03zM58 61h1.03v1.04h-1.03zM67 61h3.03v1.04h-3.03zM72 61h5.03v1.04h-5.03zM78 61h1.03v1.04h-1.03zM80 61h1.03v1.04h-1.03zM82 61h1.03v1.04h-1.03zM6 62h1.03v1.04h-1.03z"/></svg></div><figcaption><b>Status</b> The link, what Aminal is doing, WiFi, how fresh the time and weather are, and how long it has been up.</figcaption></figure>
+  </div>
+  <h3>Weather icons</h3>
+  <p>Every icon moves: the sun's rays turn, rain and snow fall, fog drifts and lightning flickers. From 7 pm to 6 am a clear sky shows a moon with twinkling stars. The numbers are the WMO weather codes Open-Meteo reports.</p>
+  <div class="grid g4 icons">
+    <figure class="fig small"><div class="oled"><img src="shots/wx_clear.gif" alt="Clear: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Clear</b> Code 0</figcaption></figure>
+    <figure class="fig small"><div class="oled"><img src="shots/wx_partly.gif" alt="Partly cloudy: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Partly cloudy</b> Codes 1 and 2</figcaption></figure>
+    <figure class="fig small"><div class="oled"><img src="shots/wx_overcast.gif" alt="Overcast: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Overcast</b> Code 3</figcaption></figure>
+    <figure class="fig small"><div class="oled"><img src="shots/wx_fog.gif" alt="Fog: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Fog</b> Codes 45 and 48</figcaption></figure>
+    <figure class="fig small"><div class="oled"><img src="shots/wx_rain.gif" alt="Rain and showers: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Rain and showers</b> Codes 61 to 67 and 80 to 82; drizzle (51 to 57) falls lighter</figcaption></figure>
+    <figure class="fig small"><div class="oled"><img src="shots/wx_snow.gif" alt="Snow: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Snow</b> Codes 71 to 77, 85 and 86</figcaption></figure>
+    <figure class="fig small"><div class="oled"><img src="shots/wx_storm.gif" alt="Thunderstorm: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Thunderstorm</b> Codes 95 to 99</figcaption></figure>
+    <figure class="fig small"><div class="oled"><img src="shots/wx_night.gif" alt="Clear, at night: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Clear, at night</b> Code 0 from 7 pm to 6 am</figcaption></figure>
+  </div>
+  <div class="pb">
+  
+  <h3>Cards</h3>
+  <p>Reminders, mail and what's next on the calendar slide down over whatever is on screen and stay for a few seconds. A tap puts one away early.</p>
+  <div class="films grid g3">
+    <figure class="fig"><div class="oled"><img src="shots/card.gif" alt="A card: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>A card</b> Slides down from the top in 150 milliseconds.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/card_long.gif" alt="A long card: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>A long card</b> Four lines fit. Longer text scrolls up a line every 1.5 seconds.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/timesup.gif" alt="Time&#x27;s up: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Time's up</b> When a timer runs out, the whole screen rings: a swinging bell, the timer's name, and a flash every half second until you tap it. The flash is the display inverting itself, which a frame-buffer capture can't see, so it is added back here.</figcaption></figure>
+  </div>
+  </div>
+</section>
+
+<!-- ============================ 07 TRIES ============================ -->
+<section class="ch" id="tries">
+  <span class="lbl">Guide · 07</span>
+  <h2>Things to try</h2>
+  <p>Some of what the pet does only shows up when you go looking for it.</p>
+  <div class="tries">
+    <div>
+      <h3>With your finger</h3>
+      <dl>
+        <dt>Pet it three times, fast.</dt><dd>Taps less than 1.5 seconds apart add up, and the third turns its eyes into hearts.</dd>
+        <dt>Leave it alone.</dt><dd>After 30 seconds it droops off to sleep. One tap wakes it.</dd>
+        <dt>Check on it late at night.</dt><dd>After 11 pm it falls asleep after only 10 seconds and shows the time while it sleeps, so it works as a night clock.</dd>
+        <dt>Double tap.</dt><dd>It walks through the clock, the weather, the timer and the status screen, then comes back to the face by itself.</dd>
+        <dt>Hold it on the timer.</dt><dd>The timer pauses and blinks. Hold again to carry on.</dd>
+      </dl>
+      <h3>With Aminal</h3>
+      <dl>
+        <dt>Talk while the clock is up.</dt><dd>It flips back to the face to listen.</dd>
+        <dt>Speak up.</dt><dd>The eyes grow with your voice.</dd>
+        <dt>Close Aminal.</dt><dd>Eight seconds later the pet is on its own, clock still running.</dd>
+        <dt>Pull the cable out.</dt><dd>If the pet is on a charger, Aminal finds it over Bluetooth within 15 seconds. Plug the cable back in and it moves back to USB by itself.</dd>
+      </dl>
+    </div>
+    <div>
+      <h3>With sound</h3>
+      <dl>
+        <dt>Play a long playlist.</dt><dd>The mood changes every 25 to 45 seconds: headphones, dancing, or the visualizer.</dd>
+        <dt>Watch the headphones.</dt><dd>Every nine seconds or so it peeks out.</dd>
+        <dt>Skip a track.</dt><dd>A gap shorter than 6 seconds doesn't stop the dance.</dd>
+        <dt>Get a message during a film.</dt><dd>The chime doesn't take the popcorn away.</dd>
+        <dt>Join a video call, or play a game.</dt><dd>Nothing happens, on purpose.</dd>
+      </dl>
+      <h3>Small details</h3>
+      <dl>
+        <dt>The bar under the clock</dt><dd>is the seconds, filling across the minute.</dd>
+        <dt>The sun's rays</dt><dd>turn, slowly.</dd>
+        <dt>Old weather</dt><dd>says so: after three hours without an update the screen adds "(old)".</dd>
+        <dt>A ringing timer</dt><dd>outranks everything: a reminder can't cover it.</dd>
+        <dt>Before anyone tells it the time,</dt><dd>the clock says "waiting for time" instead of guessing.</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ 08 SYSTEM ============================ -->
+<section class="ch" id="system">
+  <span class="lbl">Inside · 08</span>
+  <h2>How it fits together</h2>
+  <p>Aminal never talks to the pet itself. A small bridge program runs beside it, reads what Aminal is doing 25 times a second, and turns every change into one short line of text. The pet reads those lines, keeps what they say in one shared state it calls the World, and draws that state 50 times a second.</p>
+  <div class="dwrap">
+    <svg class="diagram" viewBox="0 0 1000 448" role="img" aria-label="Aminal, the pet bridge and the pet, and the links between them">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="d-headfill" d="M0 0 L10 5 L0 10 z"/></marker>
+      </defs>
+      <rect class="d-group" x="6" y="6" width="508" height="412" rx="10"/>
+      <text class="d-f" x="24" y="32">ON THE PC</text>
+      <rect class="d-group" x="640" y="6" width="354" height="336" rx="10"/>
+      <text class="d-f" x="658" y="32">ON THE DESK</text>
+
+      <rect class="d-box" x="26" y="50" width="258" height="72" rx="6"/>
+      <text class="d-t" x="42" y="80">Aminal</text>
+      <text class="d-s" x="42" y="104">state · voice · answers · timers</text>
+      <rect class="d-box" x="26" y="138" width="258" height="72" rx="6"/>
+      <text class="d-t" x="42" y="168">What's playing</text>
+      <text class="d-s" x="42" y="192">the app and its window title</text>
+      <rect class="d-box" x="26" y="226" width="258" height="72" rx="6"/>
+      <text class="d-t" x="42" y="256">The speakers</text>
+      <text class="d-s" x="42" y="280">16 bars · beats · sudden jumps</text>
+      <rect class="d-box" x="26" y="314" width="258" height="72" rx="6"/>
+      <text class="d-t" x="42" y="344">Clock and weather</text>
+      <text class="d-s" x="42" y="368">the PC's time · Open-Meteo</text>
+
+      <rect class="d-litbox" x="330" y="50" width="164" height="336" rx="8"/>
+      <text class="d-t" x="348" y="82">Pet bridge</text>
+      <text class="d-s" x="348" y="106">one line per change</text>
+      <text class="d-l" x="348" y="160">ST  LV  TM</text>
+      <text class="d-l" x="348" y="184">WX  TI  AL</text>
+      <text class="d-l" x="348" y="208">EM  GO  MD</text>
+      <text class="d-l" x="348" y="232">VZ  BE  JS</text>
+      <text class="d-s" x="348" y="290">heartbeat 2 s</text>
+      <text class="d-s" x="348" y="312">time every 10 min</text>
+      <text class="d-s" x="348" y="334">weather every 20 min</text>
+
+      <path class="d-arrow" d="M284 86 H324" marker-end="url(#ah)"/>
+      <path class="d-arrow" d="M284 174 H324" marker-end="url(#ah)"/>
+      <path class="d-arrow" d="M284 262 H324" marker-end="url(#ah)"/>
+      <path class="d-arrow" d="M284 350 H324" marker-end="url(#ah)"/>
+
+      <path class="d-lit" d="M500 122 H652" marker-start="url(#ah)" marker-end="url(#ah)"/>
+      <text class="d-p" x="514" y="110">USB cable</text>
+      <text class="d-s" x="514" y="144">always first</text>
+      <path class="d-arrow" d="M500 236 H652" marker-start="url(#ah)" marker-end="url(#ah)" stroke-dasharray="6 4"/>
+      <text class="d-p" x="514" y="224">Bluetooth</text>
+      <text class="d-s" x="514" y="258">HC-05 · 9600 baud</text>
+      <text class="d-s" x="514" y="276">without the cable</text>
+
+      <rect class="d-box" x="660" y="50" width="314" height="56" rx="6"/>
+      <text class="d-t" x="676" y="74">Link</text>
+      <text class="d-s" x="676" y="95">reads USB and Bluetooth alike</text>
+      <rect class="d-box" x="660" y="124" width="314" height="56" rx="6"/>
+      <text class="d-t" x="676" y="148">World</text>
+      <text class="d-s" x="676" y="169">time · weather · timer · Aminal · media</text>
+      <rect class="d-box" x="660" y="198" width="314" height="56" rx="6"/>
+      <text class="d-t" x="676" y="222">Face, screens, cards</text>
+      <text class="d-s" x="676" y="243">eased toward targets every frame</text>
+      <rect class="d-litbox" x="660" y="272" width="314" height="52" rx="6"/>
+      <text class="d-t" x="676" y="296">OLED</text>
+      <text class="d-s" x="676" y="315">128 × 64 · about 50 frames a second</text>
+      <path class="d-arrow" d="M817 106 V118" marker-end="url(#ah)"/>
+      <path class="d-arrow" d="M817 180 V192" marker-end="url(#ah)"/>
+      <path class="d-arrow" d="M817 254 V266" marker-end="url(#ah)"/>
+      <text class="d-s" x="960" y="95" text-anchor="end"></text>
+
+      <path class="d-dash" d="M817 342 V372"/>
+      <rect class="d-box2" x="660" y="372" width="314" height="64" rx="6" stroke-dasharray="5 4"/>
+      <text class="d-t" x="676" y="398">ESP-01 WiFi</text>
+      <text class="d-s" x="676" y="421">its own time and weather, PC off</text>
+      <text class="d-s" x="514" y="318">button presses come</text>
+      <text class="d-s" x="514" y="336">back the same way</text>
+    </svg>
+  </div>
+  <h3>Finding the pet</h3>
+  <ul class="tick">
+    <li>The bridge only talks to a port that answers <code>HI</code> with <code>PET</code>, so it never sends lines to the wrong device.</li>
+    <li>USB always wins. While the cable isn't there it tries the Bluetooth port every 15 seconds; opening the port of a pet that is switched off keeps Windows busy for seconds, so it doesn't try more often.</li>
+    <li>It sends a heartbeat every 2 seconds. After 8 seconds of silence the pet decides it is on its own.</li>
+    <li>It follows Aminal's process. When Aminal exits, the bridge says goodbye to the pet and exits too.</li>
+    <li>Nothing is sent twice: each kind of line goes out only when its value changes, apart from the time, which is refreshed every 10 minutes.</li>
+  </ul>
+</section>
+
+<!-- ============================ 09 WIRING ============================ -->
+<section class="ch" id="wiring">
+  <span class="lbl">Inside · 09</span>
+  <h2>Wiring</h2>
+  <div class="tscroll"><table>
+    <thead><tr><th>Part</th><th>What it's for</th></tr></thead>
+    <tbody>
+      <tr><td class="f">WeAct Black Pill</td><td>The brain: an STM32F401CC or F411CE, USB-C, the KEY and NRST buttons, and a blue LED on PC13.</td></tr>
+      <tr><td class="f">0.96" SSD1306 OLED</td><td>The face: 128 × 64 pixels over I2C, at address 0x3C.</td></tr>
+      <tr><td class="f">HC-05</td><td>Optional. The Bluetooth link to Aminal.</td></tr>
+      <tr><td class="f">ESP-01</td><td>Optional. Its own time and weather over WiFi.</td></tr>
+      <tr><td class="f">AMS1117-3.3, 470 µF</td><td>Power for the ESP-01, from the 5 V pin.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="wires">
+    <figure class="fig">
+      <div class="dwrap">
+        <svg class="diagram" viewBox="0 0 520 176" role="img" aria-label="OLED wiring">
+          <rect class="d-box2" x="4" y="14" width="150" height="148" rx="6"/>
+          <text class="d-f" x="18" y="38">BLACK PILL</text>
+          <rect class="d-pcb" x="362" y="14" width="154" height="148" rx="6"/>
+          <text class="d-f" x="444" y="38" style="fill:rgba(255,255,255,.7)">OLED</text>
+          <g class="d-p" text-anchor="end"><text x="140" y="66">G</text><text x="140" y="92">3V3</text><text x="140" y="118">B6</text><text x="140" y="144">B7</text></g>
+          <g class="d-p" style="fill:#fff"><text x="376" y="66">GND</text><text x="376" y="92">VCC</text><text x="376" y="118">SCL</text><text x="376" y="144">SDA</text></g>
+          <path class="d-gnd" d="M154 62 H362"/><path class="d-warm" d="M154 88 H362"/>
+          <path class="d-lit" d="M154 114 H362"/><path class="d-lit" d="M154 140 H362"/>
+          <g class="d-s" text-anchor="middle"><text x="258" y="83">3.3 V</text><text x="258" y="109">I2C clock</text><text x="258" y="135">I2C data</text></g>
+        </svg>
+      </div>
+      <figcaption><b>The OLED</b> Powered from the board's own 3.3 V. It draws little, so that is fine.</figcaption>
+    </figure>
+    <figure class="fig">
+      <div class="dwrap">
+        <svg class="diagram" viewBox="0 0 520 176" role="img" aria-label="HC-05 wiring">
+          <rect class="d-box2" x="4" y="14" width="150" height="148" rx="6"/>
+          <text class="d-f" x="18" y="38">BLACK PILL</text>
+          <rect class="d-box" x="362" y="14" width="154" height="148" rx="6"/>
+          <text class="d-f" x="440" y="38">HC-05</text>
+          <g class="d-p" text-anchor="end"><text x="140" y="66">5V</text><text x="140" y="92">G</text><text x="140" y="118">A3</text><text x="140" y="144">A2</text></g>
+          <g class="d-p"><text x="376" y="66">VCC</text><text x="376" y="92">GND</text><text x="376" y="118">TXD</text><text x="376" y="144">RXD</text></g>
+          <path class="d-warm" d="M154 62 H362"/><path class="d-gnd" d="M154 88 H362"/>
+          <path class="d-lit" d="M154 114 H362"/><path class="d-lit" d="M154 140 H362"/>
+          <g class="d-s" text-anchor="middle"><text x="258" y="57">5 V</text><text x="258" y="109">pet listens</text><text x="258" y="135">pet talks</text></g>
+        </svg>
+      </div>
+      <figcaption><b>The HC-05</b> Six pins in a row; STATE and EN stay empty. Its red LED blinks fast when it is ready to pair. Pair it with the PC (PIN 1234 or 0000), not a phone.</figcaption>
+    </figure>
+  </div>
+  <figure class="fig">
+    <div class="dwrap">
+      <svg class="diagram" viewBox="0 0 700 268" role="img" aria-label="ESP-01 wiring through an AMS1117 regulator">
+        <rect class="d-box2" x="4" y="14" width="150" height="246" rx="6"/>
+        <text class="d-f" x="18" y="38">BLACK PILL</text>
+        <rect class="d-box" x="542" y="14" width="154" height="246" rx="6"/>
+        <text class="d-f" x="614" y="38">ESP-01</text>
+        <g class="d-p" text-anchor="end"><text x="140" y="66">5V</text><text x="140" y="144">G</text><text x="140" y="170">A10</text><text x="140" y="196">A9</text><text x="140" y="222">B12</text><text x="140" y="248">B13</text></g>
+        <g class="d-p"><text x="556" y="66">3V3</text><text x="556" y="92">EN</text><text x="556" y="144">GND</text><text x="556" y="170">TX</text><text x="556" y="196">RX</text><text x="556" y="222">RST</text><text x="556" y="248">GPIO0</text></g>
+        <text class="d-s" x="556" y="118">GPIO2 · empty</text>
+        <rect class="d-litbox" x="218" y="40" width="200" height="48" rx="6" style="fill:rgba(255,138,92,.1);stroke:var(--warm)"/>
+        <text class="d-p" x="318" y="60" text-anchor="middle">AMS1117-3.3</text>
+        <text class="d-s" x="318" y="78" text-anchor="middle">+ 470 µF at the ESP</text>
+        <path class="d-warm" d="M154 62 H218"/>
+        <path class="d-warm" d="M418 62 H542"/>
+        <path class="d-warm" d="M470 62 V88 H542"/>
+        <circle class="d-dot" cx="470" cy="62" r="3.5"/>
+        <path class="d-gnd" d="M154 140 H542"/>
+        <path class="d-lit" d="M154 166 H542"/><path class="d-lit" d="M154 192 H542"/>
+        <path class="d-lit" d="M154 218 H542" style="stroke-dasharray:6 4"/><path class="d-lit" d="M154 244 H542" style="stroke-dasharray:6 4"/>
+        <g class="d-s" text-anchor="middle"><text x="186" y="56">5 V in</text><text x="480" y="56">3.3 V out</text>
+          <text x="348" y="135">ground, shared by all three</text><text x="348" y="161">pet listens</text><text x="348" y="187">pet talks</text>
+          <text x="348" y="213">lets the pet restart it</text><text x="348" y="239">lets the pet start its bootloader</text></g>
+      </svg>
+    </div>
+    <figcaption><b>The ESP-01</b> Eight pins in two rows of four. With the chips facing you and the antenna up, one row holds GND, GPIO2, GPIO0 and RX, the other TX, EN, RST and 3V3. GND and 3V3 sit in opposite corners.</figcaption>
+  </figure>
+  <div class="note warn">
+    <span class="lbl">Power the ESP-01 on its own</span>
+    <p>The ESP-01 is a 3.3 V part, and 5 V damages it. The Black Pill's 3.3 V pin can't feed it either: the radio pulls bursts of about 300 mA, and on this unit that made the module garble its replies and restart halfway through a network scan, even at lowered transmit power. An AMS1117-3.3 regulator fed from the 5 V pin, with a 470 µF capacitor across the module's 3.3 V and ground, gives it the current it needs.</p>
+  </div>
+</section>
+
+<!-- ============================ 10 FIRMWARE ============================ -->
+<section class="ch" id="firmware">
+  <span class="lbl">Inside · 10</span>
+  <h2>The firmware</h2>
+  <p>C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit's SSD1306 and GFX libraries draw the screen, and FreeSans Bold sets the big digits.</p>
+  <h3>One pass of the loop</h3>
+  <ol class="steps">
+    <li>Read every line waiting on USB and Bluetooth, up to 512 bytes a port per pass, so a flood of lines can't starve the animation.</li>
+    <li>Move the WiFi module's state machine on by one step. It never waits for the module.</li>
+    <li>If 20 ms have passed since the last frame: read the button, check the link and the timer, update the face, draw the screen and any card, and send the 1,024-byte frame to the OLED over I2C.</li>
+  </ol>
+  <p>That comes to about 50 frames a second, as fast as the I2C bus carries them.</p>
+  <h3>Easing</h3>
+  <p>No expression is drawn directly. Every frame, the eyes' position, width and height move part of the way toward a target:</p>
+<pre>current += (target - current) × 0.25   <span class="c">// position, width, and most heights</span>
+height  += (target - height)  × 0.6    <span class="c">// blinking, or closing by more than 10 px</span>
+height  += (target - height)  × 0.45   <span class="c">// while listening, to keep up with the voice</span></pre>
+  <p>So glances glide, blinks snap shut, and falling asleep is a slow droop. Every face in this handbook is just a different set of targets.</p>
+  <h3>Who gets the face</h3>
+  <p>The first of these that applies decides what the eyes do. Music and films step aside whenever Aminal is listening, thinking or speaking.</p>
+  <ol class="ladder">
+    <li>A face Aminal asked for</li>
+    <li>Happy, after a tap</li>
+    <li>Listening</li>
+    <li>Thinking</li>
+    <li>Speaking</li>
+    <li>Music</li>
+    <li>A film</li>
+    <li>Asleep</li>
+    <li>Idle: glances, blinks, habits</li>
+  </ol>
+  <h3>Timings</h3>
+  <div class="tscroll"><table>
+    <thead><tr><th>What</th><th>When</th><th>What</th><th>When</th></tr></thead>
+    <tbody>
+      <tr><td>Glance</td><td class="n">every 1.5–4 s</td><td>Music mood</td><td class="n">25–45 s</td></tr>
+      <tr><td>Blink</td><td class="n">every 2.5–6 s, 130 ms</td><td>Its own tempo</td><td class="n">115 bpm, 520 ms</td></tr>
+      <tr><td>Habit</td><td class="n">every 15–40 s</td><td>Popcorn</td><td class="n">every 3.5–7 s</td></tr>
+      <tr><td>Happy after a tap</td><td class="n">2.5 s</td><td>Back to the face</td><td class="n">after 20 s</td></tr>
+      <tr><td>Hearts</td><td class="n">3 taps under 1.5 s apart</td><td>Link lost</td><td class="n">8 s of silence</td></tr>
+      <tr><td>Falls asleep</td><td class="n">30 s; 10 s, 11 pm–7 am</td><td>Hold / double tap</td><td class="n">0.7 s / 0.35 s</td></tr>
+    </tbody>
+  </table></div>
+  <p>Every timer is compared with <code>reached(now, t)</code> rather than <code>now &gt; t</code>, so the pet keeps blinking when the millisecond counter wraps round after 49.7 days.</p>
+</section>
+
+<!-- ============================ 11 PROTOCOL ============================ -->
+<section class="ch" id="protocol">
+  <span class="lbl">Inside · 11</span>
+  <h2>The protocol</h2>
+  <p>One short line of text per message, the same on USB and Bluetooth, and simple enough to type into a serial monitor. A line longer than 159 characters is dropped whole rather than read in pieces.</p>
+  <div class="tscroll"><table>
+    <thead><tr><th>Line</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="f">HI</td><td>Who are you? The pet answers <code>PET desktop-pet 6</code>.</td></tr>
+      <tr><td class="f">PG</td><td>Heartbeat, answered <code>PO</code>.</td></tr>
+      <tr><td class="f">ST idle|listening|thinking|speaking|off</td><td>What Aminal is doing</td></tr>
+      <tr><td class="f">LV 0–100</td><td>How loud the voice is, for the eyes and the mouth</td></tr>
+      <tr><td class="f">TM &lt;unix&gt; &lt;offset s&gt;</td><td>The time, and the UTC offset</td></tr>
+      <tr><td class="f">WX &lt;temp&gt; &lt;code&gt; &lt;hi&gt; &lt;lo&gt; &lt;place&gt;</td><td>The weather, with its WMO code</td></tr>
+      <tr><td class="f">TI &lt;left&gt; &lt;total&gt; &lt;paused&gt; &lt;label&gt;</td><td>The timer, or <code>TI -</code> for none</td></tr>
+      <tr><td class="f">AL &lt;secs&gt; &lt;title&gt;|&lt;text&gt;</td><td>A card, or <code>AL -</code> to take it down</td></tr>
+      <tr><td class="f">EM &lt;face&gt; [ms]</td><td>Pull a face: happy, love, surprised, sad, angry, wink, sleepy</td></tr>
+      <tr><td class="f">GO &lt;screen&gt; [secs]</td><td>Show face, clock, weather, timer or status</td></tr>
+      <tr><td class="f">MD music [style] | watch | -</td><td>What's playing. A music style (headphones, dance, bars) can be asked for by name.</td></tr>
+      <tr><td class="f">VZ &lt;16 hex digits&gt;</td><td>Spectrum bars, 0 to f each, low notes first</td></tr>
+      <tr><td class="f">BE</td><td>A beat</td></tr>
+      <tr><td class="f">JS</td><td>A sudden loud moment in a film</td></tr>
+      <tr><td class="f">SN</td><td>Answered <code>SN &lt;hex&gt;</code>: exactly what is on the OLED</td></tr>
+      <tr><td class="f">LO &lt;lat&gt; &lt;lon&gt; &lt;place&gt;</td><td>Where the weather is for, kept in flash for the WiFi</td></tr>
+      <tr><td class="f">WF &lt;ssid&gt;&lt;tab&gt;&lt;password&gt;</td><td>USB only: join a WiFi network</td></tr>
+      <tr><td class="f">ES talk|flash [baud], ES reset</td><td>USB only: the cable straight through to the ESP-01, for debugging</td></tr>
+    </tbody>
+  </table></div>
+  <p>The pet sends events back up whichever link spoke last: <code>EV pet</code>, <code>EV next &lt;screen&gt;</code>, <code>EV hold</code>, <code>EV hold timer</code>, <code>EV dismiss</code>, <code>EV wifi ok &lt;ip&gt;</code> and <code>EV wifi fail</code>.</p>
+  <h3>A few seconds of conversation</h3>
+<pre><span class="a">→</span> HI
+<span class="a">←</span> PET desktop-pet 6
+<span class="a">→</span> TM 1790658725 19800          <span class="c">// 10:42 on 29 Sep, India's +5:30</span>
+<span class="a">→</span> WX 29 2 32 24 Mumbai
+<span class="a">→</span> ST listening
+<span class="a">→</span> LV 64
+<span class="a">→</span> ST speaking
+<span class="a">→</span> MD music dance
+<span class="a">→</span> BE
+<span class="a">←</span> EV pet                           <span class="c">// someone tapped it</span></pre>
+  <div class="pb">
+  
+  <h3>Snapshots: how these pictures were made</h3>
+  <p><code>SN</code> answers with the whole frame buffer as 2,048 hex digits. The buffer is 8 pages of 128 bytes, and each byte is a column of 8 pixels with the top pixel in the lowest bit. Here is the start of a real reply, taken while the pet was in love, and a piece of page 3, where the hearts are:</p>
+<pre>SN 0000000000000000000000000000000000000000000000000000000000000000…  <span class="c">// page 0: the top 8 rows, dark</span>
+   <span class="c">… page 3, from column 24:</span>
+   ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f1f000000000000000000
+   <span class="c">… 2,048 digits in all</span></pre>
+  <p>Over USB one snapshot takes about 36 ms, so the pet can be filmed at 28 frames a second while it keeps drawing its own 50. Over Bluetooth, at 9600 baud, one takes about 2 seconds. Each strip in this handbook is a run of those frames, decoded and drawn back pixel for pixel.</p>
+  <div class="dwrap">
+    <svg class="diagram" viewBox="0 0 680 236" role="img" aria-label="The frame buffer: 8 pages of 128 bytes, each byte a column of 8 pixels">
+      <g>
+        <rect x="0" y="10" width="384" height="24" style="fill:var(--bg2)"/><rect x="0" y="34" width="384" height="24" style="fill:var(--bg3)"/>
+        <rect x="0" y="58" width="384" height="24" style="fill:var(--bg2)"/><rect x="0" y="82" width="384" height="24" style="fill:var(--bg3)"/>
+        <rect x="0" y="106" width="384" height="24" style="fill:var(--bg2)"/><rect x="0" y="130" width="384" height="24" style="fill:var(--bg3)"/>
+        <rect x="0" y="154" width="384" height="24" style="fill:var(--bg2)"/><rect x="0" y="178" width="384" height="24" style="fill:var(--bg3)"/>
+      </g>
+      <rect x="0" y="10" width="384" height="192" class="d-line"/>
+      <g class="d-s"><text x="8" y="27">page 0</text><text x="8" y="51">page 1</text><text x="8" y="75">page 2</text><text x="8" y="99">page 3</text>
+        <text x="8" y="123">page 4</text><text x="8" y="147">page 5</text><text x="8" y="171">page 6</text><text x="8" y="195">page 7</text></g>
+      <rect x="240" y="58" width="6" height="24" style="fill:var(--lit)"/>
+      <text class="d-s" x="192" y="224" text-anchor="middle">128 columns × 8 pages = 1,024 bytes</text>
+      <path class="d-dash" d="M246 58 L470 20 M246 82 L470 180"/>
+      <g>
+        <rect x="470" y="20" width="20" height="20" class="d-box"/><rect x="470" y="40" width="20" height="20" class="d-box"/>
+        <rect x="470" y="60" width="20" height="20" style="fill:var(--lit)"/><rect x="470" y="80" width="20" height="20" style="fill:var(--lit)"/>
+        <rect x="470" y="100" width="20" height="20" style="fill:var(--lit)"/><rect x="470" y="120" width="20" height="20" style="fill:var(--lit)"/>
+        <rect x="470" y="140" width="20" height="20" class="d-box"/><rect x="470" y="160" width="20" height="20" class="d-box"/>
+      </g>
+      <g class="d-s"><text x="500" y="34">bit 0 · top</text><text x="500" y="54">bit 1</text><text x="500" y="74">bit 2</text><text x="500" y="94">bit 3</text>
+        <text x="500" y="114">bit 4</text><text x="500" y="134">bit 5</text><text x="500" y="154">bit 6</text><text x="500" y="174">bit 7 · bottom</text></g>
+      <text class="d-l" x="470" y="206">0x3c = 00111100</text>
+      <text class="d-s" x="470" y="224">one byte, 8 pixels tall</text>
+    </svg>
+  </div>
+  <div class="grid g2">
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Decoded" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M28 18h5.03v1.04h-5.03zM44 18h5.03v1.04h-5.03zM80 18h5.03v1.04h-5.03zM96 18h5.03v1.04h-5.03zM26 19h9.03v1.04h-9.03zM42 19h9.03v1.04h-9.03zM78 19h9.03v1.04h-9.03zM94 19h9.03v1.04h-9.03zM25 20h11.03v1.04h-11.03zM41 20h11.03v1.04h-11.03zM77 20h11.03v1.04h-11.03zM93 20h11.03v1.04h-11.03zM24 21h13.03v1.04h-13.03zM40 21h13.03v1.04h-13.03zM76 21h13.03v1.04h-13.03zM92 21h13.03v1.04h-13.03zM23 22h15.03v1.04h-15.03zM39 22h15.03v1.04h-15.03zM75 22h15.03v1.04h-15.03zM91 22h15.03v1.04h-15.03zM23 23h15.03v1.04h-15.03zM39 23h15.03v1.04h-15.03zM75 23h15.03v1.04h-15.03zM91 23h15.03v1.04h-15.03zM22 24h33.03v1.04h-33.03zM74 24h33.03v1.04h-33.03zM22 25h33.03v1.04h-33.03zM74 25h33.03v1.04h-33.03zM22 26h33.03v1.04h-33.03zM74 26h33.03v1.04h-33.03zM22 27h33.03v1.04h-33.03zM74 27h33.03v1.04h-33.03zM22 28h33.03v1.04h-33.03zM74 28h33.03v1.04h-33.03zM23 29h31.03v1.04h-31.03zM75 29h31.03v1.04h-31.03zM23 30h31.03v1.04h-31.03zM75 30h31.03v1.04h-31.03zM24 31h29.03v1.04h-29.03zM76 31h29.03v1.04h-29.03zM25 32h27.03v1.04h-27.03zM77 32h27.03v1.04h-27.03zM26 33h25.03v1.04h-25.03zM78 33h25.03v1.04h-25.03zM28 34h21.03v1.04h-21.03zM80 34h21.03v1.04h-21.03zM29 35h19.03v1.04h-19.03zM81 35h19.03v1.04h-19.03zM30 36h17.03v1.04h-17.03zM82 36h17.03v1.04h-17.03zM30 37h17.03v1.04h-17.03zM82 37h17.03v1.04h-17.03zM31 38h15.03v1.04h-15.03zM83 38h15.03v1.04h-15.03zM32 39h13.03v1.04h-13.03zM84 39h13.03v1.04h-13.03zM33 40h11.03v1.04h-11.03zM85 40h11.03v1.04h-11.03zM34 41h9.03v1.04h-9.03zM86 41h9.03v1.04h-9.03zM34 42h9.03v1.04h-9.03zM86 42h9.03v1.04h-9.03zM35 43h7.03v1.04h-7.03zM87 43h7.03v1.04h-7.03zM36 44h5.03v1.04h-5.03zM88 44h5.03v1.04h-5.03zM37 45h3.03v1.04h-3.03zM89 45h3.03v1.04h-3.03zM38 46h1.03v1.04h-1.03zM90 46h1.03v1.04h-1.03z"/></svg></div><figcaption><b>Decoded</b> The reply above, drawn back: all 8 pages, 128 × 64 pixels.</figcaption></figure>
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Page 3 alone" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M22 24h33.03v1.04h-33.03zM74 24h33.03v1.04h-33.03zM22 25h33.03v1.04h-33.03zM74 25h33.03v1.04h-33.03zM22 26h33.03v1.04h-33.03zM74 26h33.03v1.04h-33.03zM22 27h33.03v1.04h-33.03zM74 27h33.03v1.04h-33.03zM22 28h33.03v1.04h-33.03zM74 28h33.03v1.04h-33.03zM23 29h31.03v1.04h-31.03zM75 29h31.03v1.04h-31.03zM23 30h31.03v1.04h-31.03zM75 30h31.03v1.04h-31.03zM24 31h29.03v1.04h-29.03zM76 31h29.03v1.04h-29.03z"/></svg></div><figcaption><b>Page 3 alone</b> Only bytes 384 to 511, the 8 rows through the middle of the hearts.</figcaption></figure>
+  </div>
+  </div>
+</section>
+
+<!-- ============================ 12 HEARING ============================ -->
+<section class="ch" id="hearing">
+  <span class="lbl">Inside · 12</span>
+  <h2>How it hears music</h2>
+  <p>All of this runs on the PC, inside the bridge. The pet only ever receives the results as <code>MD</code>, <code>VZ</code>, <code>BE</code> and <code>JS</code> lines.</p>
+  <div class="tscroll"><table>
+    <thead><tr><th>Step</th><th>What happens</th></tr></thead>
+    <tbody>
+      <tr><td class="f">1 · What's playing</td><td>Once a second, Windows' per-app volume meters list the apps making sound (a peak above 2%). Each is named by its app, then its window title, then the file it plays. The loudest one that gets a name wins.</td></tr>
+      <tr><td class="f">2 · Listening in</td><td>Only while music or a film is on, the bridge records what the speakers play through WASAPI loopback (PyAudioWPatch).</td></tr>
+      <tr><td class="f">3 · Bars</td><td>Each block of 1,024 samples, about 23 ms, goes through an FFT into 16 bands spaced by pitch from 50 Hz to 12 kHz. The top end is lifted 4.5 dB per octave so the treble moves as much as the bass, and the bars show the loudest 40 dB under an automatic gain. Sent as <code>VZ</code> 20 times a second, 10 over Bluetooth.</td></tr>
+      <tr><td class="f">4 · Beats</td><td>Energy between 40 and 150 Hz rising to 1.45 times its average over the last second, at least 0.28 s after the last beat. Sent as <code>BE</code>.</td></tr>
+      <tr><td class="f">5 · Jumps</td><td>A block 4 times louder than the median of the last 5 seconds, at most once every 8 seconds. Sent as <code>JS</code>, for films only.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">
+    <span class="lbl">The sound stays put</span>
+    <p>Each block becomes 16 numbers and two yes-or-no flags and is thrown away. Nothing is recorded, saved or sent anywhere, and the listener only runs while the pet has music or a film to show.</p>
+  </div>
+  <h3>Named for certain, or not at all</h3>
+  <div class="tscroll"><table>
+    <thead><tr><th>Clue</th><th>Music</th><th>Film</th></tr></thead>
+    <tbody>
+      <tr><td class="f">The app</td><td>Spotify, Apple Music, Tidal, Deezer, foobar2000, MusicBee…</td><td>Netflix, Prime Video, Disney+, Hotstar, JioCinema apps</td></tr>
+      <tr><td class="f">A browser's title</td><td>Spotify, YouTube Music, SoundCloud, JioSaavn, Gaana, Wynk</td><td>Netflix, Prime Video, Hotstar, JioCinema, Disney+, SonyLIV, ZEE5, Apple TV</td></tr>
+      <tr><td class="f">A video player's file</td><td>.mp3, .flac, .m4a, .wav, .ogg, .opus, .aac, .wma</td><td>anything else it plays</td></tr>
+    </tbody>
+  </table></div>
+  <p>Browsers are recognised even when they aren't on the list, by the audio helper process every Chromium and Firefox browser uses. That is how Comet was picked up.</p>
+</section>
+
+<!-- ============================ 13 WIFI ============================ -->
+<section class="ch" id="wifi">
+  <span class="lbl">Inside · 13</span>
+  <h2>WiFi</h2>
+  <p>The ESP-01 keeps the factory AT firmware it shipped with, and the pet drives it with plain text commands. Once it has joined a network it makes one plain HTTP request to Open-Meteo every 20 minutes. That single reply carries the time (in its Date header), the UTC offset and today's weather, so a pet on a charger keeps its clock and forecast with the PC switched off.</p>
+<pre>start → ATE0 → AT+CWMODE_DEF? → AT+CIPMUX=0 → AT+CIFSR → idle
+idle  → AT+CIPSTART="TCP","api.open-meteo.com",80 → AT+CIPSEND → GET → +IPD … CLOSED
+      <span class="c">// every 20 min; again after 5 min if it failed; connection checked every minute</span></pre>
+  <div class="cols">
+    <div>
+      <h3>Joining</h3>
+      <p>Close Aminal and run the bridge's WiFi setup. It offers the network the PC is on, asks for the password without showing it, and sends both down the USB cable only: the pet refuses them over Bluetooth. The module remembers the network and rejoins by itself. It only sees 2.4 GHz networks.</p>
+    </div>
+    <div>
+      <h3>What it keeps</h3>
+      <p>Where the weather is for (sent by Aminal as <code>LO</code>) and the UTC offset are saved in the last sector of the Black Pill's flash, so they survive a power cut. The WiFi password isn't: only the module holds it.</p>
+    </div>
+  </div>
+  <div class="note warn">
+    <span class="lbl">Status on 29 Sep 2026</span>
+    <p>The code is finished and the module answers, but on this unit its radio browns out on the Black Pill's 3.3 V (chapter 09). WiFi starts working once the module has its own regulator.</p>
+    <p>Talking to Aminal over WiFi as well needs the ESP-01 reflashed with a small relay program. Reflashing it through the pet failed, because its ROM loader restarts on every sync, so that waits for a USB-serial adapter.</p>
+  </div>
+</section>
+
+<!-- ============================ 14 BUILD ============================ -->
+<section class="ch" id="build">
+  <span class="lbl">Inside · 14</span>
+  <h2>Building and uploading</h2>
+  <p>WeAct boards ship with the WeAct HID bootloader in their first 16 KB. Windows sees it as a plain HID device (<code>0483:572A</code>), so it needs no driver, and it avoids the chip's own USB bootloader, which often fails with Device Descriptor Request Failed.</p>
+  <ol class="steps">
+    <li><b>Install PlatformIO.</b> In VS Code, open Extensions, search for PlatformIO IDE and install it.</li>
+    <li><b>Get the uploader.</b> Download <code>WeAct_HID_Flash-CLI.exe</code> from WeAct's repository and save it as <code>tools/WeAct_HID_Flash-CLI.exe</code>. It is WeAct's own closed tool, so it isn't in the repository.</li>
+    <li><b>Open the project.</b> File, Open Folder, <code>Desktop-pet</code>. PlatformIO fetches the STM32 toolchain and the display libraries itself.</li>
+    <li><b>Enter the bootloader.</b> Hold KEY, tap NRST, wait for the blue LED to blink, then let go of KEY. A brand new board is already in it.</li>
+    <li><b>Upload.</b> Click the arrow in the blue status bar.</li>
+    <li><b>Wake it.</b> The eyes appear. If they don't, tap NRST.</li>
+  </ol>
+  <p>The default build targets the F401CC and also runs on an F411CE. For the F411's full 100 MHz, check the square chip and switch <code>default_envs</code> to <code>blackpill_f411ce</code>.</p>
+  <h3>Where everything lives in flash</h3>
+  <div class="dwrap">
+    <svg class="diagram" viewBox="0 0 900 112" role="img" aria-label="Flash layout of the STM32F401CC">
+      <rect x="2" y="40" width="56" height="32" class="d-box2"/>
+      <rect x="58" y="40" width="336" height="32" class="d-litbox"/>
+      <rect x="394" y="40" width="56" height="32" class="d-box"/>
+      <rect x="450" y="40" width="448" height="32" class="d-box2"/>
+      <text class="d-p" x="4" y="30">HID bootloader</text>
+      <text class="d-p" x="226" y="30" text-anchor="middle">Desktop-pet, 96 KB</text>
+      <text class="d-s" x="422" y="30" text-anchor="middle">16 KB free</text>
+      <text class="d-p" x="674" y="30" text-anchor="middle">last sector: the saved place and offset</text>
+      <text class="d-s" x="30" y="61" text-anchor="middle">16 KB</text>
+      <text class="d-s" x="674" y="61" text-anchor="middle">128 KB sector, nearly empty</text>
+      <g class="d-s"><text x="2" y="92">0x08000000</text><text x="58" y="106">0x08004000</text>
+        <text x="450" y="92" text-anchor="middle">0x08020000</text><text x="898" y="92" text-anchor="end">0x08040000</text></g>
+    </svg>
+  </div>
+  <p>That is the F401CC's 256 KB, drawn to scale. The app is linked to start right after the bootloader, at 0x08004000, and has 16 KB of room before it would meet the saved settings.</p>
+</section>
+
+<!-- ============================ 15 TROUBLE ============================ -->
+<section class="ch" id="trouble">
+  <span class="lbl">Inside · 15</span>
+  <h2>When something's off</h2>
+  <div class="tscroll"><table>
+    <thead><tr><th>What you see</th><th>Likely cause</th></tr></thead>
+    <tbody>
+      <tr><td><b>Blue LED blinking fast, screen blank</b></td><td>The OLED isn't answering on I2C. Check its four wires, then try address 0x3D in <code>src/main.cpp</code>.</td></tr>
+      <tr><td><b>Upload can't find the board</b></td><td>It isn't in the bootloader. Hold KEY, tap NRST, let go when the LED blinks.</td></tr>
+      <tr><td><b>No HID device at all, even holding KEY</b></td><td>The bootloader was erased by a DFU or ST-Link upload to 0x08000000. Reflash it from WeAct's repository, or build without the flash offset.</td></tr>
+      <tr><td><b>Garbage on the screen</b></td><td>The module may be an SH1106, common on 1.3 inch boards, which needs a different library.</td></tr>
+      <tr><td><b>Eyes never react to Aminal</b></td><td>The status screen says Link none: the bridge isn't running, or a serial monitor has the port.</td></tr>
+      <tr><td><b>No light on the HC-05</b></td><td>Almost always a loose VCC or GND wire.</td></tr>
+      <tr><td><b>ESP-01 answers AT, then garbles and restarts</b></td><td>A brownout. Give it its own AMS1117-3.3 and a 470 µF capacitor (chapter 09).</td></tr>
+    </tbody>
+  </table></div>
+  <h3>A map of the code</h3>
+  <div class="tscroll"><table>
+    <thead><tr><th>File</th><th>What's in it</th></tr></thead>
+    <tbody>
+      <tr><td class="f">src/pet.h</td><td>The shared World: time, weather, timer, Aminal's state, media, the current card</td></tr>
+      <tr><td class="f">src/main.cpp</td><td>Setup, the frame loop, the button, switching screens</td></tr>
+      <tr><td class="f">src/face.cpp</td><td>Eyes, moods, habits, and the listening, thinking, speaking, music and film faces</td></tr>
+      <tr><td class="f">src/media.cpp</td><td>Headphones, music notes, the visualizer and the popcorn</td></tr>
+      <tr><td class="f">src/screens.cpp</td><td>Clock, weather icons, timer, status and the cards</td></tr>
+      <tr><td class="f">src/link.cpp</td><td>The protocol, read from USB and Bluetooth alike, and the ESP-01 passthrough</td></tr>
+      <tr><td class="f">src/wifi.cpp</td><td>The ESP-01 driven through its AT firmware: joining, the request, reading the reply</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Document history</h3>
+  <div class="tscroll"><table>
+    <thead><tr><th>Revision</th><th>Date</th><th>What changed</th></tr></thead>
+    <tbody>
+      <tr><td class="f">Rev. 1</td><td class="f">29 Sep 2026</td><td>First edition, for firmware v6: the user guide, the technical notes, and real captures of every face and screen.</td></tr>
+    </tbody>
+  </table></div>
+  <footer class="end"><span>Desktop-pet · by Mosam Biswas</span><a href="https://github.com/BiswasMosam/Desktop-pet">github.com/BiswasMosam/Desktop-pet</a></footer>
+</section>
+
+</main>
+</div>
+</body>
+</html>
+

@@ -5,14 +5,14 @@ A tiny desk companion with a face. Two rounded eyes on a 0.96" OLED that glance 
 It runs on its own too. Unplug it from the PC and it carries on being a pet, keeping the clock it was last given.
 
 <p>
-  <img src="docs/images/idle.gif" width="32%" alt="Idle: glancing around and blinking">
-  <img src="docs/images/dance.gif" width="32%" alt="Dancing to music, notes floating up">
-  <img src="docs/images/watch.gif" width="32%" alt="Watching a film with a bucket of popcorn">
+  <img src="docs/shots/idle.gif" width="32%" alt="Idle: glancing around and blinking">
+  <img src="docs/shots/dance.gif" width="32%" alt="Dancing to music, notes floating up">
+  <img src="docs/shots/watch.gif" width="32%" alt="Watching a film with a bucket of popcorn">
 </p>
 
 Real captures from the pet's own frame buffer: idle, dancing, and eating popcorn through a film.
 
-**[The handbook (PDF)](docs/Desktop-pet-Handbook.pdf)** is the full user guide and technical notes: every face, trick and screen, the wiring, the firmware, the protocol and how it hears music, in 19 pages.
+**[The handbook](https://www.mosambiswas.com/Desktop-pet/)** is the full user guide and technical notes: every face, trick and screen, the wiring, the firmware, the protocol and how it hears music. It's also a 19-page [PDF](docs/Desktop-pet-Handbook.pdf).
 
 ## What it does
 

@@ -192,27 +192,89 @@ def sn_hex():
     return "\n".join(lines)
 
 
+SITE = "https://www.mosambiswas.com/Desktop-pet/"
+PDF = "Desktop-pet-Handbook.pdf"
+
+# Two cyan eyes on black, for the browser tab
+FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"
+           "%3Crect width='32' height='32' rx='7' fill='%2307090b'/%3E"
+           "%3Crect x='5' y='10' width='9' height='12' rx='3' fill='%233de8ff'/%3E"
+           "%3Crect x='18' y='10' width='9' height='12' rx='3' fill='%233de8ff'/%3E%3C/svg%3E")
+
+DESCRIPTION = ("The Desktop-pet handbook: a little OLED face for the desk that is Aminal's face, "
+               "with real captures of every mood, trick and screen, and how it all works inside.")
+
+PAGES_HEAD = f"""<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="{DESCRIPTION}">
+<meta name="theme-color" content="#07090b">
+<link rel="icon" href="{FAVICON}">
+<link rel="canonical" href="{SITE}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Desktop-pet Handbook">
+<meta property="og:description" content="{DESCRIPTION}">
+<meta property="og:url" content="{SITE}">
+<meta property="og:image" content="{SITE}og.png">
+<meta name="twitter:card" content="summary_large_image">"""
+
+
 def build(target):
+    """web: the artifact page (the host adds the document around it).
+    pages: the same page as a whole document, for GitHub Pages.
+    paper: the A4 source the PDF is printed from."""
     import calendar
+    screen = target in ("web", "pages")
     src = open("handbook.src.html", encoding="utf-8").read()
     utc = calendar.timegm((2026, 9, 29, 10, 42, 5, 0, 0, 0)) - 19800
     src = src.replace("{{TM}}", f"TM {utc} 19800").replace("{{SNHEX}}", sn_hex()).replace("{{LISTEN}}", listen_frames())
-    src = src.replace("{{FONTS}}", WEB_FONTS if target == "web" else PAPER_FONTS)
-    src = src.replace("{{TARGET}}", target)
+    src = src.replace("{{FONTS}}", WEB_FONTS if screen else PAPER_FONTS)
+    src = src.replace("{{HEAD}}", PAGES_HEAD if target == "pages" else "")
+    src = src.replace("{{PDFLINK}}", PDF if target == "pages" else SITE + PDF)
     src = src.replace("{{WORDMARK}}", pixel_text("DESKTOP-PET", label="Desktop-pet"))
     src = re.sub(r"\{\{PIXEL:([^}]*)\}\}", lambda m: pixel_text(m.group(1), "pixlabel"), src)
-    src = re.sub(r"<!--FIG(.*?)-->", lambda m: figure(target, m.group(1)), src, flags=re.S)
-    src = re.sub(r"<!--WEB-->(.*?)<!--/WEB-->", lambda m: m.group(1) if target == "web" else "",
+    src = re.sub(r"<!--FIG(.*?)-->", lambda m: figure("web" if screen else "paper", m.group(1)),
                  src, flags=re.S)
-    src = re.sub(r"<!--PAPER-->(.*?)<!--/PAPER-->", lambda m: m.group(1) if target != "web" else "",
-                 src, flags=re.S)
+    keep = {"WEB": screen, "PAPER": not screen, "DOC": target != "web"}
+    for mark, on in keep.items():
+        src = re.sub(rf"<!--{mark}-->(.*?)<!--/{mark}-->", lambda m: m.group(1) if on else "",
+                     src, flags=re.S)
     return src
+
+
+def og_image(path):
+    """A 1200 x 630 link preview: the idle face and the wordmark, in the pet's pixels."""
+    from PIL import Image, ImageDraw
+    bg, lit = (7, 9, 11), (61, 232, 255)
+    img = Image.new("RGB", (1200, 630), bg)
+    t, F = load("idle2")
+    face = F[int(np.argmin(np.abs(t - 4.5)))]
+    s, ox, oy = 5, (1200 - 128 * 5) // 2, 70
+    d = ImageDraw.Draw(img)
+    d.rectangle([ox - 12, oy - 12, ox + 128 * s + 11, oy + 64 * s + 11], fill=(0, 0, 0))
+    for y, x in zip(*np.nonzero(face)):
+        d.rectangle([ox + x * s, oy + y * s, ox + x * s + s - 1, oy + y * s + s - 1], fill=lit)
+    text, k = "DESKTOP-PET", 7
+    tx = (1200 - (len(text) * 6 - 1) * k) // 2
+    for i, ch in enumerate(text):
+        for col in range(5):
+            bits = FONT[ord(ch) * 5 + col]
+            for row in range(8):
+                if bits >> row & 1:
+                    x, y = tx + (i * 6 + col) * k, 470 + row * k
+                    d.rounded_rectangle([x + 1, y + 1, x + k - 1, y + k - 1], radius=2, fill=lit)
+    img.save(path, optimize=True)
 
 
 if __name__ == "__main__":
     import os
+    import shutil
     os.makedirs("site", exist_ok=True)
-    web, paper = build("web"), build("paper")
+    web, paper, pages = build("web"), build("paper"), build("pages")
     open("site/index.html", "w", encoding="utf-8").write(web)
     open("paper.html", "w", encoding="utf-8").write(paper)
-    print(f"web {len(web) // 1024} KB, paper {len(paper) // 1024} KB")
+    # GitHub Pages serves ../ (the repo's docs/ folder) at SITE
+    open("../index.html", "w", encoding="utf-8").write(pages)
+    os.makedirs("../shots", exist_ok=True)
+    for gif in sorted(set(re.findall(r'src="shots/([a-z_0-9]+\.gif)"', pages))):
+        shutil.copyfile(f"site/shots/{gif}", f"../shots/{gif}")
+    og_image("../og.png")
+    print(f"web {len(web) // 1024} KB, paper {len(paper) // 1024} KB, pages {len(pages) // 1024} KB")

@@ -1,8 +1,9 @@
-<!--PAPER--><!doctype html>
-<html lang="en" class="paper">
+<!--DOC--><!doctype html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<!--/PAPER-->
+{{HEAD}}
+<!--/DOC-->
 <title>Desktop-pet Handbook</title>
 {{FONTS}}
 <style>
@@ -292,9 +293,9 @@ html{scroll-behavior:smooth}
   .toc li span{display:block;font-size:7.6pt;color:var(--dim)}
 }
 </style>
-<!--PAPER--></head>
+<!--DOC--></head>
 <body>
-<!--/PAPER-->
+<!--/DOC-->
 <div class="shell">
 <aside class="rail" aria-label="Contents">
   {{WORDMARK}}
@@ -318,7 +319,7 @@ html{scroll-behavior:smooth}
     <a href="#trouble"><i>15</i>When something's off</a>
   </nav>
   <div class="files">
-    <a href="https://github.com/BiswasMosam/Desktop-pet/blob/master/docs/Desktop-pet-Handbook.pdf">PDF edition</a>
+    <a href="{{PDFLINK}}">PDF edition</a>
     <a href="https://github.com/BiswasMosam/Desktop-pet">Source on GitHub</a>
   </div>
 </aside>
@@ -1022,6 +1023,6 @@ idle  → AT+CIPSTART="TCP","api.open-meteo.com",80 → AT+CIPSEND → GET → +
 
 </main>
 </div>
-<!--PAPER--></body>
+<!--DOC--></body>
 </html>
-<!--/PAPER-->
+<!--/DOC-->
