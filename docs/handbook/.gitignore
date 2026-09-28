@@ -1,0 +1,5 @@
+site/
+paper.html
+handbook.pdf
+*.png
+__pycache__/

@@ -4,6 +4,16 @@ A tiny desk companion with a face. Two rounded eyes on a 0.96" OLED that glance 
 
 It runs on its own too. Unplug it from the PC and it carries on being a pet, keeping the clock it was last given.
 
+<p>
+  <img src="docs/images/idle.gif" width="32%" alt="Idle: glancing around and blinking">
+  <img src="docs/images/dance.gif" width="32%" alt="Dancing to music, notes floating up">
+  <img src="docs/images/watch.gif" width="32%" alt="Watching a film with a bucket of popcorn">
+</p>
+
+Real captures from the pet's own frame buffer: idle, dancing, and eating popcorn through a film.
+
+**[The handbook (PDF)](docs/Desktop-pet-Handbook.pdf)** is the full user guide and technical notes: every face, trick and screen, the wiring, the firmware, the protocol and how it hears music, in 19 pages.
+
 ## What it does
 
 ### The face
@@ -183,7 +193,7 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 
 All timers compare with `reached(now, t)` instead of `now > t`, so the pet keeps blinking after `millis()` wraps around at about 49.7 days.
 
-The saved location lives in the chip's last flash sector (0x08020000 on the F401CC). The app starts at 0x08004000 and is about 98 KB, so it has about 14 KB of room before the two would meet.
+The saved location lives in the chip's last flash sector (0x08020000 on the F401CC). The app starts at 0x08004000 and is about 96 KB, so it has about 16 KB of room before the two would meet.
 
 ## Stack
 
