@@ -92,7 +92,14 @@ python3.12 pet_bridge.py --snap pet.png   # save exactly what the OLED shows
 python3.12 pet_bridge.py --say "EM love"  # send one line
 ```
 
-Over Bluetooth, pair the HC-05 in Windows (PIN `1234`), find its **outgoing** COM port under Bluetooth > More Bluetooth settings > COM Ports, and set `PET_PORT=COMx` in Aminal's `.env`.
+### Bluetooth
+
+1. **Wire the HC-05** (the board with 6 pins in a row, not the ESP-01 with 8 in two rows): VCC to **5V**, GND to G, TXD to A3, RXD to A2. Its red LED blinks fast when it's powered and ready to pair. No light at all is almost always a loose VCC or GND wire.
+2. **Pair it with the PC**, not a phone: the HC-05 holds one connection at a time. Windows 11's own *Add device* list often shows it as *Unknown device*; press Win+R and run `DevicePairingWizard`, the old wizard, which shows it as **HC-05**. PIN `1234` (or `0000`).
+3. **Find its outgoing COM port.** Pairing makes two. The outgoing one is listed under Bluetooth > More Bluetooth settings > COM Ports as *Outgoing 'HC-05'*; it's the one whose device ID carries the module's address.
+4. **Set `PET_PORT=COMx`** in Aminal's `.env`.
+
+USB always wins. The bridge tries the cable first and the Bluetooth port every 15 s while the pet isn't plugged in (opening the port of a pet that's off makes Windows try for seconds), and plugging the cable back in moves the link to USB by itself. Running the pet from a phone charger or power bank is how it goes wireless: within 15 s of losing the cable, Aminal reaches it over the air. Everything works over Bluetooth, just slower: a full `SN` snapshot takes about 2 s at 9600 baud.
 
 ## The protocol
 
@@ -144,6 +151,6 @@ C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD13
 
 ## Next
 
-- The HC-05 as a wireless link to Aminal
+
 - The ESP-01 for time and weather when the PC is off, and a link to Aminal over WiFi
 - A real touch sensor (TTP223) in place of the KEY button
