@@ -238,7 +238,11 @@ void drawTimer(uint32_t now) {
   }
 
   header(world.timerLabel[0] ? world.timerLabel : "Timer");
-  if (world.timerPaused) small(SCREEN_W - 36, 0, "paused");
+  if (world.timerPaused) {
+    // Just left of the link name the header put in the corner
+    int link = strlen(linkName());
+    smallRight(SCREEN_W - (link ? (link + 1) * 6 : 0), 0, "paused");
+  }
 
   uint32_t left = (timerLeftMs(now) + 999) / 1000;       // round up, like a kitchen timer
   char buf[12];
