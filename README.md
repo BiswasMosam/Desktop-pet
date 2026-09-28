@@ -1,25 +1,54 @@
 # Desktop-pet
 
-A tiny desk companion with a face. Two rounded eyes on a 0.96" OLED that glance around, blink, light up when you pet it, and doze off when you ignore it.
+A tiny desk companion with a face. Two rounded eyes on a 0.96" OLED that glance around, blink, fidget, light up when you pet it and doze off when you ignore it. Plugged into the PC it becomes the physical face of [Aminal](https://github.com/BiswasMosam/Aminal), my voice assistant: its eyes listen, think and talk along with it, and it shows the time, the weather, timers and reminders.
 
-Step 1 of the build: **the face**. The Black Pill's onboard KEY button stands in for a touch sensor for now.
+It runs on its own too. Unplug it from the PC and it carries on being a pet, keeping the clock it was last given.
 
 ## What it does
 
-| Mood | When | What you see |
+### The face
+
+| Expression | When | What you see |
 | --- | --- | --- |
-| **Normal** | Default | Eyes glance somewhere random every 1.5 to 4 s and blink every 2.5 to 6 s |
-| **Happy** | You press KEY | Eyes centre, lift slightly and curve into happy `^ ^` arcs for 2.5 s |
-| **Sleepy** | 30 s with no pets | Eyes droop into slits and a pair of `z`s bobs in the corner |
+| **Idle** | Default | Glances around every 1.5 to 4 s, blinks, and every 15 to 40 s fidgets: a look around, a little hop, a suspicious squint or a double blink |
+| **Happy** | You tap KEY | Eyes lift and curve into `^ ^` arcs for 2.5 s |
+| **In love** | Three taps in a row | Beating hearts |
+| **Sleepy** | 30 s with no attention (10 s after 11 pm) | Eyes droop into slits, `z`s bob in the corner, and the time shows small in the other |
+| **Listening** | Aminal is listening | Eyes wide open, swelling with your voice |
+| **Thinking** | Aminal is working it out | Looking up and off to one side, three dots filling in |
+| **Speaking** | Aminal is talking | Eyes lifted, and a mouth that opens with Aminal's voice |
 
-Pressing KEY while it sleeps wakes it straight into Happy.
+Aminal can also make it pull a face on request: happy, love, surprised, sad, angry, wink or sleepy.
 
-Everything moves by easing the current eye position and height toward a target every frame (about 50 fps), so glances glide, blinks snap shut, and falling asleep feels like a slow droop rather than a jump cut.
+Everything moves by easing the current eye position, width and height toward a target every frame, so glances glide, blinks snap shut and falling asleep is a slow droop rather than a jump cut.
+
+### The other screens
+
+- **Clock:** big time, the date, and a hairline filling across the minute.
+- **Weather:** an animated icon (turning sun, crescent moon at night, falling rain, drifting snow, flickering lightning, rolling fog), the temperature, today's high and low, and the place.
+- **Timer:** the countdown with a bar draining under it. It blinks while paused, and when it runs out the whole screen flashes "Time's up" until you tap it.
+- **Status:** which link it's on, what Aminal is doing, and how fresh the time and weather are.
+
+Reminders, mail and what's next on the calendar slide down as a card over whatever is on screen. Ask Aminal for the weather or a timer and the pet flips to that screen while it answers.
+
+### The button
+
+KEY (PA0) is the only input:
+
+| Press | On the face | Anywhere else |
+| --- | --- | --- |
+| **Tap** | Pet it | Next screen |
+| **Double tap** | Next screen | Next screen |
+| **Hold** | Back to the face | On the timer: pause or resume it. Elsewhere: back to the face |
+
+A tap also dismisses a card. A screen you flipped to returns to the face after 20 s.
 
 ## Hardware
 
 - **WeAct Black Pill**, STM32F401CC or STM32F411CE
 - **0.96" SSD1306 OLED**, 128x64, I2C
+- **HC-05** Bluetooth module (optional): a wireless link to Aminal
+- **ESP-01** WiFi module (coming): time and weather straight from the internet
 - USB-C cable
 
 ### Wiring
@@ -30,6 +59,13 @@ Everything moves by easing the current eye position and height toward a target e
 | GND | GND |
 | SCL | B6 |
 | SDA | B7 |
+
+| HC-05 | Black Pill |
+| --- | --- |
+| VCC | 5V |
+| GND | GND |
+| TXD | A3 |
+| RXD | A2 |
 
 The KEY button (PA0) and the blue LED (PC13) are already on the board.
 
@@ -46,7 +82,37 @@ WeAct Black Pills ship with the **WeAct HID bootloader** in the first 16 KB of f
 
 The default build targets the F401CC and also runs on an F411CE. For the F411's full 100 MHz, read the square chip and, if it says `STM32F411CE`, change `default_envs` in `platformio.ini` to `blackpill_f411ce`.
 
-Serial output goes over the same USB cable (the plug icon in the status bar opens the monitor at 115200 baud) and prints `Desktop pet is awake` on boot.
+### Connecting it to Aminal
+
+Nothing to set up: Aminal starts `pet_bridge.py` beside itself, which finds the pet on USB by its identity (`0483:5740`) and starts talking. With Aminal closed the bridge can be run on its own and still gives the pet the time, weather and timers:
+
+```bash
+python3.12 pet_bridge.py                  # in the Aminal folder
+python3.12 pet_bridge.py --snap pet.png   # save exactly what the OLED shows
+python3.12 pet_bridge.py --say "EM love"  # send one line
+```
+
+Over Bluetooth, pair the HC-05 in Windows (PIN `1234`), find its **outgoing** COM port under Bluetooth > More Bluetooth settings > COM Ports, and set `PET_PORT=COMx` in Aminal's `.env`.
+
+## The protocol
+
+One short line per message, the same on USB and Bluetooth, simple enough to type into a serial monitor:
+
+| Line | Meaning |
+| --- | --- |
+| `HI` | Who are you? The pet answers `PET desktop-pet 1` |
+| `PG` | Heartbeat, answered `PO`. Eight silent seconds and the pet is on its own again |
+| `ST idle\|listening\|thinking\|speaking\|off` | What Aminal is doing |
+| `LV 0-100` | Voice level, for the eyes and the mouth |
+| `TM <unix> <utc offset s>` | The time |
+| `WX <temp> <wmo code> <hi> <lo> <place>` | The weather |
+| `TI <left s> <total s> <paused 0/1> <label>` or `TI -` | The timer, or none |
+| `AL <secs> <title>\|<text>` or `AL -` | A card, or take it down |
+| `EM <happy\|love\|surprised\|sad\|angry\|wink\|sleepy> [ms]` | Pull a face |
+| `GO <face\|clock\|weather\|timer\|status> [secs]` | Show a screen |
+| `SN` | Answered `SN <hex>`: the 1024-byte frame buffer, exactly what's on the OLED |
+
+The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold timer`, `EV dismiss`.
 
 ## Troubleshooting
 
@@ -58,23 +124,26 @@ Serial output goes over the same USB cable (the plug icon in the status bar open
 | No HID device at all, even holding KEY | The HID bootloader was erased (a DFU or ST-Link upload to `0x08000000` does that). Reflash it from WeAct's repo, or drop `board_build.flash_offset` and upload over DFU or ST-Link instead. |
 | Don't install WinUSB over *WeAct Studio HID Bootloader* in Zadig | The uploader talks to it as HID. If you already did, uninstall that device in Device Manager and replug. |
 | Garbage or noise on screen | Module may be an SH1106 (common on 1.3" boards), which needs a different library. |
+| Eyes never react to Aminal | Status screen says `Link none`: the bridge isn't running, or something else (a serial monitor) has the port open. |
 
 ## How the code is laid out
 
-`src/main.cpp`, top to bottom:
-
-- **Eye shape:** size, corner radius and gap. Change these to restyle the face.
-- **Mood and timing:** the three moods, the sleep timeout and how long a pet lasts.
-- **Drawing:** `drawEye` draws one rounded rectangle and, when happy, cuts a circle out of its bottom to make the arc. `drawFace` places both eyes and the sleeping `z`s.
-- **Behaviour:** `handleButton` catches the press edge, `updateMood` moves between moods, `updateTargets` picks where the eyes should be and eases toward it.
+| File | What's in it |
+| --- | --- |
+| `src/pet.h` | The shared `World`: time, weather, timer, Aminal's state, the current card |
+| `src/main.cpp` | Setup, the frame loop, the button, switching screens |
+| `src/face.cpp` | Eyes, moods, fidgets, and the listening, thinking and speaking faces |
+| `src/screens.cpp` | Clock, weather icons, timer, status, and the alert card |
+| `src/link.cpp` | The protocol, read from USB and the HC-05 alike |
 
 All timers compare with `reached(now, t)` instead of `now > t`, so the pet keeps blinking after `millis()` wraps around at about 49.7 days.
 
 ## Stack
 
-C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD1306 and Adafruit GFX for the display.
+C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD1306 and Adafruit GFX for the display, FreeSans Bold for the big digits.
 
 ## Next
 
+- The HC-05 as a wireless link to Aminal
+- The ESP-01 for time and weather when the PC is off, and a link to Aminal over WiFi
 - A real touch sensor (TTP223) in place of the KEY button
-- More moods and reactions

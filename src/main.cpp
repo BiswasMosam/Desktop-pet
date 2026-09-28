@@ -1,155 +1,125 @@
-// Desktop pet: step 1, the face.
+// Desktop pet: a face on the desk that keeps Aminal company.
 // Black Pill + 0.96" SSD1306 OLED (SCL -> B6, SDA -> B7, VCC -> 3V3, GND -> GND).
-// The KEY button (PA0) stands in for a touch sensor: press it to pet the pet.
+// HC-05 Bluetooth (optional): TXD -> A3, RXD -> A2, VCC -> 5V, GND -> GND.
+//
+// KEY (PA0) is the only button:
+//   tap         pet it (on the face), next screen (anywhere else), dismiss a card
+//   double tap  next screen
+//   hold        back to the face; on the timer, pause or resume it
 
-#include <Arduino.h>
 #include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include "pet.h"
 
-#define SCREEN_W   128
-#define SCREEN_H   64
 #define OLED_ADDR  0x3C   // some modules use 0x3D
 #define LED_PIN    PC13   // onboard LED, on when LOW
 #define KEY_PIN    PA0    // onboard KEY button, LOW when pressed
 
 Adafruit_SSD1306 display(SCREEN_W, SCREEN_H, &Wire, -1);
+World world;
+Screen screen = SCR_FACE;
 
-// ---------- Eye shape ----------
-const int EYE_W   = 36;
-const int EYE_H   = 36;
-const int EYE_R   = 10;   // corner radius
-const int EYE_GAP = 16;   // space between the eyes
+const uint32_t BROWSE_MS    = 20000;  // a screen you flipped to returns to the face after this
+const uint32_t DOUBLE_TAP_MS = 350;
+const uint32_t HOLD_MS      = 700;
 
-// ---------- Mood and timing ----------
-enum Mood { NORMAL, HAPPY, SLEEPY };
-Mood mood = NORMAL;
+static uint32_t screenUntil = 0;      // 0 = stay put
+static uint32_t lastFrame = 0;
 
-const unsigned long SLEEP_AFTER_MS = 30000;  // ignored for 30s -> falls asleep
-const unsigned long HAPPY_FOR_MS   = 2500;   // how long a pet keeps it happy
+// ---------- Clock and timer ----------
 
-// Current values ease toward targets, which makes movement smooth
-float curX = 0, curY = 0, curH = EYE_H;
-float tgtX = 0, tgtY = 0, tgtH = EYE_H;
-
-unsigned long lastFrame = 0;
-unsigned long nextBlink = 0, blinkEnd = 0;
-unsigned long nextLook = 0;
-unsigned long happyUntil = 0;
-unsigned long lastInteraction = 0;
-bool blinking = false;
-bool lastKey = HIGH;
-
-// True once now has passed t, even across the millis() wrap at ~49.7 days
-bool reached(unsigned long now, unsigned long t) {
-  return (long)(now - t) >= 0;
+bool clockNow(struct tm &out) {
+  if (!world.timeValid) return false;
+  time_t t = (time_t)world.epochAtSync + (millis() - world.millisAtSync) / 1000
+           + world.tzOffset;
+  gmtime_r(&t, &out);
+  return true;
 }
 
-// ---------- Drawing ----------
-void drawEye(int cx, int cy, int w, int h) {
-  if (h < 2) h = 2;
-  int r = min(EYE_R, h / 2);
-  display.fillRoundRect(cx - w / 2, cy - h / 2, w, h, r, SSD1306_WHITE);
-
-  if (mood == HAPPY) {
-    // Cut a curve out of the bottom so the eye becomes a happy "^".
-    // Placed from the full eye height, so a half-open eye waking from sleep
-    // isn't swallowed by the cutout while it grows.
-    display.fillCircle(cx, cy + EYE_H / 2 + w / 4, (w * 6) / 10, SSD1306_BLACK);
-  }
+uint32_t timerLeftMs(uint32_t now) {
+  if (!world.timerOn) return 0;
+  if (world.timerPaused) return world.timerLeftMs;
+  uint32_t gone = now - world.timerSyncMs;
+  return gone >= world.timerLeftMs ? 0 : world.timerLeftMs - gone;
 }
 
-void drawFace() {
-  display.clearDisplay();
+// ---------- Screens ----------
 
-  int cy = SCREEN_H / 2 + (int)curY;
-  int lx = SCREEN_W / 2 - EYE_GAP / 2 - EYE_W / 2 + (int)curX;
-  int rx = SCREEN_W / 2 + EYE_GAP / 2 + EYE_W / 2 + (int)curX;
-
-  drawEye(lx, cy, EYE_W, (int)curH);
-  drawEye(rx, cy, EYE_W, (int)curH);
-
-  if (mood == SLEEPY) {
-    // Little floating z that bobs up and down
-    int bob = (millis() / 400) % 3;
-    display.setTextSize(1);
-    display.setTextColor(SSD1306_WHITE);
-    display.setCursor(112, 8 - bob);
-    display.print("z");
-    display.setCursor(118, 2 - bob / 2);
-    display.print("z");
-  }
-
-  display.display();
+const char *screenName(Screen s) {
+  static const char *NAMES[] = {"face", "clock", "weather", "timer", "status"};
+  return s < SCR_COUNT ? NAMES[s] : "";
 }
 
-// ---------- Behaviour ----------
-void handleButton(unsigned long now) {
-  bool key = digitalRead(KEY_PIN);
-  if (lastKey == HIGH && key == LOW) {   // just pressed
-    mood = HAPPY;
-    happyUntil = now + HAPPY_FOR_MS;
-    lastInteraction = now;
-    blinking = false;
-  }
-  lastKey = key;
+void goScreen(Screen s, uint32_t holdMs, uint32_t now) {
+  screen = s;
+  screenUntil = (s == SCR_FACE || holdMs == 0) ? 0 : now + holdMs;
+  faceWake(now);
 }
 
-void updateMood(unsigned long now) {
-  if (mood == HAPPY && reached(now, happyUntil)) {
-    mood = NORMAL;
-  }
-  if (mood == NORMAL && now - lastInteraction > SLEEP_AFTER_MS) {
-    mood = SLEEPY;
+static void nextScreen(uint32_t now) {
+  Screen s = (Screen)((screen + 1) % SCR_COUNT);
+  if (s == SCR_TIMER && !world.timerOn) s = (Screen)((s + 1) % SCR_COUNT);
+  goScreen(s, BROWSE_MS, now);
+
+  char ev[24];
+  snprintf(ev, sizeof(ev), "EV next %s", screenName(s));
+  linkEvent(ev);
+}
+
+// ---------- The button ----------
+
+static bool keyDown = false, holdFired = false;
+static uint32_t downAt = 0, lastTapAt = 0;
+
+static void onTap(uint32_t now) {
+  if (world.alertOn) {
+    if (world.alertLoud) linkEvent("EV dismiss");
+    dismissAlert();
+  } else if (screen == SCR_FACE) {
+    faceTouch(now);
+    linkEvent("EV pet");
+  } else {
+    nextScreen(now);
   }
 }
 
-void updateTargets(unsigned long now) {
-  switch (mood) {
-    case NORMAL:
-      // Glance somewhere random every few seconds
-      if (reached(now, nextLook)) {
-        tgtX = random(-20, 21);
-        tgtY = random(-8, 9);
-        nextLook = now + random(1500, 4000);
-      }
-      // Blink every few seconds
-      if (!blinking && reached(now, nextBlink)) {
-        blinking = true;
-        blinkEnd = now + 130;
-        nextBlink = now + random(2500, 6000);
-      }
-      if (blinking && reached(now, blinkEnd)) blinking = false;
-      tgtH = blinking ? 2 : EYE_H;
-      break;
-
-    case HAPPY:
-      tgtX = 0;
-      tgtY = -4;
-      tgtH = EYE_H;
-      break;
-
-    case SLEEPY:
-      tgtX = 0;
-      tgtY = 8;
-      tgtH = 6;
-      break;
+static void onHold(uint32_t now) {
+  if (screen == SCR_TIMER && world.timerOn) {
+    linkEvent("EV hold timer");       // Aminal pauses or resumes it
+  } else {
+    goScreen(SCR_FACE, 0, now);
+    linkEvent("EV hold");
   }
+}
 
-  // Ease toward the target. Blinks close fast, everything else glides.
-  float speed = (blinking || tgtH < curH - 10) ? 0.6f : 0.25f;
-  curX += (tgtX - curX) * 0.25f;
-  curY += (tgtY - curY) * 0.25f;
-  curH += (tgtH - curH) * speed;
+static void handleKey(uint32_t now) {
+  bool pressed = digitalRead(KEY_PIN) == LOW;
+  if (pressed && !keyDown) {
+    keyDown = true;
+    holdFired = false;
+    downAt = now;
+  } else if (pressed && !holdFired && now - downAt >= HOLD_MS) {
+    holdFired = true;
+    onHold(now);
+  } else if (!pressed && keyDown) {
+    keyDown = false;
+    if (holdFired) return;
+    // The first tap acts at once, so petting never lags. A quick second tap
+    // on the face also flips to the next screen.
+    bool second = lastTapAt && now - lastTapAt < DOUBLE_TAP_MS;
+    lastTapAt = second ? 0 : now;
+    if (second && screen == SCR_FACE && !world.alertOn) nextScreen(now);
+    else onTap(now);
+  }
 }
 
 // ---------- Setup and loop ----------
+
 void setup() {
   pinMode(KEY_PIN, INPUT_PULLUP);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);  // LED off
 
-  Serial.begin(115200);
+  linkBegin();
 
   Wire.setSDA(PB7);
   Wire.setSCL(PB6);
@@ -166,23 +136,32 @@ void setup() {
   }
 
   randomSeed(analogRead(PA1));
-  unsigned long now = millis();
-  lastInteraction = now;
-  nextBlink = now + 1500;
-  nextLook = now + 1000;
+  faceBegin(millis());
 
   display.clearDisplay();
   display.display();
-  Serial.println("Desktop pet is awake");
 }
 
 void loop() {
-  unsigned long now = millis();
-  if (now - lastFrame < 20) return;   // about 50 fps
+  uint32_t now = millis();
+  linkPoll(now);                      // every pass, so lines never pile up
+  if (now - lastFrame < 20) return;   // about 50 fps, as the I2C allows
   lastFrame = now;
 
-  handleButton(now);
-  updateMood(now);
-  updateTargets(now);
-  drawFace();
+  handleKey(now);
+  linkTick(now);
+  if (screenUntil && reached(now, screenUntil)) goScreen(SCR_FACE, 0, now);
+  if (world.alertOn && reached(now, world.alertUntil)) dismissAlert();
+  faceUpdate(now);
+
+  display.clearDisplay();
+  switch (screen) {
+    case SCR_CLOCK:   drawClock(now);   break;
+    case SCR_WEATHER: drawWeather(now); break;
+    case SCR_TIMER:   drawTimer(now);   break;
+    case SCR_STATUS:  drawStatus(now);  break;
+    default:          faceDraw(now);    break;
+  }
+  if (world.alertOn) drawAlert(now);
+  display.display();
 }
