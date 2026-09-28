@@ -35,15 +35,16 @@ The KEY button (PA0) and the blue LED (PC13) are already on the board.
 
 ## Getting it running
 
-1. **Install PlatformIO.** In VS Code, open Extensions, search for *PlatformIO IDE*, install it and let it finish its first time setup.
-2. **Open the project.** File > Open Folder > `Desktop-pet`. PlatformIO fetches the STM32 toolchain and the Adafruit display libraries on its own.
-3. **Check your chip.** Read the square chip in the middle of the board. `STM32F401CC` works as is. For `STM32F411CE`, change `default_envs` at the top of `platformio.ini` to `blackpill_f411ce`.
-4. **Install the USB driver (Windows, once).** Put the board in bootloader mode (next step), open [Zadig](https://zadig.akeo.ie/), pick **STM32 BOOTLOADER**, choose **WinUSB** and click Install Driver.
-5. **Enter bootloader mode.** Hold BOOT0, tap NRST, release BOOT0.
-6. **Upload.** Click the → arrow in the blue status bar.
-7. **Tap NRST** once the upload finishes. The eyes appear.
+WeAct Black Pills ship with the **WeAct HID bootloader** in the first 16 KB of flash. It shows up in Windows as a plain HID device (`0483:572A`), so it needs no driver and no Zadig, and it sidesteps the chip's built-in USB bootloader, which often fails with *Device Descriptor Request Failed*. The project is linked to start at `0x08004000`, right after it.
 
-You repeat steps 5 to 7 for every upload. The board has no way to jump into the bootloader on its own.
+1. **Install PlatformIO.** In VS Code, open Extensions, search for *PlatformIO IDE*, install it and let it finish its first time setup.
+2. **Get the uploader.** Download [`WeAct_HID_Flash-CLI.exe`](https://github.com/WeActStudio/WeActStudio.MiniSTM32F4x1/tree/master/Soft/WeAct_HID_FW_Bootloader) from WeAct's repo and save it as `tools/WeAct_HID_Flash-CLI.exe` in this folder. It's WeAct's own tool, closed source, so it isn't committed here.
+3. **Open the project.** File > Open Folder > `Desktop-pet`. PlatformIO fetches the STM32 toolchain and the Adafruit display libraries on its own.
+4. **Enter the bootloader.** A fresh board is already in it. Once your code is on it, hold **KEY**, tap NRST, wait for the blue LED to blink, then release KEY.
+5. **Upload.** Click the → arrow in the blue status bar.
+6. The eyes appear. If they don't, tap NRST.
+
+The default build targets the F401CC and also runs on an F411CE. For the F411's full 100 MHz, read the square chip and, if it says `STM32F411CE`, change `default_envs` in `platformio.ini` to `blackpill_f411ce`.
 
 Serial output goes over the same USB cable (the plug icon in the status bar opens the monitor at 115200 baud) and prints `Desktop pet is awake` on boot.
 
@@ -52,8 +53,10 @@ Serial output goes over the same USB cable (the plug icon in the status bar open
 | Symptom | Likely cause |
 | --- | --- |
 | Blue LED blinks fast, screen blank | OLED not found on I2C. Check the four wires, then try `0x3D` for `OLED_ADDR` in `src/main.cpp`. |
-| *STM32 BOOTLOADER* never shows up | Bootloader detection on the F4x1 Black Pill is known to be unreliable. Hold BOOT0 and **replug the USB cable** instead of tapping NRST, and try a couple of times. |
-| Upload says `No DFU capable USB device available` | Board isn't in bootloader mode, or the WinUSB driver from step 4 isn't installed. |
+| Upload can't find the board | Board isn't in the HID bootloader. Hold KEY, tap NRST, release KEY when the LED blinks. |
+| Upload says the command isn't found | `tools/WeAct_HID_Flash-CLI.exe` is missing (step 2). |
+| No HID device at all, even holding KEY | The HID bootloader was erased (a DFU or ST-Link upload to `0x08000000` does that). Reflash it from WeAct's repo, or drop `board_build.flash_offset` and upload over DFU or ST-Link instead. |
+| Don't install WinUSB over *WeAct Studio HID Bootloader* in Zadig | The uploader talks to it as HID. If you already did, uninstall that device in Device Manager and replug. |
 | Garbage or noise on screen | Module may be an SH1106 (common on 1.3" boards), which needs a different library. |
 
 ## How the code is laid out
