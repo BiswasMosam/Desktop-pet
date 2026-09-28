@@ -83,9 +83,9 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 
 | ESP-01 | Black Pill |
 | --- | --- |
-| 3V3 (VCC) | 3V3, **never 5V** |
+| 3V3 (VCC) | 3.3 V from an **AMS1117-3.3** regulator fed by the 5V pin, with a 470 µF capacitor across it. **Never 5V**, and not the Black Pill's own 3V3, which browns out under the radio |
 | GND | GND |
-| EN (CH_PD) | 3V3 |
+| EN (CH_PD) | the same 3.3 V |
 | TX | A10 |
 | RX | A9 |
 | RST | B12 (lets the pet restart it) |
@@ -179,6 +179,7 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | Don't install WinUSB over *WeAct Studio HID Bootloader* in Zadig | The uploader talks to it as HID. If you already did, uninstall that device in Device Manager and replug. |
 | Garbage or noise on screen | Module may be an SH1106 (common on 1.3" boards), which needs a different library. |
 | Eyes never react to Aminal | Status screen says `Link none`: the bridge isn't running, or something else (a serial monitor) has the port open. |
+| ESP-01 answers `AT` but garbles its replies, restarts or goes silent while joining or scanning | Brownout. Its radio pulls ~300 mA bursts the Black Pill's 3.3 V regulator can't deliver: serial turns to garbage (`AT+CWLAP` echoed as `AfWLAP`), then it crashes. Lowering its transmit power (`AT+RFPOWER`) didn't help. Feed it from an **AMS1117-3.3** regulator on the 5V pin, with a 470 µF capacitor across its 3V3 and GND. |
 
 ## How the code is laid out
 
