@@ -38,6 +38,25 @@ static uint8_t touchStreak = 0;
 static bool blinking = false;
 static int8_t thinkSide = 1;
 
+// Music and films. Each song gets one of three moods, rerolled every so
+// often so a long playlist doesn't look the same all evening.
+enum MusicStyle : uint8_t { MS_HEADPHONES, MS_DANCE, MS_VISUALIZER };
+static MusicStyle style = MS_HEADPHONES;
+static uint32_t styleUntil = 0;
+static Media shownMedia = MEDIA_NONE;
+static uint32_t lastBeat = 0, nextSynthBeat = 0;
+static uint16_t beatNo = 0;
+static uint32_t eatStart = 0, nextEat = 0, nextDrift = 0;
+
+static bool aminalBusy() {
+  return world.am == AM_LISTENING || world.am == AM_THINKING || world.am == AM_SPEAKING;
+}
+
+// Music or a film is on and Aminal isn't using the face for itself
+static bool mediaShown() {
+  return world.media != MEDIA_NONE && !aminalBusy();
+}
+
 // ---------- Moods and triggers ----------
 
 static bool isNight() {
@@ -137,6 +156,79 @@ static void idleTargets(uint32_t now) {
   blinkNaturally(now, 2500, 6000);
 }
 
+// ---------- Music and films ----------
+
+static void pickStyle(uint32_t now) {
+  // The visualizer needs bars from the PC; without them, dance or vibe
+  bool bars = world.vzAt && now - world.vzAt < 1500;
+  MusicStyle was = style;
+  style = (MusicStyle)random(0, bars ? 3 : 2);
+  if (style == was && random(4)) style = (MusicStyle)((style + 1) % (bars ? 3 : 2));
+  styleUntil = now + random(25000, 45000);
+}
+
+// Asked for by name ("MD music dance"), held for as long as a random pick
+void faceMusicStyle(const char *name, uint32_t now) {
+  if      (!strcmp(name, "headphones")) style = MS_HEADPHONES;
+  else if (!strcmp(name, "dance"))      style = MS_DANCE;
+  else if (!strcmp(name, "bars"))       style = MS_VISUALIZER;
+  else return;
+  shownMedia = MEDIA_MUSIC;          // so starting the music doesn't reroll it
+  styleUntil = now + 40000;
+}
+
+// The PC's beats while they're coming, a steady 115 bpm of our own if not
+static void tickBeat(uint32_t now) {
+  bool heard = world.beatAt && now - world.beatAt < 2500;
+  bool beat = false;
+  if (heard && world.beatAt != lastBeat) {
+    lastBeat = world.beatAt;
+    beat = true;
+  } else if (!heard && reached(now, nextSynthBeat)) {
+    lastBeat = now;
+    nextSynthBeat = now + 520;
+    beat = true;
+  }
+  if (!beat) return;
+  beatNo++;
+  if (style == MS_DANCE && beatNo % 2 == 0) notesSpawn(now);
+}
+
+static void musicTargets(uint32_t now) {
+  if (reached(now, styleUntil)) pickStyle(now);
+  tickBeat(now);
+  bool onBeat = now - lastBeat < 140;
+  tgtH = EYE_H;
+  switch (style) {
+    case MS_HEADPHONES:           // eyes shut, nodding along
+      tgtW = 28; tgtX = 0; tgtY = onBeat ? 3 : -2;
+      break;
+    case MS_DANCE:                // side to side, a hop on every beat
+      tgtX = (beatNo % 2) ? 12 : -12; tgtY = onBeat ? -8 : 0;
+      break;
+    case MS_VISUALIZER:           // the eyes step aside for the bars
+      tgtX = 0; tgtY = 0;
+      break;
+  }
+}
+
+static void watchTargets(uint32_t now) {
+  // Eyes up at the screen, following the action a little
+  if (reached(now, nextDrift)) {
+    tgtX = random(-6, 7);
+    nextDrift = now + random(2500, 6000);
+  }
+  tgtY = -8;
+  tgtH = 34;
+  if (reached(now, nextEat)) {
+    eatStart = now;
+    nextEat = now + random(3500, 7000);
+  }
+  uint32_t eatT = now - eatStart;
+  if (eatStart && eatT > 450 && eatT < 1150) tgtH = 28;   // chewing, content
+  blinkNaturally(now, 3000, 7000);
+}
+
 static void emoteTargets() {
   tgtX = 0;
   tgtY = 0;
@@ -156,9 +248,18 @@ void faceUpdate(uint32_t now) {
   if (emote != EM_NONE && reached(now, emoteUntil)) emote = EM_NONE;
   if (mood == HAPPY && reached(now, happyUntil)) mood = NORMAL;
 
-  bool aminalBusy = world.am == AM_LISTENING || world.am == AM_THINKING
-                 || world.am == AM_SPEAKING;
-  if (aminalBusy) faceWake(now);
+  if (aminalBusy() || world.media != MEDIA_NONE) faceWake(now);
+
+  // Something new started playing
+  if (world.media != shownMedia) {
+    shownMedia = world.media;
+    if (shownMedia == MEDIA_MUSIC) pickStyle(now);
+    if (shownMedia == MEDIA_WATCH) {
+      eatStart = 0;
+      nextEat = now + random(1500, 3000);
+      nextDrift = now;
+    }
+  }
 
   uint32_t sleepAfter = isNight() ? NIGHT_SLEEP_MS : SLEEP_AFTER_MS;
   if (mood == NORMAL && now - lastInteraction > sleepAfter) mood = SLEEPY;
@@ -186,6 +287,10 @@ void faceUpdate(uint32_t now) {
     tgtY = -6 - world.level * 3 / 100;
     tgtH = 34 - world.level * 4 / 100;
     blinkNaturally(now, 3000, 7000);
+  } else if (world.media == MEDIA_MUSIC) {
+    musicTargets(now);
+  } else if (world.media == MEDIA_WATCH) {
+    watchTargets(now);
   } else if (mood == SLEEPY) {
     tgtX = 0; tgtY = 8; tgtH = 6;
   } else {
@@ -220,7 +325,13 @@ static Look currentLook() {
     case EM_NONE:  break;
     default:       return LOOK_PLAIN;
   }
-  return mood == HAPPY ? LOOK_HAPPY : LOOK_PLAIN;
+  if (mood == HAPPY) return LOOK_HAPPY;
+  if (mediaShown() && world.media == MEDIA_MUSIC) {
+    // Lost in it, with a peek around every nine seconds or so
+    if (style == MS_HEADPHONES) return (millis() / 1500) % 6 == 0 ? LOOK_PLAIN : LOOK_HAPPY;
+    if (style == MS_DANCE) return LOOK_HAPPY;
+  }
+  return LOOK_PLAIN;
 }
 
 static void drawHeart(int cx, int cy, int s) {
@@ -267,6 +378,13 @@ static void drawEye(int cx, int cy, int w, int h, int side, Look look, uint32_t 
 }
 
 void faceDraw(uint32_t now) {
+  bool media = mediaShown();
+  bool plain = emote == EM_NONE && mood != HAPPY;
+  if (media && plain && world.media == MEDIA_MUSIC && style == MS_VISUALIZER) {
+    visualizerDraw(now);
+    return;
+  }
+
   Look look = currentLook();
   int cy = SCREEN_H / 2 + (int)curY;
   int w = (int)curW, h = (int)curH;
@@ -275,6 +393,20 @@ void faceDraw(uint32_t now) {
 
   drawEye(lx, cy, w, h, -1, look, now);
   drawEye(rx, cy, w, h, +1, emote == EM_WINK ? LOOK_CLOSED : look, now);
+
+  if (media && world.media == MEDIA_MUSIC) {
+    if (style == MS_HEADPHONES) drawHeadphones(lx, rx, cy, w);
+    if (style == MS_DANCE) notesDraw();
+  } else if (media && world.media == MEDIA_WATCH) {
+    bucketDraw();
+    int mouthX = SCREEN_W / 2 + (int)curX, mouthY = cy + h / 2 + 5;
+    uint32_t eatT = now - eatStart;
+    if (eatStart && plain) {
+      kernelDraw(eatT, mouthX, mouthY);
+      if (eatT >= 450 && eatT < 1150) chewDraw(now, mouthX, mouthY);
+    }
+    if (world.jumpAt) burstDraw(now - world.jumpAt);
+  }
 
   bool asleep = emote == EM_SLEEPY || (emote == EM_NONE && mood == SLEEPY
                 && world.am != AM_LISTENING && world.am != AM_THINKING

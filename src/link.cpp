@@ -4,7 +4,7 @@
 // which one Aminal is on. Replies go back down the port the command came in
 // on; events (a tap, a hold) go to whichever port spoke last.
 //
-//   HI                          -> PET desktop-pet 1
+//   HI                          -> PET desktop-pet 2
 //   PG                          -> PO            (heartbeat)
 //   ST idle|listening|thinking|speaking|off
 //   LV <0-100>                  voice level
@@ -15,12 +15,23 @@
 //   EM <happy|love|surprised|sad|angry|wink|sleepy> [ms]
 //   GO <face|clock|weather|timer|status> [secs]
 //   SN                          -> SN <the 1024-byte frame buffer as hex>
+//   MD music [headphones|dance|bars] | watch | -   what's playing on the PC
+//   VZ <16 hex digits>          spectrum bars, 0-f each, low to high
+//   BE                          a beat
+//   JS                          a sudden loud moment in a film
+//   LO <lat> <lon> <place>      where the weather is for; passed on to the ESP-01
+//   NW joining|setup <ap>|ok <ip>|off     the ESP-01's WiFi (from the ESP-01)
 
 #include "pet.h"
 
 // HC-05 on USART2: PA2 -> HC-05 RXD, PA3 <- HC-05 TXD
 static Uart SerialBT(PA_3, PA_2);
 #define BT_BAUD 9600
+
+// ESP-01 on USART1: PA9 -> ESP RX, PA10 <- ESP TX. It sends the time and
+// weather it fetched itself, and relays Aminal when Aminal comes over WiFi.
+static Uart SerialESP(PA_10, PA_9);
+#define ESP_BAUD 115200
 
 const uint32_t LINK_TIMEOUT_MS = 8000;    // no line for this long -> on our own
 
@@ -33,8 +44,9 @@ struct Port {
 };
 
 static Port ports[] = {
-  {&Serial,   LINK_USB, {0}, 0, false},
-  {&SerialBT, LINK_BT,  {0}, 0, false},
+  {&Serial,    LINK_USB,  {0}, 0, false},
+  {&SerialBT,  LINK_BT,   {0}, 0, false},
+  {&SerialESP, LINK_WIFI, {0}, 0, false},
 };
 static Port *replyTo = nullptr;   // where the current command came from
 static Port *active  = nullptr;   // where events go
@@ -42,6 +54,7 @@ static Port *active  = nullptr;   // where events go
 void linkBegin() {
   Serial.begin(115200);           // USB CDC; the baud rate is ignored
   SerialBT.begin(BT_BAUD);
+  SerialESP.begin(ESP_BAUD);
 }
 
 static void reply(const char *text) {
@@ -164,6 +177,44 @@ static void setScreen(char *a, uint32_t now) {
   }
 }
 
+// MD music [headphones|dance|bars] | MD watch | MD -
+static void setMedia(char *a, uint32_t now) {
+  char *style = strchr(a, ' ');
+  if (style) *style++ = 0;
+  if      (!strcmp(a, "music")) world.media = MEDIA_MUSIC;
+  else if (!strcmp(a, "watch")) world.media = MEDIA_WATCH;
+  else                          world.media = MEDIA_NONE;
+  if (style && world.media == MEDIA_MUSIC) faceMusicStyle(style, now);
+}
+
+static void setBars(const char *a, uint32_t now) {
+  for (int i = 0; i < VZ_BARS && a[i]; i++) {
+    char c = a[i];
+    world.vz[i] = c >= 'a' ? c - 'a' + 10 : c >= 'A' ? c - 'A' + 10 : c - '0';
+    if (world.vz[i] > 15) world.vz[i] = 0;
+  }
+  world.vzAt = now;
+}
+
+// NW joining | NW setup <ap name> | NW ok <ip> | NW off     (from the ESP-01)
+static void setWifi(char *a, uint32_t now) {
+  char *rest = strchr(a, ' ');
+  if (rest) *rest++ = 0; else rest = (char *)"";
+  uint8_t was = world.wifi;
+  if      (!strcmp(a, "ok"))      world.wifi = 3;
+  else if (!strcmp(a, "setup"))   world.wifi = 2;
+  else if (!strcmp(a, "joining")) world.wifi = 1;
+  else                            world.wifi = 0;
+  strncpy(world.wifiIp, world.wifi == 3 ? rest : "", sizeof(world.wifiIp) - 1);
+  world.wifiIp[sizeof(world.wifiIp) - 1] = 0;
+  if (world.wifi == 2 && was != 2) {
+    char text[80];
+    snprintf(text, sizeof(text), "On your phone, join the WiFi \"%s\" to connect me",
+             rest[0] ? rest : "Desktop-pet");
+    showAlert("WiFi setup", text, 30, false, now);
+  }
+}
+
 static void snapshot() {
   static const char HEX_DIGITS[] = "0123456789abcdef";
   uint8_t *b = display.getBuffer();
@@ -187,7 +238,7 @@ static void handleLine(Port &p, uint32_t now) {
   replyTo = &p;
 
   bool hello = false, known = true;
-  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 1"); hello = true; }
+  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 2"); hello = true; }
   else if (!strcmp(cmd, "PG")) reply("PO");
   else if (!strcmp(cmd, "ST")) setState(args, now);
   else if (!strcmp(cmd, "LV")) world.level = constrain(atoi(args), 0, 100);
@@ -198,12 +249,25 @@ static void handleLine(Port &p, uint32_t now) {
   else if (!strcmp(cmd, "EM")) setEmote(args, now);
   else if (!strcmp(cmd, "GO")) setScreen(args, now);
   else if (!strcmp(cmd, "SN")) snapshot();
+  else if (!strcmp(cmd, "MD")) setMedia(args, now);
+  else if (!strcmp(cmd, "VZ")) setBars(args, now);
+  else if (!strcmp(cmd, "BE")) world.beatAt = now;
+  else if (!strcmp(cmd, "JS")) { world.jumpAt = now; faceEmote(EM_SURPRISED, 1500, now); }
+  else if (!strcmp(cmd, "NW")) setWifi(args, now);
+  else if (!strcmp(cmd, "LO")) {
+    // Where the weather is for: Aminal knows, the ESP-01 needs it
+    if (p.kind != LINK_WIFI) { SerialESP.print("LO "); SerialESP.print(args); SerialESP.print('\n'); }
+  }
   else known = false;
 
   if (!known) {
-    reply("? unknown");
+    // Never answer the ESP-01's own chatter (boot noise at 74880 baud)
+    if (p.kind != LINK_WIFI) reply("? unknown");
     return;
   }
+  // The ESP-01 sends time and weather of its own; that isn't Aminal. Only
+  // Aminal relayed over WiFi says HI and PG, so only those count as a link.
+  if (p.kind == LINK_WIFI && !hello && strcmp(cmd, "PG")) return;
   bool wasAlone = world.link == LINK_NONE;
   world.link = p.kind;
   world.linkSeen = now;

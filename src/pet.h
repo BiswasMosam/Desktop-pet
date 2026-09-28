@@ -27,6 +27,10 @@ enum Emote : uint8_t {
   EM_NONE, EM_HAPPY, EM_LOVE, EM_SURPRISED, EM_SAD, EM_ANGRY, EM_WINK, EM_SLEEPY
 };
 
+// ---------- What's playing on the PC ----------
+enum Media : uint8_t { MEDIA_NONE, MEDIA_MUSIC, MEDIA_WATCH };
+#define VZ_BARS 16
+
 // ---------- Screens, in the order a double tap walks through them ----------
 enum Screen : uint8_t { SCR_FACE, SCR_CLOCK, SCR_WEATHER, SCR_TIMER, SCR_STATUS, SCR_COUNT };
 
@@ -58,6 +62,17 @@ struct World {
   LinkKind link = LINK_NONE;
   uint32_t linkSeen = 0;         // millis() of the last line from the host
 
+  // The ESP-01's WiFi, as it last reported
+  uint8_t  wifi = 0;             // 0 none, 1 joining, 2 setting up, 3 online
+  char     wifiIp[16] = "";
+
+  // Music or a film on the PC, and how it sounds
+  Media    media = MEDIA_NONE;
+  uint8_t  vz[VZ_BARS] = {0};    // spectrum, 0..15 per bar
+  uint32_t vzAt = 0;             // millis() of the last spectrum frame
+  uint32_t beatAt = 0;           // millis() of the last beat heard
+  uint32_t jumpAt = 0;           // millis() of the last sudden loud moment
+
   // A card drawn over whatever screen is up
   bool     alertOn = false;
   bool     alertLoud = false;    // flashes until tapped (timer done)
@@ -81,6 +96,17 @@ void faceEmote(Emote e, uint32_t ms, uint32_t now);
 void faceWake(uint32_t now);              // something happened, stay awake
 void faceUpdate(uint32_t now);
 void faceDraw(uint32_t now);
+void faceMusicStyle(const char *name, uint32_t now);   // headphones, dance, bars
+
+// media.cpp: the props for music and films
+void drawHeadphones(int lx, int rx, int cy, int eyeW);
+void notesSpawn(uint32_t now);
+void notesDraw();
+void visualizerDraw(uint32_t now);
+void bucketDraw();
+void kernelDraw(uint32_t eatT, int mouthX, int mouthY);
+void chewDraw(uint32_t now, int mouthX, int mouthY);
+void burstDraw(uint32_t sinceJump);
 
 // screens.cpp
 void drawClock(uint32_t now);

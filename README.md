@@ -31,6 +31,20 @@ Everything moves by easing the current eye position, width and height toward a t
 
 Reminders, mail and what's next on the calendar slide down as a card over whatever is on screen. Ask Aminal for the weather or a timer and the pet flips to that screen while it answers.
 
+### Music and films
+
+When Aminal hears Spotify playing, the pet joins in, in one of three moods picked at random and rerolled every 25 to 45 s:
+
+| Mood | What you see |
+| --- | --- |
+| **Headphones** | Headphones on, eyes shut and happy, nodding on every beat, with a peek around now and then |
+| **Dancing** | Swaying side to side and hopping on the beat, music notes floating up |
+| **Visualizer** | The whole screen becomes 16 bars of what the speakers are actually playing, with falling peak marks |
+
+Put on Netflix, Prime Video or Hotstar and it looks up at the screen with a bucket of **popcorn**, flicking a kernel into its mouth and chewing every few seconds. When a scene suddenly gets loud it jumps, and the popcorn flies out of the bucket.
+
+Aminal decides music or film by the app and the tab title, never by guesswork, so a game or a video call gets no reaction at all. The beats and bars come from Aminal listening to the speakers; without them the pet dances to a steady 115 bpm of its own.
+
 ### The button
 
 KEY (PA0) is the only input:
@@ -103,11 +117,11 @@ USB always wins. The bridge tries the cable first and the Bluetooth port every 1
 
 ## The protocol
 
-One short line per message, the same on USB and Bluetooth, simple enough to type into a serial monitor:
+One short line per message, the same on USB, Bluetooth and WiFi, simple enough to type into a serial monitor:
 
 | Line | Meaning |
 | --- | --- |
-| `HI` | Who are you? The pet answers `PET desktop-pet 1` |
+| `HI` | Who are you? The pet answers `PET desktop-pet 2` |
 | `PG` | Heartbeat, answered `PO`. Eight silent seconds and the pet is on its own again |
 | `ST idle\|listening\|thinking\|speaking\|off` | What Aminal is doing |
 | `LV 0-100` | Voice level, for the eyes and the mouth |
@@ -118,6 +132,12 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 | `EM <happy\|love\|surprised\|sad\|angry\|wink\|sleepy> [ms]` | Pull a face |
 | `GO <face\|clock\|weather\|timer\|status> [secs]` | Show a screen |
 | `SN` | Answered `SN <hex>`: the 1024-byte frame buffer, exactly what's on the OLED |
+| `MD music [headphones\|dance\|bars]`, `MD watch`, `MD -` | What's playing; a mood can be asked for by name |
+| `VZ <16 hex digits>` | Spectrum bars, 0 to f each, low to high |
+| `BE` | A beat |
+| `JS` | A sudden loud moment in a film |
+| `LO <lat> <lon> <place>` | Where the weather is for; passed on to the ESP-01 |
+| `NW joining\|setup <ap>\|ok <ip>\|off` | The ESP-01's WiFi, sent by the ESP-01 |
 
 The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold timer`, `EV dismiss`.
 
@@ -141,6 +161,7 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | `src/main.cpp` | Setup, the frame loop, the button, switching screens |
 | `src/face.cpp` | Eyes, moods, fidgets, and the listening, thinking and speaking faces |
 | `src/screens.cpp` | Clock, weather icons, timer, status, and the alert card |
+| `src/media.cpp` | Headphones, music notes, the visualizer, and the popcorn |
 | `src/link.cpp` | The protocol, read from USB and the HC-05 alike |
 
 All timers compare with `reached(now, t)` instead of `now > t`, so the pet keeps blinking after `millis()` wraps around at about 49.7 days.

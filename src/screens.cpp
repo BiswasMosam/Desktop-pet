@@ -277,11 +277,16 @@ void drawStatus(uint32_t now) {
 
   header("Desktop pet");
 
+  // Six lines, nine pixels apart
   snprintf(line, sizeof(line), "Link    %s", world.link ? linkName() : "none");
-  small(0, 12, line);
+  small(0, 10, line);
 
   snprintf(line, sizeof(line), "Aminal  %s", AM[world.am]);
-  small(0, 22, line);
+  small(0, 19, line);
+
+  static const char *WIFI[] = {"none", "joining", "setup", ""};
+  snprintf(line, sizeof(line), "WiFi    %s", world.wifi == 3 ? world.wifiIp : WIFI[world.wifi]);
+  small(0, 28, line);
 
   if (world.timeValid) {
     ago(when, sizeof(when), now - world.millisAtSync);
@@ -289,7 +294,7 @@ void drawStatus(uint32_t now) {
   } else {
     snprintf(line, sizeof(line), "Time    not set");
   }
-  small(0, 32, line);
+  small(0, 37, line);
 
   if (world.wxValid) {
     ago(when, sizeof(when), now - world.wxAt);
@@ -297,11 +302,11 @@ void drawStatus(uint32_t now) {
   } else {
     snprintf(line, sizeof(line), "Weather none");
   }
-  small(0, 42, line);
+  small(0, 46, line);
 
   uint32_t up = now / 1000;
   snprintf(line, sizeof(line), "Up      %luh %02lum", up / 3600, (up / 60) % 60);
-  small(0, 52, line);
+  small(0, 55, line);
 }
 
 // ---------- Alert card ----------
