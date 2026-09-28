@@ -284,7 +284,7 @@ void drawStatus(uint32_t now) {
   snprintf(line, sizeof(line), "Aminal  %s", AM[world.am]);
   small(0, 19, line);
 
-  static const char *WIFI[] = {"none", "joining", "setup", ""};
+  static const char *WIFI[] = {"no module", "joining", "offline", ""};
   snprintf(line, sizeof(line), "WiFi    %s", world.wifi == 3 ? world.wifiIp : WIFI[world.wifi]);
   small(0, 28, line);
 

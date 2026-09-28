@@ -120,6 +120,7 @@ void setup() {
   digitalWrite(LED_PIN, HIGH);  // LED off
 
   linkBegin();
+  wifiBegin();
 
   Wire.setSDA(PB7);
   Wire.setSCL(PB6);
@@ -145,6 +146,7 @@ void setup() {
 void loop() {
   uint32_t now = millis();
   linkPoll(now);                      // every pass, so lines never pile up
+  wifiTick(now);
   if (now - lastFrame < 20) return;   // about 50 fps, as the I2C allows
   lastFrame = now;
 

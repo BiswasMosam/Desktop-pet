@@ -4,7 +4,7 @@
 // which one Aminal is on. Replies go back down the port the command came in
 // on; events (a tap, a hold) go to whichever port spoke last.
 //
-//   HI                          -> PET desktop-pet 2
+//   HI                          -> PET desktop-pet 6
 //   PG                          -> PO            (heartbeat)
 //   ST idle|listening|thinking|speaking|off
 //   LV <0-100>                  voice level
@@ -19,8 +19,13 @@
 //   VZ <16 hex digits>          spectrum bars, 0-f each, low to high
 //   BE                          a beat
 //   JS                          a sudden loud moment in a film
-//   LO <lat> <lon> <place>      where the weather is for; passed on to the ESP-01
-//   NW joining|setup <ap>|ok <ip>|off     the ESP-01's WiFi (from the ESP-01)
+//   LO <lat> <lon> <place>      where the weather is for (kept across power cuts)
+//   WF <ssid>\t<password>      USB only: join a WiFi network (the ESP-01 keeps it)
+//   ES flash|talk [baud] | reset   USB only: pass USB straight through to the
+//                               ESP-01 (in its bootloader, or its own program)
+//                               until 12-30 s of quiet; or just reset it.
+//                               Each reset first answers "ES boot <line>":
+//                               the ROM's own start-up line, read at 74880
 
 #include "pet.h"
 
@@ -28,10 +33,12 @@
 static Uart SerialBT(PA_3, PA_2);
 #define BT_BAUD 9600
 
-// ESP-01 on USART1: PA9 -> ESP RX, PA10 <- ESP TX. It sends the time and
-// weather it fetched itself, and relays Aminal when Aminal comes over WiFi.
-static Uart SerialESP(PA_10, PA_9);
-#define ESP_BAUD 115200
+// The ESP-01 (USART1, SerialESP) is driven by wifi.cpp in its own AT
+// language, not this protocol. Here are only its reset and boot pins, for
+// talking to it directly from the PC ("ES"): GPIO0 held low while it comes
+// out of reset puts it in its ROM bootloader.
+#define ESP_RST_PIN  PB12
+#define ESP_BOOT_PIN PB13
 
 const uint32_t LINK_TIMEOUT_MS = 8000;    // no line for this long -> on our own
 
@@ -44,9 +51,8 @@ struct Port {
 };
 
 static Port ports[] = {
-  {&Serial,    LINK_USB,  {0}, 0, false},
-  {&SerialBT,  LINK_BT,   {0}, 0, false},
-  {&SerialESP, LINK_WIFI, {0}, 0, false},
+  {&Serial,   LINK_USB, {0}, 0, false},
+  {&SerialBT, LINK_BT,  {0}, 0, false},
 };
 static Port *replyTo = nullptr;   // where the current command came from
 static Port *active  = nullptr;   // where events go
@@ -54,7 +60,102 @@ static Port *active  = nullptr;   // where events go
 void linkBegin() {
   Serial.begin(115200);           // USB CDC; the baud rate is ignored
   SerialBT.begin(BT_BAUD);
+  pinMode(ESP_RST_PIN, OUTPUT);
+  pinMode(ESP_BOOT_PIN, OUTPUT);
+  digitalWrite(ESP_RST_PIN, HIGH);
+  digitalWrite(ESP_BOOT_PIN, HIGH);
+}
+
+// ---------- Reflashing the ESP-01 through the pet ----------
+
+// Reset it, in its bootloader (GPIO0 low, and held low: several ESP-01
+// guides keep it grounded for the whole flash) or its own program.
+static void espReset(bool bootloader) {
+  digitalWrite(ESP_BOOT_PIN, bootloader ? LOW : HIGH);
+  digitalWrite(ESP_RST_PIN, LOW);
+  delay(60);
+  digitalWrite(ESP_RST_PIN, HIGH);
+}
+
+// The ESP8266's ROM prints why it started ("rst cause:2, boot mode:(1,7)")
+// at 74880 baud - 115200 scaled by its 26 MHz crystal - which reads as
+// garbage at any other speed. So listen at 74880 through the reset and
+// hand the PC that line in plain text.
+static void espResetAndReport(bool bootloader) {
+  SerialESP.end();
+  SerialESP.begin(74880);
+  while (SerialESP.available()) SerialESP.read();
+  espReset(bootloader);
+  char line[160];
+  int n = 0;
+  uint32_t until = millis() + 350;
+  while ((int32_t)(millis() - until) < 0) {
+    while (SerialESP.available() && n < (int)sizeof(line) - 1) {
+      char c = SerialESP.read();
+      line[n++] = (c >= 32 && c < 127) ? c : ' ';
+    }
+  }
+  line[n] = 0;
+  Serial.print("ES boot ");
+  Serial.print(line);
+  Serial.print('\n');
+}
+
+// USB <-> ESP-01, byte for byte, until the PC has been quiet for a while.
+// "ES flash [baud]" starts it in the bootloader for esptool; "ES talk
+// [baud]" in its own program, to type at it. Nothing else runs meanwhile.
+static void espPassthrough(bool bootloader, uint32_t baud) {
+  display.clearDisplay();
+  display.setFont(nullptr);
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(10, 16);
+  display.print(bootloader ? "Updating my WiFi..." : "Talking to my WiFi");
+  display.setCursor(10, 34);
+  display.print(bootloader ? "don't unplug me" : "(quiet 30 s to end)");
+  display.display();
+
+  espResetAndReport(bootloader);
+  // Changing the UART's speed lets go of the line for a moment, and the
+  // ROM picks its baud rate from the narrowest pulse it sees - a blip on a
+  // floating wire is narrower than any real bit. So reset it once more,
+  // at the new speed, and let the SYNC be the first thing it hears.
+  SerialESP.end();
+  SerialESP.begin(baud);
+  delay(20);
+  espReset(bootloader);
+  delay(250);                                  // its boot chatter, at 74880
+  while (SerialESP.available()) SerialESP.read();
+  Serial.print(bootloader ? "ES flashing\n" : "ES talking\n");
+
+  uint8_t buf[64];
+  uint32_t last = millis();
+  bool started = false;
+  while (true) {
+    int n = Serial.available();
+    int room = SerialESP.availableForWrite();
+    if (n > 0 && room > 0) {                  // only as fast as the UART takes it
+      n = min(n, min(room, (int)sizeof(buf)));
+      for (int i = 0; i < n; i++) buf[i] = Serial.read();
+      SerialESP.write(buf, n);
+      last = millis();
+      started = true;
+    }
+    n = SerialESP.available();
+    if (n > 0) {
+      n = min(n, (int)sizeof(buf));
+      for (int i = 0; i < n; i++) buf[i] = SerialESP.read();
+      Serial.write(buf, n);
+      last = millis();
+    }
+    // esptool pauses while flash is erased, so give it room before giving up
+    uint32_t quiet = millis() - last;
+    if (quiet > (bootloader ? (started ? 12000UL : 30000UL) : 30000UL)) break;
+  }
+  SerialESP.end();
   SerialESP.begin(ESP_BAUD);
+  espReset(false);                             // back to its own program
+  wifiRestart(millis());                       // and wifi.cpp starts over
 }
 
 static void reply(const char *text) {
@@ -196,25 +297,6 @@ static void setBars(const char *a, uint32_t now) {
   world.vzAt = now;
 }
 
-// NW joining | NW setup <ap name> | NW ok <ip> | NW off     (from the ESP-01)
-static void setWifi(char *a, uint32_t now) {
-  char *rest = strchr(a, ' ');
-  if (rest) *rest++ = 0; else rest = (char *)"";
-  uint8_t was = world.wifi;
-  if      (!strcmp(a, "ok"))      world.wifi = 3;
-  else if (!strcmp(a, "setup"))   world.wifi = 2;
-  else if (!strcmp(a, "joining")) world.wifi = 1;
-  else                            world.wifi = 0;
-  strncpy(world.wifiIp, world.wifi == 3 ? rest : "", sizeof(world.wifiIp) - 1);
-  world.wifiIp[sizeof(world.wifiIp) - 1] = 0;
-  if (world.wifi == 2 && was != 2) {
-    char text[80];
-    snprintf(text, sizeof(text), "On your phone, join the WiFi \"%s\" to connect me",
-             rest[0] ? rest : "Desktop-pet");
-    showAlert("WiFi setup", text, 30, false, now);
-  }
-}
-
 static void snapshot() {
   static const char HEX_DIGITS[] = "0123456789abcdef";
   uint8_t *b = display.getBuffer();
@@ -238,7 +320,7 @@ static void handleLine(Port &p, uint32_t now) {
   replyTo = &p;
 
   bool hello = false, known = true;
-  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 2"); hello = true; }
+  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 6"); hello = true; }
   else if (!strcmp(cmd, "PG")) reply("PO");
   else if (!strcmp(cmd, "ST")) setState(args, now);
   else if (!strcmp(cmd, "LV")) world.level = constrain(atoi(args), 0, 100);
@@ -253,21 +335,25 @@ static void handleLine(Port &p, uint32_t now) {
   else if (!strcmp(cmd, "VZ")) setBars(args, now);
   else if (!strcmp(cmd, "BE")) world.beatAt = now;
   else if (!strcmp(cmd, "JS")) { world.jumpAt = now; faceEmote(EM_SURPRISED, 1500, now); }
-  else if (!strcmp(cmd, "NW")) setWifi(args, now);
-  else if (!strcmp(cmd, "LO")) {
-    // Where the weather is for: Aminal knows, the ESP-01 needs it
-    if (p.kind != LINK_WIFI) { SerialESP.print("LO "); SerialESP.print(args); SerialESP.print('\n'); }
+  else if (!strcmp(cmd, "LO")) wifiSetPlace(args, now);
+  else if (!strcmp(cmd, "WF") && p.kind == LINK_USB) wifiJoin(args);   // never over the air
+  else if (!strcmp(cmd, "ES") && p.kind == LINK_USB) {
+    // Only over the cable: a flash through Bluetooth would take an hour
+    char *baud = strchr(args, ' ');
+    if (baud) *baud++ = 0;
+    uint32_t rate = baud ? strtoul(baud, nullptr, 10) : ESP_BAUD;
+    if (rate < 1200) rate = ESP_BAUD;
+    if      (!strcmp(args, "flash")) espPassthrough(true, rate);
+    else if (!strcmp(args, "talk"))  espPassthrough(false, rate);
+    else if (!strcmp(args, "reset")) espResetAndReport(false), SerialESP.end(), SerialESP.begin(ESP_BAUD);
+    return;
   }
   else known = false;
 
   if (!known) {
-    // Never answer the ESP-01's own chatter (boot noise at 74880 baud)
-    if (p.kind != LINK_WIFI) reply("? unknown");
+    reply("? unknown");
     return;
   }
-  // The ESP-01 sends time and weather of its own; that isn't Aminal. Only
-  // Aminal relayed over WiFi says HI and PG, so only those count as a link.
-  if (p.kind == LINK_WIFI && !hello && strcmp(cmd, "PG")) return;
   bool wasAlone = world.link == LINK_NONE;
   world.link = p.kind;
   world.linkSeen = now;

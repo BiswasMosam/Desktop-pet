@@ -62,7 +62,7 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 - **WeAct Black Pill**, STM32F401CC or STM32F411CE
 - **0.96" SSD1306 OLED**, 128x64, I2C
 - **HC-05** Bluetooth module (optional): a wireless link to Aminal
-- **ESP-01** WiFi module (coming): time and weather straight from the internet
+- **ESP-01** WiFi module (optional): its own time and weather when the PC is off
 - USB-C cable
 
 ### Wiring
@@ -80,6 +80,18 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 | GND | GND |
 | TXD | A3 |
 | RXD | A2 |
+
+| ESP-01 | Black Pill |
+| --- | --- |
+| 3V3 (VCC) | 3V3, **never 5V** |
+| GND | GND |
+| EN (CH_PD) | 3V3 |
+| TX | A10 |
+| RX | A9 |
+| RST | B12 (lets the pet restart it) |
+| GPIO0 | B13 (lets the pet start its bootloader) |
+
+The ESP-01's pins aren't labelled on top. With the chips facing you and the antenna up, one row holds GND, GPIO2, GPIO0 and RX, the other TX, EN, RST and 3V3; GND and 3V3 sit at opposite corners. GPIO2 stays empty.
 
 The KEY button (PA0) and the blue LED (PC13) are already on the board.
 
@@ -113,15 +125,29 @@ python3.12 pet_bridge.py --say "EM love"  # send one line
 3. **Find its outgoing COM port.** Pairing makes two. The outgoing one is listed under Bluetooth > More Bluetooth settings > COM Ports as *Outgoing 'HC-05'*; it's the one whose device ID carries the module's address.
 4. **Set `PET_PORT=COMx`** in Aminal's `.env`.
 
+### WiFi
+
+The ESP-01 keeps its factory **AT firmware**, and the pet drives it with plain text commands: join the network, then one plain-HTTP request to Open-Meteo every 20 minutes. That single reply carries the time (its `Date` header), the UTC offset and today's weather, so a pet running from a charger keeps its clock and forecast with the PC off. Where the weather is for (`LO`, sent by Aminal) and the UTC offset are kept in the Black Pill's flash across power cuts.
+
+To connect it, close Aminal and run, in the Aminal folder:
+
+```bash
+python3.12 pet_bridge.py --wifi
+```
+
+It offers the network the PC is on, asks for the password without showing it, and sends both down the USB cable only. The module keeps them and rejoins by itself from then on. The ESP8266 only does **2.4 GHz** networks.
+
+Reflashing the ESP-01 with firmware of its own, through the pet, was tried and failed: its ROM loader restarts on every esptool SYNC. The pet can still talk to it directly for debugging (`ES talk`), and every reset it does reports the ROM's own start-up line (`ES boot ets Jan 8 2013,rst cause:2, boot mode:(3,6)`), read at 74880 baud.
+
 USB always wins. The bridge tries the cable first and the Bluetooth port every 15 s while the pet isn't plugged in (opening the port of a pet that's off makes Windows try for seconds), and plugging the cable back in moves the link to USB by itself. Running the pet from a phone charger or power bank is how it goes wireless: within 15 s of losing the cable, Aminal reaches it over the air. Everything works over Bluetooth, just slower: a full `SN` snapshot takes about 2 s at 9600 baud.
 
 ## The protocol
 
-One short line per message, the same on USB, Bluetooth and WiFi, simple enough to type into a serial monitor:
+One short line per message, the same on USB and Bluetooth, simple enough to type into a serial monitor:
 
 | Line | Meaning |
 | --- | --- |
-| `HI` | Who are you? The pet answers `PET desktop-pet 2` |
+| `HI` | Who are you? The pet answers `PET desktop-pet 6` |
 | `PG` | Heartbeat, answered `PO`. Eight silent seconds and the pet is on its own again |
 | `ST idle\|listening\|thinking\|speaking\|off` | What Aminal is doing |
 | `LV 0-100` | Voice level, for the eyes and the mouth |
@@ -136,10 +162,11 @@ One short line per message, the same on USB, Bluetooth and WiFi, simple enough t
 | `VZ <16 hex digits>` | Spectrum bars, 0 to f each, low to high |
 | `BE` | A beat |
 | `JS` | A sudden loud moment in a film |
-| `LO <lat> <lon> <place>` | Where the weather is for; passed on to the ESP-01 |
-| `NW joining\|setup <ap>\|ok <ip>\|off` | The ESP-01's WiFi, sent by the ESP-01 |
+| `LO <lat> <lon> <place>` | Where the weather is for; kept in flash for the WiFi to use |
+| `WF <ssid><tab><password>` | USB only: join a WiFi network (the ESP-01 keeps it) |
+| `ES talk\|flash [baud]`, `ES reset` | USB only: the cable straight through to the ESP-01, in its own program or its bootloader, until 12-30 s of quiet |
 
-The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold timer`, `EV dismiss`.
+The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold timer`, `EV dismiss`, `EV wifi ok <ip>`, `EV wifi fail`.
 
 ## Troubleshooting
 
@@ -162,9 +189,12 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | `src/face.cpp` | Eyes, moods, fidgets, and the listening, thinking and speaking faces |
 | `src/screens.cpp` | Clock, weather icons, timer, status, and the alert card |
 | `src/media.cpp` | Headphones, music notes, the visualizer, and the popcorn |
-| `src/link.cpp` | The protocol, read from USB and the HC-05 alike |
+| `src/link.cpp` | The protocol, read from USB and the HC-05 alike, and the ESP-01 passthrough |
+| `src/wifi.cpp` | The ESP-01 driven through its AT firmware: joining, the HTTP request, reading the reply |
 
 All timers compare with `reached(now, t)` instead of `now > t`, so the pet keeps blinking after `millis()` wraps around at about 49.7 days.
+
+The saved location lives in the chip's last flash sector (0x08020000 on the F401CC). The app starts at 0x08004000 and is about 98 KB, so it has about 14 KB of room before the two would meet.
 
 ## Stack
 
@@ -172,5 +202,5 @@ C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD13
 
 ## Next
 
-- The ESP-01 for time and weather when the PC is off, and a link to Aminal over WiFi
+- Aminal over WiFi, which needs the ESP-01 reflashed with a relay (a USB-serial adapter would do it)
 - A real touch sensor (TTP223) in place of the KEY button

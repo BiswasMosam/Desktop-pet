@@ -62,8 +62,8 @@ struct World {
   LinkKind link = LINK_NONE;
   uint32_t linkSeen = 0;         // millis() of the last line from the host
 
-  // The ESP-01's WiFi, as it last reported
-  uint8_t  wifi = 0;             // 0 none, 1 joining, 2 setting up, 3 online
+  // The ESP-01's WiFi
+  uint8_t  wifi = 0;             // 0 no module, 1 joining, 2 offline, 3 online
   char     wifiIp[16] = "";
 
   // Music or a film on the PC, and how it sounds
@@ -116,6 +116,15 @@ void drawStatus(uint32_t now);
 void drawAlert(uint32_t now);
 void showAlert(const char *title, const char *text, uint32_t secs, bool loud, uint32_t now);
 void dismissAlert();
+
+// wifi.cpp: the ESP-01, driven through its factory AT firmware
+extern Uart SerialESP;
+#define ESP_BAUD 115200
+void wifiBegin();
+void wifiTick(uint32_t now);
+void wifiRestart(uint32_t now);
+void wifiSetPlace(char *args, uint32_t now);   // LO <lat> <lon> <place>
+void wifiJoin(char *args);                     // WF <ssid>\t<password>
 
 // link.cpp
 void linkBegin();
