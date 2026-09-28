@@ -1,6 +1,6 @@
 # Desktop-pet
 
-A tiny desk companion with a face. Two rounded eyes on a 0.96" OLED that glance around, blink, fidget, light up when you pet it and doze off when you ignore it. Plugged into the PC it becomes the physical face of [Aminal](https://github.com/BiswasMosam/Aminal), my voice assistant: its eyes listen, think and talk along with it, and it shows the time, the weather, timers and reminders.
+A tiny desk companion with a face. Two rounded eyes on a 0.96" OLED that glance around, blink, fidget, light up when you pet it and doze off when you ignore it. Plugged into the PC it becomes the physical face of [Aminal](https://github.com/BiswasMosam/Aminal-Public), my voice assistant: its eyes listen, think and talk along with it, and it shows the time, the weather, timers and reminders.
 
 It runs on its own too. Unplug it from the PC and it carries on being a pet, keeping the clock it was last given.
 
@@ -110,32 +110,20 @@ The default build targets the F401CC and also runs on an F411CE. For the F411's 
 
 ### Connecting it to Aminal
 
-Nothing to set up: Aminal starts `pet_bridge.py` beside itself, which finds the pet on USB by its identity (`0483:5740`) and starts talking. With Aminal closed the bridge can be run on its own and still gives the pet the time, weather and timers:
-
-```bash
-python3.12 pet_bridge.py                  # in the Aminal folder
-python3.12 pet_bridge.py --snap pet.png   # save exactly what the OLED shows
-python3.12 pet_bridge.py --say "EM love"  # send one line
-```
+Nothing to set up: Aminal starts a small bridge beside itself, which finds the pet on USB by its identity (`0483:5740`) and starts talking. With Aminal closed the bridge can be run on its own and still gives the pet the time, weather and timers. It can also save exactly what the OLED shows as a PNG (`SN`) or send the pet a single line. Aminal's code is private; its own README has the exact commands.
 
 ### Bluetooth
 
 1. **Wire the HC-05** (the board with 6 pins in a row, not the ESP-01 with 8 in two rows): VCC to **5V**, GND to G, TXD to A3, RXD to A2. Its red LED blinks fast when it's powered and ready to pair. No light at all is almost always a loose VCC or GND wire.
 2. **Pair it with the PC**, not a phone: the HC-05 holds one connection at a time. Windows 11's own *Add device* list often shows it as *Unknown device*; press Win+R and run `DevicePairingWizard`, the old wizard, which shows it as **HC-05**. PIN `1234` (or `0000`).
 3. **Find its outgoing COM port.** Pairing makes two. The outgoing one is listed under Bluetooth > More Bluetooth settings > COM Ports as *Outgoing 'HC-05'*; it's the one whose device ID carries the module's address.
-4. **Set `PET_PORT=COMx`** in Aminal's `.env`.
+4. **Give that port to Aminal** as the pet's Bluetooth port.
 
 ### WiFi
 
 The ESP-01 keeps its factory **AT firmware**, and the pet drives it with plain text commands: join the network, then one plain-HTTP request to Open-Meteo every 20 minutes. That single reply carries the time (its `Date` header), the UTC offset and today's weather, so a pet running from a charger keeps its clock and forecast with the PC off. Where the weather is for (`LO`, sent by Aminal) and the UTC offset are kept in the Black Pill's flash across power cuts.
 
-To connect it, close Aminal and run, in the Aminal folder:
-
-```bash
-python3.12 pet_bridge.py --wifi
-```
-
-It offers the network the PC is on, asks for the password without showing it, and sends both down the USB cable only. The module keeps them and rejoins by itself from then on. The ESP8266 only does **2.4 GHz** networks.
+To connect it, close Aminal and run its bridge's WiFi setup. It offers the network the PC is on, asks for the password without showing it, and sends both down the USB cable only. The module keeps them and rejoins by itself from then on. The ESP8266 only does **2.4 GHz** networks.
 
 Reflashing the ESP-01 with firmware of its own, through the pet, was tried and failed: its ROM loader restarts on every esptool SYNC. The pet can still talk to it directly for debugging (`ES talk`), and every reset it does reports the ROM's own start-up line (`ES boot ets Jan 8 2013,rst cause:2, boot mode:(3,6)`), read at 74880 baud.
 
