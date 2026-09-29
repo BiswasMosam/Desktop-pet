@@ -2,7 +2,8 @@
 // Black Pill + 0.96" SSD1306 OLED (SCL -> B6, SDA -> B7, VCC -> 3V3, GND -> GND).
 // HC-05 Bluetooth (optional): TXD -> A3, RXD -> A2, VCC -> 5V, GND -> GND.
 //
-// KEY (PA0) is the only button:
+// KEY (PA0) is the only button, or a TTP223 touch pad on B0 under the top of
+// the enclosure, which does exactly the same:
 //   tap         pet it (on the face), next screen (anywhere else), dismiss a card
 //   double tap  next screen
 //   hold        back to the face; on the timer, pause or resume it
@@ -13,6 +14,9 @@
 #define OLED_ADDR  0x3C   // some modules use 0x3D
 #define LED_PIN    PC13   // onboard LED, on when LOW
 #define KEY_PIN    PA0    // onboard KEY button, LOW when pressed
+#define TOUCH_PIN  PB0    // TTP223 touch pad (optional), HIGH while touched.
+                          // Not PA0: the bootloader reads PA0 at reset, and a
+                          // TTP223 holds its output LOW when nobody's touching.
 
 Adafruit_SSD1306 display(SCREEN_W, SCREEN_H, &Wire, -1);
 World world;
@@ -92,7 +96,7 @@ static void onHold(uint32_t now) {
 }
 
 static void handleKey(uint32_t now) {
-  bool pressed = digitalRead(KEY_PIN) == LOW;
+  bool pressed = digitalRead(KEY_PIN) == LOW || digitalRead(TOUCH_PIN) == HIGH;
   if (pressed && !keyDown) {
     keyDown = true;
     holdFired = false;
@@ -116,6 +120,7 @@ static void handleKey(uint32_t now) {
 
 void setup() {
   pinMode(KEY_PIN, INPUT_PULLUP);
+  pinMode(TOUCH_PIN, INPUT_PULLDOWN);   // reads "not touched" with no pad fitted
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);  // LED off
 

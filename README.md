@@ -57,7 +57,7 @@ Aminal decides music or film by the app and the tab title, never by guesswork, s
 
 ### The button
 
-KEY (PA0) is the only input:
+KEY (PA0) is the only input, or a TTP223 touch pad on B0 under the top of the [enclosure](enclosure/), which does exactly the same:
 
 | Press | On the face | Anywhere else |
 | --- | --- | --- |
@@ -73,6 +73,7 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 - **0.96" SSD1306 OLED**, 128x64, I2C
 - **HC-05** Bluetooth module (optional): a wireless link to Aminal
 - **ESP-01** WiFi module (optional): its own time and weather when the PC is off
+- **TTP223** touch sensor (optional): pet it by touching the top of its head
 - USB-C cable
 
 ### Wiring
@@ -101,9 +102,21 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 | RST | B12 (lets the pet restart it) |
 | GPIO0 | B13 (lets the pet start its bootloader) |
 
+| TTP223 | Black Pill |
+| --- | --- |
+| VCC | 3.3 |
+| GND | G |
+| I/O | B0 (not A0: the bootloader reads A0 at reset, and the pad's output sits low) |
+
 The ESP-01's pins aren't labelled on top. With the chips facing you and the antenna up, one row holds GND, GPIO2, GPIO0 and RX, the other TX, EN, RST and 3V3; GND and 3V3 sit at opposite corners. GPIO2 stays empty.
 
 The KEY button (PA0) and the blue LED (PC13) are already on the board.
+
+### The enclosure
+
+<img src="enclosure/renders/hero.png" width="48%" alt="The pet in its printed head"> <img src="enclosure/renders/cutaway.png" width="48%" alt="The head cut open">
+
+A 3D-printable head: a soft cube with ears, the screen clamped behind a black visor, the Black Pill clicked into a cradle lined up with a USB-C port in the back, and the touch pad under the top. Four parts, no supports. The STLs, print settings and how to put it together are in [enclosure/](enclosure/).
 
 ## Getting it running
 
@@ -202,4 +215,3 @@ C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD13
 ## Next
 
 - Aminal over WiFi, which needs the ESP-01 reflashed with a relay (a USB-serial adapter would do it)
-- A real touch sensor (TTP223) in place of the KEY button
