@@ -46,10 +46,10 @@ BOSS_W, BOSS_H, BOSS_R = 31.6, 26.0, 4.0     # the part of the visor in the wall
 # WeAct STM32F4x1: 52.81 x 20.78, chip, buttons and USB-C on top, the USB-C
 # overhanging its end by ~0.8. The headers point DOWN, so every jumper plug
 # hangs underneath: 2.5 of header plastic, 14 of plug, then the wire's bend.
+# The 4-pin SWD header sits on that side too, in the middle of the far end.
 BP_L, BP_W, BP_T = 52.81, 20.78, 1.6
 BP_LIFT = 23.5                  # board bottom above the base floor (plugs + 7 mm to bend)
-SPINE_HALF = 3.0                # the stand under the board's middle; the USB-C's
-                                # shell tabs come through the board at about +-4.3
+BP_ROW_OUT = 8.89               # outer face of the header strips, from the middle
 USB_W, USB_H = 14.0, 8.6        # port in the back wall, roomy for big plug overmoulds
 USB_GAP = 1.2                   # board end to the inside of the back wall
 
@@ -204,35 +204,46 @@ def base_outline(shrink=0.0):
 
 
 def black_pill_stand():
-    """The Black Pill held up high, so its jumper plugs hang free underneath.
+    """The Black Pill held up high by its edges, so everything underneath hangs
+    free: both rows of jumper plugs, the SWD header in the middle of the far
+    end (and a plug on it, if one's ever wanted), and any parts on that side.
 
-    A spine under the middle of the board, between the two rows of plugs,
-    carries it; a shoulder at the far end takes the push of the USB cable
-    going in (the back wall takes the pull coming out); four springy posts
-    outside the rows clip over its long edges so it can't lift or slide
-    sideways. Nothing reaches above the board's top except those clips, so a
-    fitted SWD header at the far end is fine."""
+    Four springy posts stand outside the rows of plugs. Each has a ledge under
+    the board's edge, in the 1.5 mm strip between the edge and the header
+    strip, and a clip over its top, so the board is held edge-on at four
+    points. The two front posts wrap round the board's corners: that's what
+    takes the push of the USB cable going in (the back wall takes the pull
+    coming out). Nothing reaches over the board's top but the clips."""
     y0, y1, bottom, top = BP_Y0, BP_Y1, BP_BOTTOM, BP_TOP
-    s = box(-SPINE_HALF, SPINE_HALF, y0 - 3.0, y1 - 1.5, FLOOR - 0.01, bottom)
-    s += box(-SPINE_HALF, SPINE_HALF, y0 - 3.0, y0 - 0.2, FLOOR - 0.01, top - 0.1)   # shoulder
-    # a foot so the spine doesn't rock on the floor
-    s += Manifold.batch_hull([box(-SPINE_HALF - 1.5, SPINE_HALF + 1.5, y0 - 3.0, y1 - 1.5, FLOOR - 0.01, FLOOR + 0.5),
-                              box(-SPINE_HALF, SPINE_HALF, y0 - 3.0, y1 - 1.5, FLOOR - 0.01, FLOOR + 3.5)])
-
     edge = BP_W / 2
+    ledge_in = BP_ROW_OUT + 0.3             # clear of the header strip's outer face
+    s = None
     for sx in (-1, 1):
-        for yc in (y0 + 9.0, y1 - 11.0):
-            post = box(sx * (edge + 0.2), sx * (edge + 2.2), yc - 3, yc + 3, FLOOR - 0.01, top + 1.3)
+        for yc, front in ((y0 + 3.0, True), (y1 - 5.0, False)):
+            post = box(sx * (edge + 0.2), sx * (edge + 2.4), yc - 3, yc + 3, FLOOR - 0.01, top + 1.3)
             # its foot runs front to back, so the floor beside it stays clear
             post += Manifold.batch_hull([
-                box(sx * (edge + 0.2), sx * (edge + 2.2), yc - 7, yc + 7, FLOOR - 0.01, FLOOR + 0.5),
-                box(sx * (edge + 0.2), sx * (edge + 2.2), yc - 3, yc + 3, FLOOR - 0.01, FLOOR + 5.0)])
-            # the clip: flat underneath over the board edge, sloped on top so the
-            # board pushes the posts apart on its way down
-            clip = Manifold.batch_hull([
+                box(sx * (edge + 0.2), sx * (edge + 2.4), yc - 5, yc + 5, FLOOR - 0.01, FLOOR + 0.5),
+                box(sx * (edge + 0.2), sx * (edge + 2.4), yc - 3, yc + 3, FLOOR - 0.01, FLOOR + 5.0)])
+            # the ledge under the board's edge; its underside slopes at 45 degrees
+            # so it prints without support
+            post += Manifold.batch_hull([
+                box(sx * ledge_in, sx * (edge + 0.2), yc - 3, yc + 3, bottom - 1.0, bottom),
+                box(sx * (edge + 0.19), sx * (edge + 0.2), yc - 3, yc + 3, bottom - 2.2, bottom)])
+            # the clip: flat underneath over the board's edge, sloped on top so
+            # the board pushes the posts apart on its way down
+            post += Manifold.batch_hull([
                 box(sx * (edge - 0.7), sx * (edge + 0.2), yc - 3, yc + 3, top + 0.1, top + 0.4),
                 box(sx * (edge + 0.19), sx * (edge + 0.2), yc - 3, yc + 3, top + 0.1, top + 1.3)])
-            s += post + clip
+            if front:
+                # round the corner: a stop against the board's end, outside the
+                # header strip, so the SWD header between the two stops is clear
+                post += box(sx * (BP_ROW_OUT - 1.9), sx * (edge + 2.4), y0 - 2.4, y0 - 0.2,
+                            FLOOR - 0.01, top - 0.1)
+                post += Manifold.batch_hull([
+                    box(sx * (BP_ROW_OUT - 1.9), sx * (edge + 2.4), y0 - 5.0, y0 - 0.2, FLOOR - 0.01, FLOOR + 0.5),
+                    box(sx * (BP_ROW_OUT - 1.9), sx * (edge + 2.4), y0 - 2.4, y0 - 0.2, FLOOR - 0.01, FLOOR + 4.0)])
+            s = post if s is None else s + post
     return s
 
 

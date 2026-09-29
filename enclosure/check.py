@@ -44,6 +44,15 @@ def black_pill_duponts():
     return m
 
 
+def swd():
+    """The 4-pin SWD header on the underside, in the middle of the far end.
+    Two cases: straight pins pointing down with a jumper plug on them, placed
+    anywhere in the first 9 mm; or right-angle pins sticking out past the end."""
+    straight = box(-5.1, 5.1, y0 + 0.3, y0 + 9.0, bp_bottom - 16.5, bp_bottom)
+    right_angle = box(-4.1, 4.1, y0 - 7.0, y0 + 8.0, bp_bottom - 2.2, bp_bottom)
+    return straight, right_angle
+
+
 def usb_plug():
     """A USB-C plug's overmould (12.35 x 6.5, the spec's maximum) fully home."""
     face = y1 + 0.8
@@ -100,7 +109,9 @@ if __name__ == "__main__":
     hc05, esp, ams = loose()
 
     solids = {"shell": shell, "visor": visor, "base": base}
+    swd_straight, swd_right = swd()
     things = {"Black Pill": bp, "BP jumpers": dup, "USB plug mould": plug_mould,
+              "SWD + plug": swd_straight, "SWD right-angle": swd_right,
               "OLED pcb": pcb, "OLED glass": glass, "OLED solder": solder,
               "OLED header": header, "OLED jumpers": oled_dup, "touch board": touch_board,
               "touch pins": touch_pins, "HC-05": hc05, "ESP-01": esp, "AMS1117": ams}
@@ -137,12 +148,13 @@ if __name__ == "__main__":
     colors = {"shell": [236, 236, 232, 255], "visor": [20, 22, 26, 255], "base": [200, 200, 196, 255],
               "Black Pill": [25, 25, 25, 255], "BP jumpers": [30, 30, 30, 255],
               "USB plug mould": [60, 60, 64, 255], "OLED pcb": [31, 79, 163, 255],
+              "SWD + plug": [30, 30, 30, 255], "SWD right-angle": [30, 30, 30, 255],
               "OLED glass": [8, 8, 10, 255], "OLED header": [20, 20, 20, 255],
               "OLED jumpers": [30, 30, 30, 255], "touch board": [200, 40, 40, 255],
               "touch pins": [30, 30, 30, 255], "HC-05": [30, 90, 200, 255], "ESP-01": [20, 20, 20, 255],
               "AMS1117": [30, 110, 60, 255]}
     for name, m in allm.items():
-        if name == "OLED solder":
+        if name in ("OLED solder", "SWD right-angle"):     # a what-if, not drawn
             continue
         scene.add_geometry(tm(m, colors[name]), node_name=name, geom_name=name)
     scene.export("assembly.glb")

@@ -56,7 +56,8 @@ const mat = (color, rough = 0.6, metal = 0) =>
 const MATS = {
   'shell': mat(0xecebe6, 0.72),
   'base': mat(0xd9d8d3, 0.75), 'visor': mat(0x16181b, 0.5),
-  'Black Pill': mat(0x151515, 0.5), 'BP jumpers': mat(0x222222, 0.6), 'USB plug mould': mat(0x3a3b3f, 0.55),
+  'Black Pill': mat(0x151515, 0.5), 'BP jumpers': mat(0x222222, 0.6), 'SWD + plug': mat(0x2a2a2a, 0.6),
+  'USB plug mould': mat(0x3a3b3f, 0.55),
   'OLED pcb': mat(0x1f4fa3, 0.5), 'OLED glass': mat(0x050506, 0.15, 0.2), 'OLED header': mat(0x111111, 0.6),
   'OLED jumpers': mat(0x222222, 0.6), 'touch board': mat(0xc0392b, 0.5), 'touch pins': mat(0x222222, 0.6),
   'HC-05': mat(0x2f6fd0, 0.5), 'ESP-01': mat(0x1b1b1b, 0.5), 'AMS1117': mat(0x2e8b57, 0.5),
@@ -89,7 +90,7 @@ const explode = {
 };
 
 // the tray on its own, empty or with the Black Pill clipped in
-const TRAY = { tray: ['base'], 'tray-board': ['base', 'Black Pill', 'BP jumpers', 'USB plug mould'] };
+const TRAY = { tray: ['base'], 'tray-board': ['base', 'Black Pill', 'BP jumpers', 'SWD + plug', 'USB plug mould'] };
 if (TRAY[view]) root.remove(face);
 
 for (const [name, mesh] of Object.entries(byName)) {
@@ -104,7 +105,7 @@ for (const [name, mesh] of Object.entries(byName)) {
   m.geometry = toCreasedNormals(g, THREE.MathUtils.degToRad(35));
   const material = (MATS[name] || mat(0x888888)).clone();
   // the cut goes through everything except what sits on the centre line
-  const whole = ['visor', 'Black Pill', 'BP jumpers', 'USB plug mould', 'OLED pcb', 'OLED glass',
+  const whole = ['visor', 'Black Pill', 'BP jumpers', 'SWD + plug', 'USB plug mould', 'OLED pcb', 'OLED glass',
                  'OLED header', 'OLED jumpers', 'touch board', 'touch pins'];
   if (!whole.includes(name)) {
     material.clippingPlanes = clip;

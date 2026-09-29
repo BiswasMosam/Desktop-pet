@@ -10,22 +10,21 @@ A head for the face: a soft cube, the screen behind a black visor, the Black Pil
 
 | ![The base](renders/tray.png) | ![The base with the Black Pill in](renders/tray-board.png) |
 | --- | --- |
-| The base: a spine for the Black Pill to sit on and four posts that clip over its edges | The board on it, chip side up, its plugs hanging free between the posts |
+| The base: four posts that hold the Black Pill by its edges, the front two wrapping round its corners | The board on them, chip side up, its plugs and the SWD header hanging free underneath |
 
 ![Exploded](renders/exploded.png)
 
-**66 × 70 × 58 mm.** Everything is modelled in [`model.py`](model.py) from the WeAct board drawing and the OLED module's dimensions, and [`check.py`](check.py) fits it all together with stand-ins for the boards, a jumper plug on every one of the Black Pill's 40 pins, and a USB-C plug pushed fully home: nothing overlaps.
+**66 × 70 × 58 mm.** Everything is modelled in [`model.py`](model.py) from the WeAct board drawing and the OLED module's dimensions, and [`check.py`](check.py) fits it all together with stand-ins for the boards, a jumper plug on every one of the Black Pill's 40 pins, the SWD header (straight with a plug on it, or right-angle), and a USB-C plug pushed fully home: nothing overlaps.
 
 ## The Black Pill's stand
 
-The Black Pill goes in the way it's wired: chip, buttons and USB-C on top, headers pointing down, every jumper plug hanging underneath. So it sits 23.5 mm up:
+The Black Pill goes in the way it's wired: chip, buttons and USB-C on top, headers pointing down, every jumper plug hanging underneath, and the 4-pin SWD header on that side too, in the middle of the far end. So it sits 23.5 mm up, held only by its edges:
 
-- **A spine** under the middle of the board, between the two rows of plugs, carries it. It stops short of the USB-C's metal tabs that come through the board.
-- **A shoulder** at the spine's far end takes the push when the USB cable goes in, and the back wall takes the pull when it comes out.
-- **Four springy posts**, outside the rows of plugs, clip over the board's long edges so it can't lift or slide sideways.
-- The plugs end 7 mm above the floor, which leaves room for the wires to bend out to the sides.
+- **Four springy posts** stand outside the rows of plugs. Each has a ledge under the board's edge, in the 1.5 mm strip between the edge and the yellow header strip, and a clip over its top, so the board can't lift, drop or slide sideways.
+- **The two front posts wrap round the board's corners.** They take the push when the USB cable goes in, and the back wall takes the pull when it comes out. Between them the far end is open, so the SWD header, and a plug on it if you ever want one, hangs free.
+- **Nothing sits under the board.** The whole space between the two header strips is empty, down to the floor. The plugs end 7 mm above the floor, which leaves room for the wires to bend out to the sides.
 
-Nothing reaches over the board's top except those four clips, so buttons, the USB-C and an SWD header, if yours has one, all stay clear.
+Nothing reaches over the board's top except those four clips, so the buttons and the USB-C stay clear.
 
 ## What to print
 
@@ -53,7 +52,7 @@ PLA or PETG, 0.4 mm nozzle, 0.2 mm layers, 15% infill. The walls are 2.4 mm, six
 1. **Print the visor first** and check the screen before printing anything else. Press the OLED onto its four pegs, glass into the recess, then power the pet and double tap to the **Status** screen. The whole top line (*Desktop pet … USB*) and bottom line (*Up …*) should show through the window. If a line is cut off, measure roughly how far and change `AA_UP` in `model.py` (positive moves the window up). Then take the OLED off again.
 2. **Screen into the head.** Push the visor into the face from the outside. Reach in through the open bottom, put the OLED onto the pegs and glue or melt each peg tip. The screen is now clamped through the wall and can't move.
 3. **Touch pad under the top.** Pad side up (the side without the chip), pins toward the back, into the pocket in the middle of the top. A bit of tape or glue holds it. Don't touch the head while the pet powers up: the TTP223 measures its "not touched" level then.
-4. **Black Pill onto its stand,** with its jumpers already plugged in. USB end toward the back of the base (the end with the finger notch), chip side up. Lower it between the four posts, slide it forward against the shoulder, and press down until all four clips snap over its edges. Bend the wires out to the sides under the board.
+4. **Black Pill onto its stand,** with its jumpers already plugged in. USB end toward the back of the base (the end with the finger notch), chip side up, its far end against the two corner stops. Press it down between the four posts until all four clips snap over its edges. Bend the wires out to the sides under the board.
 5. **The loose modules** go on the floor: the HC-05 on the left, the ESP-01 and its regulator on the right, over the vents.
 6. **Wire everything** as in the main README, and the touch pad as below.
 7. **Base into the head,** USB end at the back, until both catches click into the side windows. To open it again, press both catches in through those windows and pull the base down by the notch at the back.
