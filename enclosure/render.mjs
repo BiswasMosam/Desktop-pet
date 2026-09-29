@@ -6,7 +6,7 @@ import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const views = process.argv.slice(2).length ? process.argv.slice(2) : ['hero', 'back', 'cutaway', 'exploded'];
+const views = process.argv.slice(2).length ? process.argv.slice(2) : ['hero', 'back', 'cutaway', 'exploded', 'tray', 'tray-board'];
 const types = { '.html': 'text/html', '.glb': 'model/gltf-binary', '.png': 'image/png', '.js': 'text/javascript' };
 const server = http.createServer((req, res) => {
   const file = path.join(process.cwd(), decodeURIComponent(req.url.split(/[?#]/)[0]));

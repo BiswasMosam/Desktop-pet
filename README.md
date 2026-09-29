@@ -116,7 +116,7 @@ The KEY button (PA0) and the blue LED (PC13) are already on the board.
 
 <img src="enclosure/renders/hero.png" width="48%" alt="The pet in its printed head"> <img src="enclosure/renders/cutaway.png" width="48%" alt="The head cut open">
 
-A 3D-printable head: a soft cube with ears, the screen clamped behind a black visor, the Black Pill clicked into a cradle lined up with a USB-C port in the back, and the touch pad under the top. Four parts, no supports. The STLs, print settings and how to put it together are in [enclosure/](enclosure/).
+A 3D-printable head: a soft cube, the screen clamped behind a black visor, the Black Pill up on a stand with its jumper plugs hanging free underneath and its USB-C lined up with a port in the back, and the touch pad under the top. Three parts, no supports. The STLs, print settings and how to put it together are in [enclosure/](enclosure/).
 
 ## Getting it running
 

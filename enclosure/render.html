@@ -54,14 +54,14 @@ scene.add(floor);
 const mat = (color, rough = 0.6, metal = 0) =>
   new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
 const MATS = {
-  'shell': mat(0xecebe6, 0.72), 'ear L': mat(0xecebe6, 0.72), 'ear R': mat(0xecebe6, 0.72),
+  'shell': mat(0xecebe6, 0.72),
   'base': mat(0xd9d8d3, 0.75), 'visor': mat(0x16181b, 0.5),
   'Black Pill': mat(0x151515, 0.5), 'BP jumpers': mat(0x222222, 0.6), 'USB plug mould': mat(0x3a3b3f, 0.55),
   'OLED pcb': mat(0x1f4fa3, 0.5), 'OLED glass': mat(0x050506, 0.15, 0.2), 'OLED header': mat(0x111111, 0.6),
   'OLED jumpers': mat(0x222222, 0.6), 'touch board': mat(0xc0392b, 0.5), 'touch pins': mat(0x222222, 0.6),
   'HC-05': mat(0x2f6fd0, 0.5), 'ESP-01': mat(0x1b1b1b, 0.5), 'AMS1117': mat(0x2e8b57, 0.5),
 };
-const ENCLOSURE = ['shell', 'ear L', 'ear R', 'base', 'visor'];
+const ENCLOSURE = ['shell', 'base', 'visor'];
 
 // model space is mm with z up; three wants y up
 const root = new THREE.Group();
@@ -85,10 +85,15 @@ root.add(face);
 const clip = view === 'cutaway' ? [new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0)] : [];
 const hideInside = view === 'hero' || view === 'exploded';
 const explode = {
-  'ear L': [0, 0, 26], 'ear R': [0, 0, 26], 'base': [0, 0, -34], 'visor': [0, -30, 0],
+  'base': [0, 0, -40], 'visor': [0, -30, 0],
 };
 
+// the tray on its own, empty or with the Black Pill clipped in
+const TRAY = { tray: ['base'], 'tray-board': ['base', 'Black Pill', 'BP jumpers', 'USB plug mould'] };
+if (TRAY[view]) root.remove(face);
+
 for (const [name, mesh] of Object.entries(byName)) {
+  if (TRAY[view] && !TRAY[view].includes(name)) continue;
   if (hideInside && !ENCLOSURE.includes(name)) continue;
   if (view === 'hero' && name === 'USB plug mould') continue;
   const m = mesh.clone();
@@ -120,6 +125,8 @@ const shots = {
   back:     { pos: [95, 85, -275],   target: [0, 24, -40] },
   cutaway:  { pos: [235, 120, 90],   target: [0, 26, -35] },
   exploded: { pos: [-190, 140, 250], target: [0, 26, -33] },
+  tray:         { pos: [-150, 125, 150], target: [0, 10, -36] },
+  'tray-board': { pos: [-150, 125, 150], target: [0, 12, -36] },
 };
 const s = shots[view];
 cam.position.set(...s.pos);

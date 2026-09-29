@@ -10,9 +10,7 @@ back, z up from the desk (0).
 Parts (none needs supports):
     shell       the head; printed upside down, top on the bed
     visor       the black screen bezel; printed face down
-    base        the floor with the Black Pill's cradle; printed flat
-    ears_round  a pair of round ears; printed flat
-    ears_cat    a pair of pointed ears; printed flat
+    base        the floor, with the Black Pill up on its stand; printed flat
 """
 import math
 import os
@@ -45,9 +43,13 @@ BEZEL_W, BEZEL_H, BEZEL_T, BEZEL_R = 38.0, 32.0, 1.6, 6.0
 BOSS_W, BOSS_H, BOSS_R = 31.6, 26.0, 4.0     # the part of the visor in the wall
 
 # ---------------------------------------------------------------- Black Pill
-# WeAct STM32F4x1: 52.81 x 20.78, USB-C on the top at one end, overhanging ~0.8
+# WeAct STM32F4x1: 52.81 x 20.78, chip, buttons and USB-C on top, the USB-C
+# overhanging its end by ~0.8. The headers point DOWN, so every jumper plug
+# hangs underneath: 2.5 of header plastic, 14 of plug, then the wire's bend.
 BP_L, BP_W, BP_T = 52.81, 20.78, 1.6
-BP_RIB = 4.0                    # board bottom above the base floor (pin tails)
+BP_LIFT = 23.5                  # board bottom above the base floor (plugs + 7 mm to bend)
+SPINE_HALF = 3.0                # the stand under the board's middle; the USB-C's
+                                # shell tabs come through the board at about +-4.3
 USB_W, USB_H = 14.0, 8.6        # port in the back wall, roomy for big plug overmoulds
 USB_GAP = 1.2                   # board end to the inside of the back wall
 
@@ -64,10 +66,12 @@ TOUCH_L, TOUCH_W = 15.0, 11.0
 TOUCH_Y = D / 2
 TOUCH_ROOF = 1.0                # roof left over the pad
 
-# ---------------------------------------------------------------- ears
-EAR_X, EAR_Y = 18.0, 24.0       # where they sit on the roof
-EAR_T = 5.0                     # thickness, front to back
-PEG_X, PEG_Y, PEG_Z = 3.0, EAR_T, 5.0
+# where the Black Pill ends up
+BP_Y1 = D - WALL - USB_GAP              # its USB end
+BP_Y0 = BP_Y1 - BP_L                    # its far end
+BP_BOTTOM = FLOOR + BP_LIFT
+BP_TOP = BP_BOTTOM + BP_T
+USB_Z = BP_TOP + 1.65                   # middle of the USB-C receptacle
 
 
 # ================================================================ helpers
@@ -81,6 +85,7 @@ def rrect(w, h, r):
 
 
 def box(x0, x1, y0, y1, z0, z1):
+    x0, x1 = sorted((x0, x1))
     return Manifold.cube((x1 - x0, y1 - y0, z1 - z0)).translate((x0, y0, z0))
 
 
@@ -133,10 +138,9 @@ def shell():
     x_wall = W / 2 - WALL
     for sx in (-1, 1):
         for yc in (16.0, D - 16.0):
-            x0, x1 = sorted((sx * x_wall, sx * (x_wall - 1.6)))
-            xw0, xw1 = sorted((sx * x_wall, sx * (x_wall - 0.01)))
-            s += Manifold.batch_hull([box(x0, x1, yc - 4, yc + 4, rim_top + 0.1, rim_top + 0.6),
-                                      box(xw0, xw1, yc - 4, yc + 4, rim_top + 0.1, rim_top + 2.4)])
+            s += Manifold.batch_hull([
+                box(sx * x_wall, sx * (x_wall - 1.6), yc - 4, yc + 4, rim_top + 0.1, rim_top + 0.6),
+                box(sx * x_wall, sx * (x_wall - 0.01), yc - 4, yc + 4, rim_top + 0.1, rim_top + 2.4)])
 
     # The face opening, for the visor's boss
     face = rrect(BOSS_W + 2 * 0.2, BOSS_H + 2 * 0.2, BOSS_R + 0.2).translate((0, OLED_Z))
@@ -145,19 +149,14 @@ def shell():
     s -= box(-6.8, 6.8, WALL - 1.2, WALL + 1, OLED_Z + 10.0, OLED_Z + OLED_H / 2 + 0.6)
 
     # USB-C port, centred on the board's connector, with a soft outer edge
-    usb_z = FLOOR + BP_RIB + BP_T + 1.65
-    port = rrect(USB_W, USB_H, 3.0).translate((0, usb_z))
-    s -= plate_xz(port, D - WALL - 1, D + 1)
-    flare = Manifold.batch_hull([
-        plate_xz(rrect(USB_W, USB_H, 3.0).translate((0, usb_z)), D - 0.8, D - 0.79),
-        plate_xz(rrect(USB_W + 1.6, USB_H + 1.6, 3.8).translate((0, usb_z)), D, D + 0.01)])
-    s -= flare
+    s -= plate_xz(rrect(USB_W, USB_H, 3.0).translate((0, USB_Z)), D - WALL - 1, D + 1)
+    s -= Manifold.batch_hull([
+        plate_xz(rrect(USB_W, USB_H, 3.0).translate((0, USB_Z)), D - 0.8, D - 0.79),
+        plate_xz(rrect(USB_W + 1.6, USB_H + 1.6, 3.8).translate((0, USB_Z)), D, D + 0.01)])
 
     # Windows the base's snaps catch in, left and right
     for sx in (-1, 1):
-        x0 = sx * (W / 2 + 1)
-        x1 = sx * (W / 2 - WALL - 1)
-        s -= box(min(x0, x1), max(x0, x1), SNAP_Y - SNAP_W / 2 - 0.5,
+        s -= box(sx * (W / 2 + 1), sx * (W / 2 - WALL - 1), SNAP_Y - SNAP_W / 2 - 0.5,
                  SNAP_Y + SNAP_W / 2 + 0.5, SNAP_Z0, SNAP_Z1)
 
     # Touch sensor pocket under the middle of the roof, the roof thinned over it
@@ -171,15 +170,6 @@ def shell():
     s += frame
     s -= box(-pw / 2, pw / 2, TOUCH_Y - pl / 2, TOUCH_Y + pl / 2, top_in - 0.1,
              H - TOUCH_ROOF)
-
-    # Ear sockets: a slot through the roof and a sleeve below it
-    for sx in (-1, 1):
-        cx = sx * EAR_X
-        sleeve = box(cx - PEG_X / 2 - 1.4, cx + PEG_X / 2 + 1.4, EAR_Y - PEG_Y / 2 - 1.4,
-                     EAR_Y + PEG_Y / 2 + 1.4, top_in - 4.0, top_in + 0.5)
-        s += sleeve
-        s -= box(cx - PEG_X / 2 - 0.15, cx + PEG_X / 2 + 0.15, EAR_Y - PEG_Y / 2 - 0.15,
-                 EAR_Y + PEG_Y / 2 + 0.15, top_in - 5, H + 1)
     return s
 
 
@@ -213,47 +203,62 @@ def base_outline(shrink=0.0):
     return rrect(w, d, max(0.5, R_SIDE - WALL - FIT - shrink)).translate((0, D / 2))
 
 
+def black_pill_stand():
+    """The Black Pill held up high, so its jumper plugs hang free underneath.
+
+    A spine under the middle of the board, between the two rows of plugs,
+    carries it; a shoulder at the far end takes the push of the USB cable
+    going in (the back wall takes the pull coming out); four springy posts
+    outside the rows clip over its long edges so it can't lift or slide
+    sideways. Nothing reaches above the board's top except those clips, so a
+    fitted SWD header at the far end is fine."""
+    y0, y1, bottom, top = BP_Y0, BP_Y1, BP_BOTTOM, BP_TOP
+    s = box(-SPINE_HALF, SPINE_HALF, y0 - 3.0, y1 - 1.5, FLOOR - 0.01, bottom)
+    s += box(-SPINE_HALF, SPINE_HALF, y0 - 3.0, y0 - 0.2, FLOOR - 0.01, top - 0.1)   # shoulder
+    # a foot so the spine doesn't rock on the floor
+    s += Manifold.batch_hull([box(-SPINE_HALF - 1.5, SPINE_HALF + 1.5, y0 - 3.0, y1 - 1.5, FLOOR - 0.01, FLOOR + 0.5),
+                              box(-SPINE_HALF, SPINE_HALF, y0 - 3.0, y1 - 1.5, FLOOR - 0.01, FLOOR + 3.5)])
+
+    edge = BP_W / 2
+    for sx in (-1, 1):
+        for yc in (y0 + 9.0, y1 - 11.0):
+            post = box(sx * (edge + 0.2), sx * (edge + 2.2), yc - 3, yc + 3, FLOOR - 0.01, top + 1.3)
+            # its foot runs front to back, so the floor beside it stays clear
+            post += Manifold.batch_hull([
+                box(sx * (edge + 0.2), sx * (edge + 2.2), yc - 7, yc + 7, FLOOR - 0.01, FLOOR + 0.5),
+                box(sx * (edge + 0.2), sx * (edge + 2.2), yc - 3, yc + 3, FLOOR - 0.01, FLOOR + 5.0)])
+            # the clip: flat underneath over the board edge, sloped on top so the
+            # board pushes the posts apart on its way down
+            clip = Manifold.batch_hull([
+                box(sx * (edge - 0.7), sx * (edge + 0.2), yc - 3, yc + 3, top + 0.1, top + 0.4),
+                box(sx * (edge + 0.19), sx * (edge + 0.2), yc - 3, yc + 3, top + 0.1, top + 1.3)])
+            s += post + clip
+    return s
+
+
 def base():
     b = plate_xy(base_outline(), 0, FLOOR)
 
     # the rim that rises inside the walls
     rim = plate_xy(base_outline(), FLOOR - 0.01, FLOOR + LIP_H) - \
         plate_xy(base_outline(LIP_T), FLOOR - 1, FLOOR + LIP_H + 1)
-    rim -= box(-12.5, 12.5, D - WALL - 6, D, FLOOR - 0.5, FLOOR + LIP_H + 1)   # USB end
+    # open under the Black Pill's USB end, where its first plugs hang down low
+    rim -= box(-11.0, 11.0, D - WALL - 6, D, FLOOR - 0.5, FLOOR + LIP_H + 1)
     x_in = W / 2 - WALL - FIT
     for sx in (-1, 1):
         # cut the snap tab free on both sides so it can flex
         for dy in (-SNAP_W / 2 - 1.0, SNAP_W / 2):
-            x0, x1 = sorted((sx * (x_in + 1), sx * (x_in - LIP_T - 1)))
-            rim -= box(x0, x1, SNAP_Y + dy, SNAP_Y + dy + 1.0, FLOOR + 0.8, FLOOR + LIP_H + 1)
+            rim -= box(sx * (x_in + 1), sx * (x_in - LIP_T - 1), SNAP_Y + dy, SNAP_Y + dy + 1.0,
+                       FLOOR + 0.8, FLOOR + LIP_H + 1)
         # the catch: flat on the bottom, sloped on top so the shell rides over it
         catch_bottom = SNAP_Z0 + 0.3
-        catch = Manifold.batch_hull([
-            box(*sorted((sx * (x_in - 0.1), sx * (x_in + 0.7))), SNAP_Y - SNAP_W / 2 + 0.5,
+        rim += Manifold.batch_hull([
+            box(sx * (x_in - 0.1), sx * (x_in + 0.7), SNAP_Y - SNAP_W / 2 + 0.5,
                 SNAP_Y + SNAP_W / 2 - 0.5, catch_bottom, catch_bottom + 1.0),
-            box(*sorted((sx * (x_in - 0.1), sx * (x_in + 0.01))), SNAP_Y - SNAP_W / 2 + 0.5,
+            box(sx * (x_in - 0.1), sx * (x_in + 0.01), SNAP_Y - SNAP_W / 2 + 0.5,
                 SNAP_Y + SNAP_W / 2 - 0.5, catch_bottom, FLOOR + LIP_H)])
-        rim += catch
     b += rim
-
-    # The Black Pill's cradle, USB end at the back
-    y1 = D - WALL - USB_GAP                 # board's USB end
-    y0 = y1 - BP_L                          # board's far end
-    top = FLOOR + BP_RIB + BP_T             # top of the board
-    b += box(-4, 4, y0 + 2, y1 - 2, FLOOR - 0.01, FLOOR + BP_RIB)            # rib under it
-    half = BP_W / 2 + 0.2
-    for sx in (-1, 1):
-        x0, x1 = sorted((sx * half, sx * (half + 1.6)))
-        b += box(x0, x1, y0 - 0.2, y1 + 0.2, FLOOR - 0.01, top + 0.5)       # side rails
-        # lips over the board's edge near the USB end, so it can't lift
-        lx0, lx1 = sorted((sx * (half - 0.6), sx * (half + 1.6)))
-        b += box(lx0, lx1, y1 - 9, y1 + 0.2, top + 0.1, top + 1.0)
-    # the far end snaps under a lip on a springy end wall
-    b += box(-5.5, 5.5, y0 - 1.8, y0 - 0.2, FLOOR - 0.01, top + 1.2)   # between the header rows
-    lip = Manifold.batch_hull([
-        box(-5.5, 5.5, y0 - 0.2, y0 + 0.6, top + 0.1, top + 0.5),
-        box(-5.5, 5.5, y0 - 0.2, y0 - 0.19, top + 0.1, top + 1.2)])
-    b += lip
+    b += black_pill_stand()
 
     # vents under where the ESP-01 and its regulator go (right side)
     for i in range(7):
@@ -264,42 +269,13 @@ def base():
     return b
 
 
-def ear(kind):
-    """One ear, standing on z=0 with its peg below, profile in (x, z)."""
-    if kind == "round":
-        prof = CrossSection.circle(8.5, SEG).translate((0, 7.0))
-        prof = prof + rrect(15.0, 7.0, 0.5).translate((0, 3.5))
-        detail = CrossSection.circle(4.6, SEG).translate((0, 7.6))
-    else:
-        prof = CrossSection.batch_hull([CrossSection.circle(2.2, SEG).translate(p)
-                                        for p in [(-6.3, 2.2), (6.3, 2.2), (-0.9, 13.2)]])
-        prof = prof + rrect(17.0, 4.0, 0.5).translate((0, 2.0))
-        detail = CrossSection.batch_hull([CrossSection.circle(1.2, SEG).translate(p)
-                                          for p in [(-3.6, 3.4), (3.2, 3.4), (-1.0, 10.0)]])
-    prof = prof - CrossSection.square((40, 40)).translate((-20, -40))   # flat on the roof
-    e = plate_xz(prof, EAR_Y - EAR_T / 2, EAR_Y + EAR_T / 2)
-    e -= plate_xz(detail, EAR_Y - EAR_T / 2 - 1, EAR_Y - EAR_T / 2 + 0.8)  # inner ear, front
-    peg = box(-PEG_X / 2, PEG_X / 2, EAR_Y - PEG_Y / 2, EAR_Y + PEG_Y / 2, -PEG_Z, 0.01)
-    return e + peg
-
-
-# ================================================================ assembly and export
-
-def ears(kind):
-    """The pair, in place on the head."""
-    left = ear(kind).translate((-EAR_X, 0, H))
-    right = ear(kind).mirror((1, 0, 0)).translate((EAR_X, 0, H)) if kind == "cat" \
-        else ear(kind).translate((EAR_X, 0, H))
-    return left, right
-
+# ================================================================ export
 
 def print_pose(name, m):
     """Turn a part from its place on the pet into the way it goes on the bed."""
     if name == "shell":                       # upside down: rotate about y, not mirror
         m = m.rotate((0, 180, 0))
     elif name == "visor":                     # face down
-        m = m.rotate((-90, 0, 0))
-    elif name.startswith("ear"):              # lying on its back, inner ear up
         m = m.rotate((-90, 0, 0))
     lo = np.array(m.bounding_box()[:3])
     hi = np.array(m.bounding_box()[3:])
@@ -316,31 +292,13 @@ def write_stl(m, path):
 
 
 def parts():
-    er = ears("round")
-    ec = ears("cat")
-    return {
-        "shell": shell(),
-        "visor": visor(),
-        "base": base(),
-        "ears_round": er[0] + er[1],
-        "ears_cat": ec[0] + ec[1],
-    }
+    return {"shell": shell(), "visor": visor(), "base": base()}
 
 
 if __name__ == "__main__":
     os.makedirs("stl", exist_ok=True)
     for name, m in parts().items():
-        if name.startswith("ears"):
-            # print the pair side by side, both lying flat
-            left, right = ears(name.split("_")[1])
-            a = print_pose("ear", left)
-            b = print_pose("ear", right)
-            span = a.bounding_box()[3] - a.bounding_box()[0]
-            m_print = a.translate((-(span / 2 + 3), 0, 0)) + b.translate((span / 2 + 3, 0, 0))
-        else:
-            m_print = print_pose(name, m)
-        tm = write_stl(m_print, f"stl/{name}.stl")
-        bb = tm.bounds
-        size = bb[1] - bb[0]
-        print(f"{name:11s} {size[0]:6.1f} x {size[1]:6.1f} x {size[2]:6.1f} mm  "
+        tm = write_stl(print_pose(name, m), f"stl/{name}.stl")
+        size = tm.bounds[1] - tm.bounds[0]
+        print(f"{name:6s} {size[0]:6.1f} x {size[1]:6.1f} x {size[2]:6.1f} mm  "
               f"{tm.volume / 1000:6.1f} cm3  watertight={tm.is_watertight}  tris={len(tm.faces)}")

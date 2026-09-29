@@ -11,33 +11,35 @@ from model import box, plate_xz, rrect
 
 # ---------------------------------------------------------------- stand-ins
 
-y1 = M.D - M.WALL - M.USB_GAP              # Black Pill's USB end
-y0 = y1 - M.BP_L
-bp_bottom = M.FLOOR + M.BP_RIB
-bp_top = bp_bottom + M.BP_T
-usb_z = bp_top + 1.65
+y1, y0 = M.BP_Y1, M.BP_Y0
+bp_bottom, bp_top, usb_z = M.BP_BOTTOM, M.BP_TOP, M.USB_Z
+
+
+def pin_y(n):
+    """Pin n of 20 along a row, counted from the USB end (WeAct drawing: 1.43 in, 2.54 pitch)."""
+    return y1 - 1.43 - 2.54 * n
 
 
 def black_pill():
+    """Chip side up, headers pointing down: plastic under the board, solder stubs on top."""
     board = box(-M.BP_W / 2, M.BP_W / 2, y0, y1, bp_bottom, bp_top)
     usb = box(-4.5, 4.5, y1 + 0.8 - 7.35, y1 + 0.8, bp_top, bp_top + 3.26)
-    rows = [box(sx * 7.62 - 1.27, sx * 7.62 + 1.27, y0 + 0.2, y1 - 0.2, bp_top, bp_top + 2.5)
-            for sx in (-1, 1)]
-    tails = [box(sx * 7.62 - 0.4, sx * 7.62 + 0.4, y0 + 1, y1 - 1, bp_bottom - 1.8, bp_bottom)
-             for sx in (-1, 1)]
-    return board + usb + rows[0] + rows[1] + tails[0] + tails[1]
+    tabs = [box(sx * 4.3 - 0.5, sx * 4.3 + 0.5, y1 - 6, y1 - 1, bp_bottom - 1.0, bp_bottom) for sx in (-1, 1)]
+    m = board + usb + tabs[0] + tabs[1]
+    for sx in (-1, 1):
+        m += box(sx * 7.62 - 1.27, sx * 7.62 + 1.27, y0 + 0.13, y1 - 0.13, bp_bottom - 2.5, bp_bottom)
+        m += box(sx * 7.62 - 0.9, sx * 7.62 + 0.9, y0 + 0.4, y1 - 0.4, bp_top, bp_top + 1.2)
+    return m
 
 
 def black_pill_duponts():
-    """The jumper housings actually used: top row 5V G 3.3 .. A2 A3, bottom row
-    B12 B13 A9 A10 B6 B7, standing 14 mm on the header."""
+    """A jumper plug on every one of the 40 pins, hanging 14 mm under the header,
+    so the stand clears them whichever pins are used."""
     m = None
-    # pin n along the board from the USB end: y = y1 - 1.4 - 2.54 n
-    used = {-1: [0, 1, 2, 12, 13, 6], 1: [0, 1, 5, 6, 12, 13]}
-    for sx, pins in used.items():
-        for n in pins:
-            y = y1 - 1.4 - 2.54 * n
-            h = box(sx * 7.62 - 1.27, sx * 7.62 + 1.27, y - 1.27, y + 1.27, bp_top + 2.5, bp_top + 16.5)
+    for sx in (-1, 1):
+        for n in range(20):
+            y = pin_y(n)
+            h = box(sx * 7.62 - 1.27, sx * 7.62 + 1.27, y - 1.27, y + 1.27, bp_bottom - 16.5, bp_bottom - 2.5)
             m = h if m is None else m + h
     return m
 
@@ -77,7 +79,7 @@ def touch():
 
 
 def loose():
-    hc05 = box(-28.4, -12.9, 16, 53.3, M.FLOOR, M.FLOOR + 3.6)
+    hc05 = box(-28.5, -13.0, 16, 53.3, M.FLOOR, M.FLOOR + 3.6)
     esp = box(13.0, 27.3, 20, 44.8, M.FLOOR, M.FLOOR + 3.0)
     ams = box(15.0, 26.0, 48, 60, M.FLOOR, M.FLOOR + 6.0)
     return hc05, esp, ams
@@ -91,14 +93,13 @@ def vol(m):
 
 if __name__ == "__main__":
     shell, visor, base = M.shell(), M.visor(), M.base()
-    ears = M.ears("round")
     bp, dup = black_pill(), black_pill_duponts()
     plug_shell, plug_mould = usb_plug()
     pcb, glass, solder, header, oled_dup = oled()
     touch_board, touch_pins = touch()
     hc05, esp, ams = loose()
 
-    solids = {"shell": shell, "visor": visor, "base": base, "ear L": ears[0], "ear R": ears[1]}
+    solids = {"shell": shell, "visor": visor, "base": base}
     things = {"Black Pill": bp, "BP jumpers": dup, "USB plug mould": plug_mould,
               "OLED pcb": pcb, "OLED glass": glass, "OLED solder": solder,
               "OLED header": header, "OLED jumpers": oled_dup, "touch board": touch_board,
@@ -119,8 +120,10 @@ if __name__ == "__main__":
     print("clashes:", bad)
 
     # how far the board can slide, and what the plug's mould clears
-    print("USB port: board face at y=%.2f, wall inside y=%.2f, outside y=%.2f" %
-          (y1 + 0.8, M.D - M.WALL, M.D))
+    print("USB port: board face at y=%.2f, wall inside y=%.2f, outside y=%.2f, centre z=%.2f" %
+          (y1 + 0.8, M.D - M.WALL, M.D, usb_z))
+    print("Black Pill bottom z=%.2f, plugs hang to z=%.2f, floor top z=%.2f: %.1f mm for the wires to bend" %
+          (bp_bottom, bp_bottom - 16.5, M.FLOOR, bp_bottom - 16.5 - M.FLOOR))
     print("OLED lit area centre z=%.2f, window %.1f x %.1f" % (M.OLED_Z + M.AA_UP, M.WINDOW_W, M.WINDOW_H))
 
     # the assembly for renders: part name -> mesh
@@ -132,7 +135,6 @@ if __name__ == "__main__":
 
     scene = trimesh.Scene()
     colors = {"shell": [236, 236, 232, 255], "visor": [20, 22, 26, 255], "base": [200, 200, 196, 255],
-              "ear L": [236, 236, 232, 255], "ear R": [236, 236, 232, 255],
               "Black Pill": [25, 25, 25, 255], "BP jumpers": [30, 30, 30, 255],
               "USB plug mould": [60, 60, 64, 255], "OLED pcb": [31, 79, 163, 255],
               "OLED glass": [8, 8, 10, 255], "OLED header": [20, 20, 20, 255],
