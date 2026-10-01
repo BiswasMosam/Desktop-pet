@@ -51,7 +51,7 @@ uint32_t timerLeftMs(uint32_t now) {
 // ---------- Screens ----------
 
 const char *screenName(Screen s) {
-  static const char *NAMES[] = {"face", "clock", "weather", "timer", "status"};
+  static const char *NAMES[] = {"face", "clock", "weather", "timer", "usage", "status"};
   return s < SCR_COUNT ? NAMES[s] : "";
 }
 
@@ -62,8 +62,10 @@ void goScreen(Screen s, uint32_t holdMs, uint32_t now) {
 }
 
 static void nextScreen(uint32_t now) {
-  Screen s = (Screen)((screen + 1) % SCR_COUNT);
-  if (s == SCR_TIMER && !world.timerOn) s = (Screen)((s + 1) % SCR_COUNT);
+  // The timer only while one runs, Claude's usage only once it has been heard
+  Screen s = screen;
+  do s = (Screen)((s + 1) % SCR_COUNT);
+  while ((s == SCR_TIMER && !world.timerOn) || (s == SCR_USAGE && !world.cuValid));
   goScreen(s, BROWSE_MS, now);
 
   char ev[24];
@@ -174,6 +176,7 @@ void loop() {
     case SCR_CLOCK:   drawClock(now);   break;
     case SCR_WEATHER: drawWeather(now); break;
     case SCR_TIMER:   drawTimer(now);   break;
+    case SCR_USAGE:   drawUsage(now);   break;
     case SCR_STATUS:  drawStatus(now);  break;
     default:          faceDraw(now);    break;
   }

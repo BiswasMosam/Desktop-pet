@@ -182,6 +182,18 @@ if which(["selfie"]):
     pet.send("SF -")
     time.sleep(0.5)
 
+# ---------- Claude's usage ----------
+if which(["usage"]):
+    def at(day, h, m):
+        """Unix time of h:m IST on that day of Sep/Oct 2026 (day > 30 is October)."""
+        month, d = (10, day - 30) if day > 30 else (9, day)
+        return calendar.timegm((2026, month, d, h, m, 0, 0, 0, 0)) - OFFSET
+    pet.send(local_time(10, 42))
+    pet.send(f"CU 95 {at(29, 13, 40)} 14 {at(31, 19, 30)}")
+    pet.send("GO usage 60")
+    still("usage", 0.5)
+    pet.send("GO face")
+
 # ---------- The card ----------
 if which(["cardui"]):
     pet.send("GO face")

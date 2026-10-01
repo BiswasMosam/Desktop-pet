@@ -279,6 +279,51 @@ static void ago(char *out, size_t n, uint32_t ms) {
   else               snprintf(out, n, "%luh ago", s / 3600);
 }
 
+// ---------- Claude usage ----------
+
+// "resets 4:10 am", or with the day for one further off: "resets Thu 7:30 pm"
+static void resetText(char *out, size_t n, uint32_t at, bool withDay) {
+  time_t t = (time_t)at + world.tzOffset;
+  struct tm tm;
+  gmtime_r(&t, &tm);
+  int hr = tm.tm_hour % 12 == 0 ? 12 : tm.tm_hour % 12;
+  const char *ap = tm.tm_hour < 12 ? "am" : "pm";
+  if (withDay) snprintf(out, n, "resets %s %d:%02d %s", DAYS[tm.tm_wday], hr, tm.tm_min, ap);
+  else         snprintf(out, n, "resets %d:%02d %s", hr, tm.tm_min, ap);
+}
+
+// A name and its percentage, a bar under them, and when it resets
+static void usageRow(int y, const char *name, uint8_t pct, uint32_t resetAt, bool withDay) {
+  char line[28];
+  small(0, y, name);
+  snprintf(line, sizeof(line), "%u%%", pct);
+  int w = strlen(line) * 6;
+  if (pct >= 90) {
+    // Nearly out: the number turns over, the way the app turns it red
+    display.fillRect(SCREEN_W - w - 2, y - 1, w + 2, 9, SSD1306_WHITE);
+    display.setTextColor(SSD1306_BLACK);
+    display.setCursor(SCREEN_W - w - 1, y);
+    display.print(line);
+    display.setTextColor(SSD1306_WHITE);
+  } else {
+    smallRight(SCREEN_W, y, line);
+  }
+  display.drawRect(0, y + 9, SCREEN_W, 6, SSD1306_WHITE);
+  int fill = (SCREEN_W - 4) * min<int>(pct, 100) / 100;
+  if (fill > 0) display.fillRect(2, y + 11, fill, 2, SSD1306_WHITE);
+  if (resetAt && world.timeValid) {
+    resetText(line, sizeof(line), resetAt, withDay);
+    small(0, y + 17, line);
+  }
+}
+
+void drawUsage(uint32_t now) {
+  // Heard nothing for 20 minutes: the bridge or its sign-in has gone quiet
+  header(now - world.cuAt > 20UL * 60 * 1000 ? "Claude (old)" : "Claude");
+  usageRow(11, "Session", world.cuSession, world.cuSessionReset, false);
+  usageRow(37, "Week", world.cuWeek, world.cuWeekReset, true);
+}
+
 void drawStatus(uint32_t now) {
   static const char *AM[] = {"offline", "idle", "listening", "thinking", "speaking"};
   char line[28], when[12];

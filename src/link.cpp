@@ -4,7 +4,7 @@
 // protocol, so the pet doesn't care which one Aminal is on. Replies go back down the port the command came in
 // on; events (a tap, a hold) go to whichever port spoke last.
 //
-//   HI                          -> PET desktop-pet 10
+//   HI                          -> PET desktop-pet 11
 //   RF [test|poll]              -> RF <RC522 chip version, hex> | RF -;
 //                               test: SPI read-back; poll: one try at a card
 //   IP                          -> IP <its WiFi address> | IP -
@@ -16,7 +16,8 @@
 //   TI <left s> <total s> <paused 0|1> <label>   or   TI -
 //   AL <secs> <title>|<text>    or   AL -   (take it down)
 //   EM <happy|love|surprised|sad|angry|wink|sleepy> [ms]
-//   GO <face|clock|weather|timer|status> [secs]
+//   GO <face|clock|weather|timer|usage|status> [secs]
+//   CU <session %> <its reset, unix> <week %> <its reset, unix>   Claude usage
 //   SN                          -> SN <the 1024-byte frame buffer as hex>
 //   MD music [headphones|dance|bars] | watch | -   what's playing on the PC
 //   VZ <16 hex digits>          spectrum bars, 0-f each, low to high
@@ -323,6 +324,21 @@ static void setSelfie(char *a, uint32_t now) {
   goScreen(SCR_FACE, 0, now);
 }
 
+// CU <session %> <reset unix> <week %> <reset unix>
+static void setUsage(char *a, uint32_t now) {
+  char *p = a;
+  long session = strtol(p, &p, 10);
+  unsigned long sessionReset = strtoul(p, &p, 10);
+  long week = strtol(p, &p, 10);
+  unsigned long weekReset = strtoul(p, &p, 10);
+  world.cuSession = constrain(session, 0, 100);
+  world.cuWeek = constrain(week, 0, 100);
+  world.cuSessionReset = sessionReset;
+  world.cuWeekReset = weekReset;
+  world.cuAt = now;
+  world.cuValid = true;
+}
+
 static void setBars(const char *a, uint32_t now) {
   for (int i = 0; i < VZ_BARS && a[i]; i++) {
     char c = a[i];
@@ -355,7 +371,7 @@ static void handleLine(Port &p, uint32_t now) {
   replyTo = &p;
 
   bool hello = false, known = true;
-  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 10"); hello = true; }
+  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 11"); hello = true; }
   else if (!strcmp(cmd, "PG")) reply("PO");
   else if (!strcmp(cmd, "RF")) {
     char b[104];
@@ -387,6 +403,7 @@ static void handleLine(Port &p, uint32_t now) {
   }
   else if (!strcmp(cmd, "AC")) setActivity(args);
   else if (!strcmp(cmd, "SF")) setSelfie(args, now);
+  else if (!strcmp(cmd, "CU")) setUsage(args, now);
   else if (!strcmp(cmd, "LO")) wifiSetPlace(args, now);
   else if (!strcmp(cmd, "WF") && p.kind == LINK_USB) wifiJoin(args);   // never over the air
   else if (!strcmp(cmd, "ES") && p.kind == LINK_USB) {

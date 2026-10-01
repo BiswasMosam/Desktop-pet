@@ -38,7 +38,8 @@ enum Activity : uint8_t { ACT_NONE, ACT_CODE, ACT_GAME };
 enum Cam : uint8_t { CAM_NONE, CAM_READY, CAM_COUNT, CAM_SHOT };
 
 // ---------- Screens, in the order a double tap walks through them ----------
-enum Screen : uint8_t { SCR_FACE, SCR_CLOCK, SCR_WEATHER, SCR_TIMER, SCR_STATUS, SCR_COUNT };
+enum Screen : uint8_t { SCR_FACE, SCR_CLOCK, SCR_WEATHER, SCR_TIMER, SCR_USAGE, SCR_STATUS,
+                        SCR_COUNT };
 
 struct World {
   // Clock: a Unix time pinned to a millis() reading, local offset added on display
@@ -88,6 +89,12 @@ struct World {
   Cam      cam = CAM_NONE;
   uint32_t camAt = 0;
   uint16_t camCountMs = 0;
+
+  // Claude's plan usage, from the bridge: how much is used and when it resets
+  bool     cuValid = false;
+  uint8_t  cuSession = 0, cuWeek = 0;             // percent
+  uint32_t cuSessionReset = 0, cuWeekReset = 0;   // Unix time, 0 if unknown
+  uint32_t cuAt = 0;                              // millis() when it arrived
 
   // A card drawn over whatever screen is up
   bool     alertOn = false;
@@ -149,6 +156,7 @@ void cameraDraw(uint32_t now);
 void drawClock(uint32_t now);
 void drawWeather(uint32_t now);
 void drawTimer(uint32_t now);
+void drawUsage(uint32_t now);
 void drawStatus(uint32_t now);
 void drawAlert(uint32_t now);
 void bigDigit(const char *s, int cx, int baseline);   // the timer's font

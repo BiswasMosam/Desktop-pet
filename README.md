@@ -37,6 +37,7 @@ Everything moves by easing the current eye position, width and height toward a t
 - **Clock:** big time, the date, and a hairline filling across the minute.
 - **Weather:** an animated icon (turning sun, crescent moon at night, falling rain, drifting snow, flickering lightning, rolling fog), the temperature, today's high and low, and the place.
 - **Timer:** the countdown with a bar draining under it. It blinks while paused, and when it runs out the whole screen flashes "Time's up" until you tap it.
+- **Claude:** how much of your Claude plan is used, the way Claude's own Usage settings show it: the current session and the week, each with a bar and when it resets. From 90% the number turns over, white on black. The bridge reads it every 2 minutes with the sign-in Claude Code keeps on the PC, and only the four numbers reach the pet. The page joins the round once there are numbers to show.
 - **Status:** which link it's on, what Aminal is doing, and how fresh the time and weather are.
 
 Reminders, mail and what's next on the calendar slide down as a card over whatever is on screen. Ask Aminal for the weather or a timer and the pet flips to that screen while it answers.
@@ -184,7 +185,7 @@ One short line per message, the same on USB and WiFi, simple enough to type into
 
 | Line | Meaning |
 | --- | --- |
-| `HI` | Who are you? The pet answers `PET desktop-pet 10` |
+| `HI` | Who are you? The pet answers `PET desktop-pet 11` |
 | `IP` | Its WiFi address: `IP 192.168.1.12`, or `IP -` when it isn't online |
 | `PG` | Heartbeat, answered `PO`. Eight silent seconds and the pet is on its own again |
 | `ST idle\|listening\|thinking\|speaking\|off` | What Aminal is doing |
@@ -194,7 +195,8 @@ One short line per message, the same on USB and WiFi, simple enough to type into
 | `TI <left s> <total s> <paused 0/1> <label>` or `TI -` | The timer, or none |
 | `AL <secs> <title>\|<text>` or `AL -` | A card, or take it down |
 | `EM <happy\|love\|surprised\|sad\|angry\|wink\|sleepy> [ms]` | Pull a face |
-| `GO <face\|clock\|weather\|timer\|status> [secs]` | Show a screen |
+| `GO <face\|clock\|weather\|timer\|usage\|status> [secs]` | Show a screen |
+| `CU <session %> <reset> <week %> <reset>` | Claude's usage, each reset as Unix time |
 | `SN` | Answered `SN <hex>`: the 1024-byte frame buffer, exactly what's on the OLED |
 | `RF`, `RF test`, `RF poll` | The RC522: its chip version; a wiring test (a register written and read back, and whether anything drives MISO); one try at reading a card |
 | `MD music [headphones\|dance\|bars]`, `MD watch`, `MD -` | What's playing; a mood can be asked for by name |
@@ -229,7 +231,7 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | `src/pet.h` | The shared `World`: time, weather, timer, Aminal's state, the current card |
 | `src/main.cpp` | Setup, the frame loop, the button, switching screens |
 | `src/face.cpp` | Eyes, moods, fidgets, and the listening, thinking and speaking faces |
-| `src/screens.cpp` | Clock, weather icons, timer, status, and the alert card |
+| `src/screens.cpp` | Clock, weather icons, timer, Claude's usage, status, and the alert card |
 | `src/media.cpp` | Headphones, music notes, the visualizer, and the popcorn |
 | `src/activity.cpp` | Glasses, the keyboard and paws, the controller, and the sparks |
 | `src/camera.cpp` | The camera face for a selfie: countdown, flash and shutter |

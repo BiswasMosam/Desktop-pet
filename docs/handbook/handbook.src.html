@@ -333,7 +333,7 @@ html{scroll-behavior:smooth}
 
 <!-- ============================ COVER ============================ -->
 <header class="cover" id="top">
-  <div class="cover__top"><span>Handbook · Rev. 2 · 2 Oct 2026</span><span>Firmware v10</span></div>
+  <div class="cover__top"><span>Handbook · Rev. 2 · 2 Oct 2026</span><span>Firmware v11</span></div>
   <div>
     {{WORDMARK}}
     <div class="cover__sub">User guide and technical notes</div>
@@ -433,7 +433,7 @@ html{scroll-behavior:smooth}
       <tr><td class="f">Hold, 0.7 s</td><td>Back to the face</td><td>On the timer: pause or carry on. Anywhere else: back to the face.</td></tr>
     </tbody>
   </table></div>
-  <p>A tap also puts away a card. The screens come round in this order: face, clock, weather, timer (only while one is running) and status. A screen you flip to goes back to the face by itself after 20 seconds.</p>
+  <p>A tap also puts away a card. The screens come round in this order: face, clock, weather, timer (only while one is running), Claude (once the bridge has sent its numbers) and status. A screen you flip to goes back to the face by itself after 20 seconds.</p>
   <div class="dwrap">
     <svg class="diagram" viewBox="0 0 660 200" role="img" aria-label="Button timing for a tap, a double tap and a hold">
       <text class="d-p" x="0" y="46">Tap</text>
@@ -589,6 +589,15 @@ html{scroll-behavior:smooth}
     <!--FIG timer | -1 | Timer | Counts down by itself between updates, over a bar that drains. Paused, it blinks like an oven. | gif=timer-->
     <!--FIG status | -1 | Status | The link, what Aminal is doing, WiFi, how fresh the time and weather are, and how long it has been up.-->
   </div>
+  <h3>Claude's usage</h3>
+  <div class="grid g2">
+    <!--FIG usage | -1 | Claude | The current session and the week, as Claude's own Usage settings show them: how much is used, a bar, and when each resets. From 90% the number turns over, white on black.-->
+    <ul class="tick">
+      <li>The bridge reads the numbers every 2 minutes with the sign-in Claude Code keeps on the PC. Only the four numbers reach the pet; the sign-in never leaves the PC.</li>
+      <li>The bridge never renews that sign-in, since Claude Code owns it. If it has expired, the page keeps the last numbers, and after 20 minutes without news the title says "(old)".</li>
+      <li>The page only joins the round of screens once there are numbers to show.</li>
+    </ul>
+  </div>
   <h3>Weather icons</h3>
   <p>Every icon moves: the sun's rays turn, rain and snow fall, fog drifts and lightning flickers. From 7 pm to 6 am a clear sky shows a moon with twinkling stars. The numbers are the WMO weather codes Open-Meteo reports.</p>
   <div class="grid g4 icons">
@@ -625,7 +634,7 @@ html{scroll-behavior:smooth}
         <dt>Pet it three times, fast.</dt><dd>Taps less than 1.5 seconds apart add up, and the third turns its eyes into hearts.</dd>
         <dt>Leave it alone.</dt><dd>After 30 seconds it droops off to sleep. One tap wakes it.</dd>
         <dt>Check on it late at night.</dt><dd>After 11 pm it falls asleep after only 10 seconds and shows the time while it sleeps, so it works as a night clock.</dd>
-        <dt>Double tap.</dt><dd>It walks through the clock, the weather, the timer and the status screen, then comes back to the face by itself.</dd>
+        <dt>Double tap.</dt><dd>It walks through the clock, the weather, the timer, Claude's usage and the status screen, then comes back to the face by itself.</dd>
         <dt>Hold it on the timer.</dt><dd>The timer pauses and blinks. Hold again to carry on.</dd>
         <dt>Tap your card on its right cheek.</dt><dd>A hidden folder opens. Tap again and it closes.</dd>
       </dl>
@@ -697,7 +706,7 @@ html{scroll-behavior:smooth}
       <text class="d-l" x="348" y="184">WX  TI  AL</text>
       <text class="d-l" x="348" y="208">EM  GO  MD</text>
       <text class="d-l" x="348" y="232">VZ  BE  JS</text>
-      <text class="d-l" x="348" y="256">AC  SF  IP</text>
+      <text class="d-l" x="348" y="256">AC  SF  CU</text>
       <text class="d-s" x="348" y="290">heartbeat 2 s</text>
       <text class="d-s" x="348" y="312">time every 10 min</text>
       <text class="d-s" x="348" y="334">weather every 20 min</text>
@@ -906,7 +915,7 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
   <div class="tscroll"><table>
     <thead><tr><th>Line</th><th>Meaning</th></tr></thead>
     <tbody>
-      <tr><td class="f">HI</td><td>Who are you? The pet answers <code>PET desktop-pet 10</code>.</td></tr>
+      <tr><td class="f">HI</td><td>Who are you? The pet answers <code>PET desktop-pet 11</code>.</td></tr>
       <tr><td class="f">PG</td><td>Heartbeat, answered <code>PO</code>.</td></tr>
       <tr><td class="f">ST idle|listening|thinking|speaking|off</td><td>What Aminal is doing</td></tr>
       <tr><td class="f">LV 0–100</td><td>How loud the voice is, for the eyes and the mouth</td></tr>
@@ -915,7 +924,8 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
       <tr><td class="f">TI &lt;left&gt; &lt;total&gt; &lt;paused&gt; &lt;label&gt;</td><td>The timer, or <code>TI -</code> for none</td></tr>
       <tr><td class="f">AL &lt;secs&gt; &lt;title&gt;|&lt;text&gt;</td><td>A card, or <code>AL -</code> to take it down</td></tr>
       <tr><td class="f">EM &lt;face&gt; [ms]</td><td>Pull a face: happy, love, surprised, sad, angry, wink, sleepy</td></tr>
-      <tr><td class="f">GO &lt;screen&gt; [secs]</td><td>Show face, clock, weather, timer or status</td></tr>
+      <tr><td class="f">GO &lt;screen&gt; [secs]</td><td>Show face, clock, weather, timer, usage or status</td></tr>
+      <tr><td class="f">CU &lt;session %&gt; &lt;reset&gt; &lt;week %&gt; &lt;reset&gt;</td><td>Claude's usage, each reset as Unix time</td></tr>
       <tr><td class="f">MD music [style] | watch | -</td><td>What's playing. A music style (headphones, dance, bars) can be asked for by name.</td></tr>
       <tr><td class="f">VZ &lt;16 hex digits&gt;</td><td>Spectrum bars, 0 to f each, low notes first</td></tr>
       <tr><td class="f">BE</td><td>A beat</td></tr>
@@ -933,7 +943,7 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
   <p>The pet sends events back up whichever link spoke last: <code>EV pet</code>, <code>EV next &lt;screen&gt;</code>, <code>EV hold</code>, <code>EV hold timer</code>, <code>EV dismiss</code>, <code>EV wifi ok &lt;ip&gt;</code>, <code>EV wifi fail</code> and <code>EV card &lt;uid&gt; tap</code>.</p>
   <h3>A few seconds of conversation</h3>
 <pre><span class="a">→</span> HI
-<span class="a">←</span> PET desktop-pet 10
+<span class="a">←</span> PET desktop-pet 11
 <span class="a">→</span> {{TM}}          <span class="c">// 10:42 on 29 Sep, India's +5:30</span>
 <span class="a">→</span> WX 29 2 32 24 Mumbai
 <span class="a">→</span> ST listening
@@ -1100,7 +1110,7 @@ idle  ↔ +IPD,0,… in from the bridge, AT+CIPSEND=0,… back to it</pre>
       <tr><td class="f">src/activity.cpp</td><td>Glasses, the keyboard and paws, the controller and the sparks</td></tr>
       <tr><td class="f">src/camera.cpp</td><td>The camera face for a selfie: countdown, flash and shutter</td></tr>
       <tr><td class="f">src/rfid.cpp</td><td>The card reader, and turning a card's arrival into a tap</td></tr>
-      <tr><td class="f">src/screens.cpp</td><td>Clock, weather icons, timer, status and the cards</td></tr>
+      <tr><td class="f">src/screens.cpp</td><td>Clock, weather icons, timer, Claude's usage, status and the cards</td></tr>
       <tr><td class="f">src/link.cpp</td><td>The protocol, read from USB and WiFi alike, and the ESP-01 passthrough</td></tr>
       <tr><td class="f">src/wifi.cpp</td><td>The ESP-01 driven through its AT firmware: joining, the weather request, and the bridge's link on port 7676</td></tr>
     </tbody>
@@ -1109,7 +1119,7 @@ idle  ↔ +IPD,0,… in from the bridge, AT+CIPSEND=0,… back to it</pre>
   <div class="tscroll"><table>
     <thead><tr><th>Revision</th><th>Date</th><th>What changed</th></tr></thead>
     <tbody>
-      <tr><td class="f">Rev. 2</td><td class="f">2 Oct 2026</td><td>For firmware v10: coding and gaming faces, the selfie camera, the RFID card, WiFi as the link to the PC, a bridge that runs without Aminal, Bluetooth taken out, new wiring for the ESP-01, the RC522 and the touch pad, and a chapter on the printed head.</td></tr>
+      <tr><td class="f">Rev. 2</td><td class="f">2 Oct 2026</td><td>For firmware v11: coding and gaming faces, the selfie camera, the RFID card, a page for Claude's usage, WiFi as the link to the PC, a bridge that runs without Aminal, Bluetooth taken out, new wiring for the ESP-01, the RC522 and the touch pad, and a chapter on the printed head.</td></tr>
       <tr><td class="f">Rev. 1</td><td class="f">29 Sep 2026</td><td>First edition, for firmware v6: the user guide, the technical notes, and real captures of every face and screen.</td></tr>
     </tbody>
   </table></div>

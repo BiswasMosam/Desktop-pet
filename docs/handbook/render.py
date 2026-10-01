@@ -83,6 +83,7 @@ if __name__ == "__main__":
     made.append(gif("timesup", invert_every=0.5))
     made.append((png("clock"),))
     made.append((png("status"),))
+    made.append((png("usage"),))
     for m in made:
         print(*m, f"{os.path.getsize(m[0]) // 1024} KB")
 
