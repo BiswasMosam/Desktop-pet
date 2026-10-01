@@ -227,6 +227,8 @@ def build(target):
     utc = calendar.timegm((2026, 9, 29, 10, 42, 5, 0, 0, 0)) - 19800
     src = src.replace("{{TM}}", f"TM {utc} 19800").replace("{{SNHEX}}", sn_hex()).replace("{{LISTEN}}", listen_frames())
     src = src.replace("{{FONTS}}", WEB_FONTS if screen else PAPER_FONTS)
+    # pictures that aren't frame captures: next to the page on screen, in site/ for the PDF
+    src = src.replace("{{SHOTS}}", "shots" if screen else "site/shots")
     src = src.replace("{{HEAD}}", PAGES_HEAD if target == "pages" else "")
     src = src.replace("{{PDFLINK}}", PDF if target == "pages" else SITE + PDF)
     src = src.replace("{{WORDMARK}}", pixel_text("DESKTOP-PET", label="Desktop-pet"))
@@ -274,7 +276,7 @@ if __name__ == "__main__":
     # GitHub Pages serves ../ (the repo's docs/ folder) at SITE
     open("../index.html", "w", encoding="utf-8").write(pages)
     os.makedirs("../shots", exist_ok=True)
-    for gif in sorted(set(re.findall(r'src="shots/([a-z_0-9]+\.gif)"', pages))):
+    for gif in sorted(set(re.findall(r'src="shots/([a-z_0-9]+\.(?:gif|png))"', pages))):
         shutil.copyfile(f"site/shots/{gif}", f"../shots/{gif}")
     og_image("../og.png")
     print(f"web {len(web) // 1024} KB, paper {len(paper) // 1024} KB, pages {len(pages) // 1024} KB")

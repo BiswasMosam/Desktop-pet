@@ -44,7 +44,7 @@ def rec(name, seconds, feed=None):
 
 
 def reset():
-    for line in ("MD -", "ST idle", "AL -", "TI -", "GO face"):
+    for line in ("MD -", "AC -", "SF -", "ST idle", "AL -", "TI -", "GO face"):
         pet.send(line)
     time.sleep(0.3)
 
@@ -144,6 +144,52 @@ if which(["watch"]):
     rec("jump", 1.6)
     pet.send("MD -")
     time.sleep(0.5)
+
+# ---------- Coding and gaming ----------
+if which(["code"]):
+    pet.send("AC code")
+    time.sleep(1.2)
+    rec("code_read", 6)
+    pet.send("AC code typing")
+    time.sleep(0.8)
+    rec("code_type", 4)
+    pet.send("MD music")
+    time.sleep(0.8)
+    rec("code_music", 4, Feeder(0.5, lambda t: ["BE"]))
+    pet.send("MD -")
+    pet.send("AC -")
+    time.sleep(0.5)
+
+if which(["game"]):
+    pet.send("AC game")
+    time.sleep(1.2)
+    fired = []
+    rec("game", 5, lambda t: (pet.send("JS"), fired.append(t)) if t >= 2.5 and not fired else None)
+    pet.send("AC -")
+    time.sleep(0.5)
+
+# ---------- A selfie ----------
+if which(["selfie"]):
+    plan = [(0.0, "SF ready"), (2.2, "SF count 2100"), (4.9, "SF shot"), (8.6, "SF -")]
+    sent = []
+
+    def selfie(t):
+        for at, line in plan:
+            if t >= at and line not in sent:
+                sent.append(line)
+                pet.send(line)
+    rec("selfie", 8.5, selfie)
+    pet.send("SF -")
+    time.sleep(0.5)
+
+# ---------- The card ----------
+if which(["cardui"]):
+    pet.send("GO face")
+    time.sleep(0.4)
+    pet.send("AL 3 Folder open|Tap again to close it")
+    rec("card_open", 1.2)
+    pet.send("AL -")
+    time.sleep(0.3)
 
 # ---------- The screens ----------
 if which(["screens"]):

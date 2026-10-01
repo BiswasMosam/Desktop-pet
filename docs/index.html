@@ -92,6 +92,7 @@ section.ch{padding-block:80px 8px;border-top:1px solid var(--line);margin-top:72
 .px-off{fill:#000}
 .px-on{fill:var(--lit)}
 .fig figcaption{font-size:14.5px;line-height:1.55;color:var(--dim)}
+.fig img.render{display:block;width:100%;height:auto;border-radius:10px;border:1px solid var(--line);background:#07090b}
 .fig figcaption b{display:block;font-weight:700;color:var(--ink);margin-bottom:2px;font-size:15px}
 .fig.small figcaption{font-size:13.5px}
 .fig.small figcaption b{font-size:14px}
@@ -217,7 +218,7 @@ html{scroll-behavior:smooth}
 /* ================= PAPER (A4) ================= */
 @media print{
   @page{size:A4;margin:15mm 15mm 17mm;background:#07090b;
-    @bottom-left{content:"Desktop-pet  ·  Handbook  ·  Rev. 1";font-family:'Space Mono',monospace;
+    @bottom-left{content:"Desktop-pet  ·  Handbook  ·  Rev. 2";font-family:'Space Mono',monospace;
       font-size:6.2pt;letter-spacing:.16em;color:rgba(227,234,238,.42);text-transform:uppercase}
     @bottom-right{content:counter(page, decimal-leading-zero);font-family:'Space Mono',monospace;
       font-size:6.8pt;color:#3de8ff}}
@@ -316,17 +317,21 @@ html{scroll-behavior:smooth}
     <a href="#moods"><i>03</i>Left to itself</a>
     <a href="#aminal"><i>04</i>Aminal's face</a>
     <a href="#media"><i>05</i>Music and films</a>
-    <a href="#screens"><i>06</i>Screens and cards</a>
-    <a href="#tries"><i>07</i>Things to try</a>
+    <a href="#activity"><i>06</i>Coding and gaming</a>
+    <a href="#selfie"><i>07</i>Selfies</a>
+    <a href="#card"><i>08</i>The card</a>
+    <a href="#screens"><i>09</i>Screens and cards</a>
+    <a href="#tries"><i>10</i>Things to try</a>
     <span>Inside</span>
-    <a href="#system"><i>08</i>How it fits together</a>
-    <a href="#wiring"><i>09</i>Wiring</a>
-    <a href="#firmware"><i>10</i>The firmware</a>
-    <a href="#protocol"><i>11</i>The protocol</a>
-    <a href="#hearing"><i>12</i>How it hears music</a>
-    <a href="#wifi"><i>13</i>WiFi</a>
-    <a href="#build"><i>14</i>Building and uploading</a>
-    <a href="#trouble"><i>15</i>When something's off</a>
+    <a href="#system"><i>11</i>How it fits together</a>
+    <a href="#wiring"><i>12</i>Wiring</a>
+    <a href="#head"><i>13</i>The head</a>
+    <a href="#firmware"><i>14</i>The firmware</a>
+    <a href="#protocol"><i>15</i>The protocol</a>
+    <a href="#hearing"><i>16</i>How it hears music</a>
+    <a href="#wifi"><i>17</i>WiFi</a>
+    <a href="#build"><i>18</i>Building and uploading</a>
+    <a href="#trouble"><i>19</i>When something's off</a>
   </nav>
   <div class="files">
     <a href="Desktop-pet-Handbook.pdf">PDF edition</a>
@@ -338,11 +343,11 @@ html{scroll-behavior:smooth}
 
 <!-- ============================ COVER ============================ -->
 <header class="cover" id="top">
-  <div class="cover__top"><span>Handbook · Rev. 1 · 29 Sep 2026</span><span>Firmware v6</span></div>
+  <div class="cover__top"><span>Handbook · Rev. 2 · 2 Oct 2026</span><span>Firmware v10</span></div>
   <div>
     <svg class="wordmark" viewBox="0 0 65 8" role="img" aria-label="Desktop-pet"><rect x="0.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="0.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="1.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="1.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="2.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="2.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="3.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="3.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="4.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="6.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="7.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="8.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="9.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="10.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="10.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="12.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="13.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="14.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="15.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="16.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="18.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="19.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="20.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="20.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="21.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="21.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="22.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="22.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="24.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="24.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="25.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="26.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="27.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="28.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="28.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="30.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="31.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="31.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="32.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="32.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="33.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="33.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="34.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="36.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="37.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="37.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="38.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="38.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="39.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="39.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="40.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="40.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="42.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="43.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="44.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="45.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="46.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="48.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="49.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="49.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="50.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="50.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="51.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="51.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="52.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="52.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="54.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="55.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="56.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="57.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="58.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="58.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="60.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="60.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="61.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="1.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="2.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="3.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="4.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="5.08" width="0.84" height="0.84" rx="0.185"/><rect x="62.08" y="6.08" width="0.84" height="0.84" rx="0.185"/><rect x="63.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="64.08" y="0.08" width="0.84" height="0.84" rx="0.185"/><rect x="64.08" y="1.08" width="0.84" height="0.84" rx="0.185"/></svg>
     <div class="cover__sub">User guide and technical notes</div>
-    <p class="lede">A small face that lives on the desk. Two rounded eyes on a 0.96 inch OLED glance around, blink, cheer up when you pet it and fall asleep when you ignore it. Plugged into the PC it becomes the face of Aminal, my voice assistant, and it keeps the time, shows the weather, runs timers and dances to your music.</p>
+    <p class="lede">A small face that lives on the desk. Two rounded eyes on a 0.96 inch OLED glance around, blink, cheer up when you pet it and fall asleep when you ignore it. Connected to the PC it becomes the face of Aminal, my voice assistant. It keeps the time, shows the weather and runs timers, dances to your music, codes and games along with you, counts down your selfies, and keeps a secret behind its right cheek.</p>
   </div>
   <div class="cover__art">
     <div class="module" aria-label="The pet's OLED module">
@@ -354,8 +359,8 @@ html{scroll-behavior:smooth}
   <div class="cover__grid">
     <div><span class="lbl">Board</span><div>WeAct Black Pill, STM32F401CC or F411CE</div></div>
     <div><span class="lbl">Display</span><div>SSD1306 OLED, 128 × 64 pixels, I2C</div></div>
-    <div><span class="lbl">Input</span><div>One button, KEY</div></div>
-    <div><span class="lbl">Links</span><div>USB, Bluetooth (HC-05), WiFi (ESP-01)</div></div>
+    <div><span class="lbl">Input</span><div>KEY, a touch pad, an RFID card</div></div>
+    <div><span class="lbl">Links</span><div>USB, and WiFi through an ESP-01</div></div>
   </div>
 </header>
 
@@ -365,20 +370,21 @@ html{scroll-behavior:smooth}
 <section class="ch" id="meet">
   <span class="lbl">Guide · 01</span>
   <h2>Meet the pet</h2>
-  <p>Desktop-pet is a face for the desk. It runs on a WeAct Black Pill, a thumb-sized board with an STM32 chip on it, and draws on a 128 × 64 OLED about the size of a postage stamp. It has one button, called KEY, and that is the only way to touch it.</p>
-  <p>On its own it behaves like a small animal: it looks around, blinks, fidgets, enjoys being petted and dozes off when nobody pays attention. Connected to the PC it also becomes the face of Aminal, my voice assistant, and a small dashboard for the time, the weather, timers, reminders, and whatever music or film is playing.</p>
+  <p>Desktop-pet is a face for the desk. It runs on a WeAct Black Pill, a thumb-sized board with an STM32 chip on it, and draws on a 128 × 64 OLED about the size of a postage stamp. You touch it through one button, called KEY, or a touch pad under the top of its head.</p>
+  <p>On its own it behaves like a small animal: it looks around, blinks, fidgets, enjoys being petted and dozes off when nobody pays attention. Connected to the PC it also follows what you're doing: it dances to your music, eats popcorn through films, puts on glasses while you code and picks up a controller when you play. It is the face of Aminal, my voice assistant, and a small dashboard for the time, the weather, timers and reminders.</p>
+  <p>On the PC a small bridge program does the talking. It starts when you log in and runs whether Aminal is open or not, so the pet follows the PC all day, and Aminal adds its listening, thinking and speaking on top.</p>
   <div class="tscroll"><table>
     <thead><tr><th>How it's connected</th><th>What it does</th></tr></thead>
     <tbody>
-      <tr><td class="f">USB cable to the PC</td><td>Everything. The fastest link, and the one Aminal always prefers.</td></tr>
-      <tr><td class="f">Bluetooth, on a charger</td><td>Everything, a little slower. Aminal finds it within 15 seconds of the cable coming out.</td></tr>
-      <tr><td class="f">A charger, PC off</td><td>Still a pet, still keeping the clock it was last given. With the WiFi module working, it fetches its own time and weather.</td></tr>
+      <tr><td class="f">USB cable to the PC</td><td>Everything. The fastest link, always used when it's plugged in.</td></tr>
+      <tr><td class="f">WiFi, on a charger</td><td>Everything, over the air. The bridge finds it about 20 to 30 seconds after it powers up.</td></tr>
+      <tr><td class="f">A charger, PC off</td><td>Still a pet. Its WiFi module fetches its own time and weather.</td></tr>
     </tbody>
   </table></div>
   
   <div class="note">
     <span class="lbl">About the pictures</span>
-    <p>Every screen on this page is a real capture. The pet was asked for its frame buffer 28 times a second over USB (the <code>SN</code> command, chapter 11), and the frames became these animations, pixel for pixel. The time, the weather and the timers are example values sent to the pet for the pictures.</p>
+    <p>Every screen on this page is a real capture. The pet was asked for its frame buffer 28 times a second over USB (the <code>SN</code> command, chapter 15), and the frames became these animations, pixel for pixel. The time, the weather and the timers are example values sent to the pet for the pictures.</p>
   </div>
   
 </section>
@@ -453,7 +459,7 @@ html{scroll-behavior:smooth}
 <section class="ch" id="aminal">
   <span class="lbl">Guide · 04</span>
   <h2>Aminal's face</h2>
-  <p>While Aminal runs, the pet shows what it is doing. The bridge (chapter 08) sends Aminal's state and the loudness of the voice up to 20 times a second, so the eyes keep up with speech.</p>
+  <p>While Aminal runs, the pet shows what it is doing. The bridge (chapter 11) sends Aminal's state and the loudness of the voice up to 20 times a second, so the eyes keep up with speech.</p>
   <div class="films grid g3">
     <figure class="fig"><div class="oled"><img src="shots/listening.gif" alt="Listening: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Listening</b> Eyes wide open, swelling with the loudness of your voice.</figcaption></figure>
     <figure class="fig"><div class="oled"><img src="shots/thinking.gif" alt="Thinking: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Thinking</b> Looking up and off to one side, switching sides every second or so, while three dots fill in.</figcaption></figure>
@@ -463,7 +469,7 @@ html{scroll-behavior:smooth}
   <ul class="tick">
     <li>Start talking to Aminal while the clock or the weather is up, and the pet flips back to the face to listen.</li>
     <li>Ask for the weather or a timer, and it shows that screen while Aminal answers.</li>
-    <li>Answers that carry a reminder, mail or what's next on the calendar arrive as a card (chapter 06).</li>
+    <li>Answers that carry a reminder, mail or what's next on the calendar arrive as a card (chapter 09).</li>
     <li>When Aminal connects, the pet greets it with a happy face. When Aminal closes, the pet waits 8 seconds for another message and then carries on by itself.</li>
   </ul>
 </section>
@@ -485,7 +491,7 @@ html{scroll-behavior:smooth}
     <figure class="fig"><div class="oled"><img src="shots/jump.gif" alt="A loud scene: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>A loud scene</b> When the sound suddenly jumps, so does the pet: surprised eyes, and four kernels fly out of the bucket.</figcaption></figure>
   </div>
   <h3>How it tells them apart</h3>
-  <p>Aminal decides from the app and the window title, never from the sound itself. Spotify is music. A browser tab that says Netflix is a film. A video player showing an .mp3 is music. Anything it can't name for certain, such as a game, a video call or a YouTube video, gets no reaction at all.</p>
+  <p>Aminal decides from the app and the window title, never from the sound itself. Spotify is music. A browser tab that says Netflix is a film. A video player showing an .mp3 is music. Anything it can't name for certain, such as a video call or a YouTube video, gets no reaction at all. Games are noticed a different way (chapter 06).</p>
   <ul class="tick">
     <li>A new kind of sound has to play for 2 seconds before the pet reacts, so a notification chime is not a song.</li>
     <li>Silence has to last 6 seconds before it stops, so the gap between two tracks doesn't end the dance.</li>
@@ -494,9 +500,58 @@ html{scroll-behavior:smooth}
   </ul>
 </section>
 
+<!-- ============================ 06 ACTIVITY ============================ -->
+<section class="ch" id="activity">
+  <span class="lbl">Guide · 06</span>
+  <h2>Coding and gaming</h2>
+  <p>The pet also follows what's in front on the PC. With an editor or a terminal in front it puts on its glasses; with a game in front it picks up a controller.</p>
+  <div class="films grid g2">
+    <figure class="fig"><div class="oled"><img src="shots/code_read.gif" alt="Reading code: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Reading code</b> Glasses on, reading along a line, a quick hop back, and on down the page.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/code_type.gif" alt="Typing: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Typing</b> While the keys or the mouse are moving, two paws tap on a little keyboard and bits of code fly off its ends.</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/game.gif" alt="Gaming: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Gaming</b> Narrowed eyes dart after the action while the buttons get mashed. A loud moment in the game makes sparks burst out and the eyes pop wide (second and third frames).</figcaption></figure>
+    <figure class="fig"><div class="oled"><img src="shots/code_music.gif" alt="With music on too: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>With music on too</b> The headphones go on over whatever it's doing, and it nods on the beat.</figcaption></figure>
+  </div>
+  <h3>How it decides</h3>
+  <ul class="tick">
+    <li><b>Code:</b> VS Code, Cursor, the JetBrains IDEs, Android Studio, Sublime Text, Notepad++, the Arduino IDE, any terminal, and GitHub, Colab or Jupyter in a browser.</li>
+    <li><b>Games:</b> anything run from a Steam, Epic, Riot, Xbox, EA, Ubisoft, GOG or Rockstar library (the launchers themselves don't count), a few games by name, and anything in exclusive full screen.</li>
+    <li>It goes by the program in front, its folder and its window title. It never looks at what's in a window or what you type.</li>
+    <li>Something has to stay in front for 3 seconds before it counts, so alt-tabbing past an editor isn't coding, and be gone for 8 before it ends, so a look at the docs isn't the end.</li>
+    <li>An editor nobody has touched for 5 minutes isn't coding. A game never times out that way, because Windows doesn't count a gamepad as input.</li>
+  </ul>
+</section>
+
+<!-- ============================ 07 SELFIE ============================ -->
+<section class="ch" id="selfie">
+  <span class="lbl">Guide · 07</span>
+  <h2>Selfies</h2>
+  <p>Ask Aminal for a selfie and the pet turns into a camera. While the webcam opens and meters for your face, the lens focuses and searches for you. As Aminal says "Hold still, three, two, one", the numbers count down inside the lens. The moment the photo is taken, the screen flashes white and the shutter blinks shut and open.</p>
+  <div class="films grid g2">
+    <figure class="fig"><div class="oled"><img src="shots/selfie.gif" alt="Getting ready: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Getting ready</b> "smile please!" while the camera opens, then 3, 2, 1 in time with the voice.</figcaption></figure>
+    <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="The shot" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M23 3h20.03v1.04h-20.03zM22 4h22.03v1.04h-22.03zM22 5h22.03v1.04h-22.03zM92 5h12.03v1.04h-12.03zM22 6h22.03v1.04h-22.03zM92 6h12.03v1.04h-12.03zM22 7h22.03v1.04h-22.03zM92 7h12.03v1.04h-12.03zM14 8h100.03v1.04h-100.03zM13 9h102.03v1.04h-102.03zM12 10h2.03v1.04h-2.03zM114 10h2.03v1.04h-2.03zM11 11h2.03v1.04h-2.03zM115 11h2.03v1.04h-2.03zM10 12h2.03v1.04h-2.03zM60 12h9.03v1.04h-9.03zM116 12h2.03v1.04h-2.03zM10 13h2.03v1.04h-2.03zM57 13h15.03v1.04h-15.03zM116 13h2.03v1.04h-2.03zM10 14h2.03v1.04h-2.03zM18 14h12.03v1.04h-12.03zM55 14h2.03v1.04h-2.03zM58 14h2.03v1.04h-2.03zM69 14h2.03v1.04h-2.03zM72 14h2.03v1.04h-2.03zM116 14h2.03v1.04h-2.03zM10 15h2.03v1.04h-2.03zM18 15h12.03v1.04h-12.03zM54 15h1.03v1.04h-1.03zM56 15h2.03v1.04h-2.03zM61 15h7.03v1.04h-7.03zM71 15h2.03v1.04h-2.03zM74 15h1.03v1.04h-1.03zM116 15h2.03v1.04h-2.03zM10 16h2.03v1.04h-2.03zM18 16h12.03v1.04h-12.03zM53 16h3.03v1.04h-3.03zM58 16h13.03v1.04h-13.03zM73 16h3.03v1.04h-3.03zM116 16h2.03v1.04h-2.03zM10 17h2.03v1.04h-2.03zM18 17h12.03v1.04h-12.03zM52 17h2.03v1.04h-2.03zM56 17h17.03v1.04h-17.03zM75 17h2.03v1.04h-2.03zM116 17h2.03v1.04h-2.03zM10 18h2.03v1.04h-2.03zM18 18h12.03v1.04h-12.03zM51 18h2.03v1.04h-2.03zM55 18h19.03v1.04h-19.03zM76 18h2.03v1.04h-2.03zM116 18h2.03v1.04h-2.03zM10 19h2.03v1.04h-2.03zM18 19h12.03v1.04h-12.03zM50 19h2.03v1.04h-2.03zM54 19h21.03v1.04h-21.03zM77 19h2.03v1.04h-2.03zM116 19h2.03v1.04h-2.03zM10 20h2.03v1.04h-2.03zM18 20h12.03v1.04h-12.03zM49 20h2.03v1.04h-2.03zM53 20h23.03v1.04h-23.03zM78 20h2.03v1.04h-2.03zM116 20h2.03v1.04h-2.03zM10 21h2.03v1.04h-2.03zM48 21h1.03v1.04h-1.03zM50 21h1.03v1.04h-1.03zM52 21h25.03v1.04h-25.03zM78 21h1.03v1.04h-1.03zM80 21h1.03v1.04h-1.03zM116 21h2.03v1.04h-2.03zM10 22h2.03v1.04h-2.03zM48 22h2.03v1.04h-2.03zM51 22h27.03v1.04h-27.03zM79 22h2.03v1.04h-2.03zM116 22h2.03v1.04h-2.03zM10 23h2.03v1.04h-2.03zM47 23h1.03v1.04h-1.03zM49 23h1.03v1.04h-1.03zM51 23h27.03v1.04h-27.03zM79 23h1.03v1.04h-1.03zM81 23h1.03v1.04h-1.03zM116 23h2.03v1.04h-2.03zM10 24h2.03v1.04h-2.03zM47 24h2.03v1.04h-2.03zM50 24h29.03v1.04h-29.03zM80 24h2.03v1.04h-2.03zM116 24h2.03v1.04h-2.03zM10 25h2.03v1.04h-2.03zM47 25h2.03v1.04h-2.03zM50 25h29.03v1.04h-29.03zM80 25h2.03v1.04h-2.03zM116 25h2.03v1.04h-2.03zM10 26h2.03v1.04h-2.03zM46 26h2.03v1.04h-2.03zM50 26h29.03v1.04h-29.03zM81 26h2.03v1.04h-2.03zM116 26h2.03v1.04h-2.03zM10 27h2.03v1.04h-2.03zM46 27h2.03v1.04h-2.03zM49 27h31.03v1.04h-31.03zM81 27h2.03v1.04h-2.03zM116 27h2.03v1.04h-2.03zM10 28h2.03v1.04h-2.03zM46 28h2.03v1.04h-2.03zM49 28h31.03v1.04h-31.03zM81 28h2.03v1.04h-2.03zM116 28h2.03v1.04h-2.03zM10 29h2.03v1.04h-2.03zM46 29h2.03v1.04h-2.03zM49 29h15.03v1.04h-15.03zM65 29h15.03v1.04h-15.03zM81 29h2.03v1.04h-2.03zM116 29h2.03v1.04h-2.03zM10 30h2.03v1.04h-2.03zM46 30h2.03v1.04h-2.03zM49 30h14.03v1.04h-14.03zM66 30h14.03v1.04h-14.03zM81 30h2.03v1.04h-2.03zM116 30h2.03v1.04h-2.03zM10 31h2.03v1.04h-2.03zM46 31h2.03v1.04h-2.03zM49 31h15.03v1.04h-15.03zM65 31h15.03v1.04h-15.03zM81 31h2.03v1.04h-2.03zM116 31h2.03v1.04h-2.03zM10 32h2.03v1.04h-2.03zM46 32h2.03v1.04h-2.03zM49 32h31.03v1.04h-31.03zM81 32h2.03v1.04h-2.03zM116 32h2.03v1.04h-2.03zM10 33h2.03v1.04h-2.03zM46 33h2.03v1.04h-2.03zM49 33h31.03v1.04h-31.03zM81 33h2.03v1.04h-2.03zM116 33h2.03v1.04h-2.03zM10 34h2.03v1.04h-2.03zM46 34h2.03v1.04h-2.03zM50 34h29.03v1.04h-29.03zM81 34h2.03v1.04h-2.03zM116 34h2.03v1.04h-2.03zM10 35h2.03v1.04h-2.03zM47 35h2.03v1.04h-2.03zM50 35h29.03v1.04h-29.03zM80 35h2.03v1.04h-2.03zM116 35h2.03v1.04h-2.03zM10 36h2.03v1.04h-2.03zM47 36h2.03v1.04h-2.03zM50 36h29.03v1.04h-29.03zM80 36h2.03v1.04h-2.03zM116 36h2.03v1.04h-2.03zM10 37h2.03v1.04h-2.03zM47 37h1.03v1.04h-1.03zM49 37h1.03v1.04h-1.03zM51 37h27.03v1.04h-27.03zM79 37h1.03v1.04h-1.03zM81 37h1.03v1.04h-1.03zM116 37h2.03v1.04h-2.03zM10 38h2.03v1.04h-2.03zM48 38h2.03v1.04h-2.03zM51 38h27.03v1.04h-27.03zM79 38h2.03v1.04h-2.03zM116 38h2.03v1.04h-2.03zM10 39h2.03v1.04h-2.03zM48 39h1.03v1.04h-1.03zM50 39h1.03v1.04h-1.03zM52 39h25.03v1.04h-25.03zM78 39h1.03v1.04h-1.03zM80 39h1.03v1.04h-1.03zM116 39h2.03v1.04h-2.03zM10 40h2.03v1.04h-2.03zM49 40h2.03v1.04h-2.03zM53 40h23.03v1.04h-23.03zM78 40h2.03v1.04h-2.03zM116 40h2.03v1.04h-2.03zM10 41h2.03v1.04h-2.03zM50 41h2.03v1.04h-2.03zM54 41h21.03v1.04h-21.03zM77 41h2.03v1.04h-2.03zM116 41h2.03v1.04h-2.03zM10 42h2.03v1.04h-2.03zM51 42h2.03v1.04h-2.03zM55 42h19.03v1.04h-19.03zM76 42h2.03v1.04h-2.03zM116 42h2.03v1.04h-2.03zM10 43h2.03v1.04h-2.03zM52 43h2.03v1.04h-2.03zM56 43h17.03v1.04h-17.03zM75 43h2.03v1.04h-2.03zM116 43h2.03v1.04h-2.03zM10 44h2.03v1.04h-2.03zM53 44h3.03v1.04h-3.03zM58 44h13.03v1.04h-13.03zM73 44h3.03v1.04h-3.03zM116 44h2.03v1.04h-2.03zM10 45h2.03v1.04h-2.03zM54 45h1.03v1.04h-1.03zM56 45h2.03v1.04h-2.03zM61 45h7.03v1.04h-7.03zM71 45h2.03v1.04h-2.03zM74 45h1.03v1.04h-1.03zM116 45h2.03v1.04h-2.03zM10 46h2.03v1.04h-2.03zM55 46h2.03v1.04h-2.03zM58 46h2.03v1.04h-2.03zM69 46h2.03v1.04h-2.03zM72 46h2.03v1.04h-2.03zM116 46h2.03v1.04h-2.03zM10 47h2.03v1.04h-2.03zM57 47h15.03v1.04h-15.03zM116 47h2.03v1.04h-2.03zM11 48h2.03v1.04h-2.03zM60 48h9.03v1.04h-9.03zM115 48h2.03v1.04h-2.03zM12 49h2.03v1.04h-2.03zM114 49h2.03v1.04h-2.03zM13 50h102.03v1.04h-102.03zM14 51h100.03v1.04h-100.03zM53 56h2.03v1.04h-2.03zM60 56h1.03v1.04h-1.03zM70 56h1.03v1.04h-1.03zM78 56h1.03v1.04h-1.03zM54 57h1.03v1.04h-1.03zM70 57h1.03v1.04h-1.03zM78 57h1.03v1.04h-1.03zM47 58h3.03v1.04h-3.03zM54 58h1.03v1.04h-1.03zM59 58h2.03v1.04h-2.03zM65 58h3.03v1.04h-3.03zM70 58h1.03v1.04h-1.03zM73 58h1.03v1.04h-1.03zM78 58h1.03v1.04h-1.03zM46 59h1.03v1.04h-1.03zM50 59h1.03v1.04h-1.03zM54 59h1.03v1.04h-1.03zM60 59h1.03v1.04h-1.03zM64 59h1.03v1.04h-1.03zM68 59h1.03v1.04h-1.03zM70 59h1.03v1.04h-1.03zM72 59h1.03v1.04h-1.03zM78 59h1.03v1.04h-1.03zM46 60h1.03v1.04h-1.03zM54 60h1.03v1.04h-1.03zM60 60h1.03v1.04h-1.03zM64 60h1.03v1.04h-1.03zM70 60h2.03v1.04h-2.03zM78 60h1.03v1.04h-1.03zM46 61h1.03v1.04h-1.03zM50 61h1.03v1.04h-1.03zM54 61h1.03v1.04h-1.03zM60 61h1.03v1.04h-1.03zM64 61h1.03v1.04h-1.03zM68 61h1.03v1.04h-1.03zM70 61h1.03v1.04h-1.03zM72 61h1.03v1.04h-1.03zM47 62h3.03v1.04h-3.03zM53 62h3.03v1.04h-3.03zM59 62h3.03v1.04h-3.03zM65 62h3.03v1.04h-3.03zM70 62h1.03v1.04h-1.03zM73 62h1.03v1.04h-1.03zM78 62h1.03v1.04h-1.03z"/></svg></div><figcaption><b>The shot</b> "cheese!", the flash, and the shutter closing. Then "click!", and "developing" until Aminal has the picture.</figcaption></figure>
+  </div>
+  <p>The flash is the real shutter, not a timer. The photo burst starts the instant "three, two, one" finishes, and the bridge flashes the pet at exactly that moment, when Aminal stops speaking. A guess would miss: the voice takes anywhere from 1.9 to 2.4 seconds to say it.</p>
+</section>
+
+<!-- ============================ 08 CARD ============================ -->
+<section class="ch" id="card">
+  <span class="lbl">Guide · 08</span>
+  <h2>The card</h2>
+  <p>An RFID reader hides inside the right side of the pet's head (chapter 13). Tap the white card from its kit on the right side, near the front, and a hidden folder opens on the PC. Tap again and it closes.</p>
+  <div class="grid g2">
+    <figure class="fig"><div class="oled"><img src="shots/card_open.gif" alt="Folder open: real capture" width="512" height="256" loading="lazy"></div><figcaption><b>Folder open</b> The pet looks up in surprise, says what it did on a card, and the folder opens.</figcaption></figure>
+    <ul class="tick">
+      <li>The first card ever tapped becomes the key. Any other card gets a sad face and "Not my card".</li>
+      <li>The folder is called Vault and lives in your user folder. It's made on the first tap and marked hidden and system, so it stays out of sight even with hidden files shown. Hidden isn't locked: anyone who types the path can open it.</li>
+      <li>A tap is the card arriving after being away for 1.5 seconds, so a card left lying on the reader counts once.</li>
+      <li>It works with Aminal closed: the bridge does it.</li>
+    </ul>
+  </div>
+</section>
+
 <!-- ============================ 06 SCREENS ============================ -->
 <section class="ch" id="screens">
-  <span class="lbl">Guide · 06</span>
+  <span class="lbl">Guide · 09</span>
   <h2>Screens and cards</h2>
   <div class="grid g4">
     <figure class="fig"><div class="oled"><svg viewBox="0 0 128 64" role="img" aria-label="Clock" preserveAspectRatio="xMidYMid meet"><rect width="128" height="64" class="px-off"/><path class="px-on" d="M0 0h5.03v1.04h-5.03zM25 0h3.03v1.04h-3.03zM31 0h3.03v1.04h-3.03zM43 0h3.03v1.04h-3.03zM110 0h1.03v1.04h-1.03zM114 0h1.03v1.04h-1.03zM117 0h3.03v1.04h-3.03zM122 0h4.03v1.04h-4.03zM0 1h1.03v1.04h-1.03zM2 1h1.03v1.04h-1.03zM4 1h1.03v1.04h-1.03zM24 1h1.03v1.04h-1.03zM28 1h1.03v1.04h-1.03zM30 1h1.03v1.04h-1.03zM34 1h1.03v1.04h-1.03zM42 1h1.03v1.04h-1.03zM46 1h1.03v1.04h-1.03zM110 1h1.03v1.04h-1.03zM114 1h1.03v1.04h-1.03zM116 1h1.03v1.04h-1.03zM120 1h1.03v1.04h-1.03zM122 1h1.03v1.04h-1.03zM126 1h1.03v1.04h-1.03zM2 2h1.03v1.04h-1.03zM6 2h1.03v1.04h-1.03zM10 2h1.03v1.04h-1.03zM13 2h3.03v1.04h-3.03zM28 2h1.03v1.04h-1.03zM30 2h1.03v1.04h-1.03zM34 2h1.03v1.04h-1.03zM42 2h1.03v1.04h-1.03zM49 2h3.03v1.04h-3.03zM54 2h1.03v1.04h-1.03zM56 2h2.03v1.04h-2.03zM110 2h1.03v1.04h-1.03zM114 2h1.03v1.04h-1.03zM116 2h1.03v1.04h-1.03zM122 2h1.03v1.04h-1.03zM126 2h1.03v1.04h-1.03zM2 3h1.03v1.04h-1.03zM6 3h1.03v1.04h-1.03zM10 3h1.03v1.04h-1.03zM12 3h1.03v1.04h-1.03zM16 3h1.03v1.04h-1.03zM25 3h3.03v1.04h-3.03zM31 3h4.03v1.04h-4.03zM43 3h3.03v1.04h-3.03zM48 3h1.03v1.04h-1.03zM52 3h1.03v1.04h-1.03zM54 3h2.03v1.04h-2.03zM58 3h1.03v1.04h-1.03zM110 3h1.03v1.04h-1.03zM114 3h1.03v1.04h-1.03zM117 3h3.03v1.04h-3.03zM122 3h4.03v1.04h-4.03zM2 4h1.03v1.04h-1.03zM6 4h1.03v1.04h-1.03zM10 4h1.03v1.04h-1.03zM12 4h5.03v1.04h-5.03zM24 4h1.03v1.04h-1.03zM34 4h1.03v1.04h-1.03zM46 4h1.03v1.04h-1.03zM48 4h5.03v1.04h-5.03zM54 4h2.03v1.04h-2.03zM58 4h1.03v1.04h-1.03zM110 4h1.03v1.04h-1.03zM114 4h1.03v1.04h-1.03zM120 4h1.03v1.04h-1.03zM122 4h1.03v1.04h-1.03zM126 4h1.03v1.04h-1.03zM2 5h1.03v1.04h-1.03zM6 5h1.03v1.04h-1.03zM9 5h2.03v1.04h-2.03zM12 5h1.03v1.04h-1.03zM24 5h1.03v1.04h-1.03zM33 5h1.03v1.04h-1.03zM42 5h1.03v1.04h-1.03zM46 5h1.03v1.04h-1.03zM48 5h1.03v1.04h-1.03zM54 5h1.03v1.04h-1.03zM56 5h2.03v1.04h-2.03zM110 5h1.03v1.04h-1.03zM114 5h1.03v1.04h-1.03zM116 5h1.03v1.04h-1.03zM120 5h1.03v1.04h-1.03zM122 5h1.03v1.04h-1.03zM126 5h1.03v1.04h-1.03zM2 6h1.03v1.04h-1.03zM7 6h2.03v1.04h-2.03zM10 6h1.03v1.04h-1.03zM13 6h3.03v1.04h-3.03zM24 6h5.03v1.04h-5.03zM30 6h3.03v1.04h-3.03zM43 6h3.03v1.04h-3.03zM49 6h3.03v1.04h-3.03zM54 6h1.03v1.04h-1.03zM111 6h3.03v1.04h-3.03zM117 6h3.03v1.04h-3.03zM122 6h4.03v1.04h-4.03zM54 7h1.03v1.04h-1.03zM25 18h3.03v1.04h-3.03zM40 18h7.03v1.04h-7.03zM72 18h6.03v1.04h-6.03zM87 18h7.03v1.04h-7.03zM24 19h4.03v1.04h-4.03zM38 19h11.03v1.04h-11.03zM72 19h6.03v1.04h-6.03zM85 19h11.03v1.04h-11.03zM24 20h4.03v1.04h-4.03zM37 20h13.03v1.04h-13.03zM71 20h7.03v1.04h-7.03zM84 20h13.03v1.04h-13.03zM23 21h5.03v1.04h-5.03zM37 21h13.03v1.04h-13.03zM71 21h7.03v1.04h-7.03zM83 21h15.03v1.04h-15.03zM21 22h7.03v1.04h-7.03zM36 22h6.03v1.04h-6.03zM45 22h6.03v1.04h-6.03zM70 22h8.03v1.04h-8.03zM83 22h6.03v1.04h-6.03zM92 22h6.03v1.04h-6.03zM18 23h10.03v1.04h-10.03zM36 23h5.03v1.04h-5.03zM46 23h5.03v1.04h-5.03zM69 23h3.03v1.04h-3.03zM73 23h5.03v1.04h-5.03zM82 23h6.03v1.04h-6.03zM93 23h6.03v1.04h-6.03zM18 24h10.03v1.04h-10.03zM36 24h5.03v1.04h-5.03zM46 24h5.03v1.04h-5.03zM69 24h3.03v1.04h-3.03zM73 24h5.03v1.04h-5.03zM82 24h5.03v1.04h-5.03zM94 24h5.03v1.04h-5.03zM18 25h10.03v1.04h-10.03zM35 25h5.03v1.04h-5.03zM47 25h5.03v1.04h-5.03zM55 25h5.03v1.04h-5.03zM68 25h3.03v1.04h-3.03zM73 25h5.03v1.04h-5.03zM82 25h5.03v1.04h-5.03zM94 25h5.03v1.04h-5.03zM23 26h5.03v1.04h-5.03zM35 26h5.03v1.04h-5.03zM47 26h5.03v1.04h-5.03zM55 26h5.03v1.04h-5.03zM68 26h3.03v1.04h-3.03zM73 26h5.03v1.04h-5.03zM82 26h5.03v1.04h-5.03zM94 26h5.03v1.04h-5.03zM23 27h5.03v1.04h-5.03zM35 27h5.03v1.04h-5.03zM47 27h5.03v1.04h-5.03zM55 27h5.03v1.04h-5.03zM67 27h3.03v1.04h-3.03zM73 27h5.03v1.04h-5.03zM94 27h5.03v1.04h-5.03zM23 28h5.03v1.04h-5.03zM35 28h5.03v1.04h-5.03zM47 28h5.03v1.04h-5.03zM55 28h5.03v1.04h-5.03zM67 28h2.03v1.04h-2.03zM73 28h5.03v1.04h-5.03zM93 28h6.03v1.04h-6.03zM23 29h5.03v1.04h-5.03zM35 29h5.03v1.04h-5.03zM47 29h5.03v1.04h-5.03zM55 29h5.03v1.04h-5.03zM66 29h3.03v1.04h-3.03zM73 29h5.03v1.04h-5.03zM93 29h5.03v1.04h-5.03zM23 30h5.03v1.04h-5.03zM35 30h5.03v1.04h-5.03zM47 30h5.03v1.04h-5.03zM65 30h3.03v1.04h-3.03zM73 30h5.03v1.04h-5.03zM92 30h6.03v1.04h-6.03zM23 31h5.03v1.04h-5.03zM35 31h5.03v1.04h-5.03zM47 31h5.03v1.04h-5.03zM65 31h2.03v1.04h-2.03zM73 31h5.03v1.04h-5.03zM91 31h6.03v1.04h-6.03zM23 32h5.03v1.04h-5.03zM35 32h5.03v1.04h-5.03zM47 32h5.03v1.04h-5.03zM64 32h3.03v1.04h-3.03zM73 32h5.03v1.04h-5.03zM89 32h7.03v1.04h-7.03zM23 33h5.03v1.04h-5.03zM35 33h5.03v1.04h-5.03zM47 33h5.03v1.04h-5.03zM64 33h16.03v1.04h-16.03zM88 33h7.03v1.04h-7.03zM23 34h5.03v1.04h-5.03zM35 34h5.03v1.04h-5.03zM47 34h5.03v1.04h-5.03zM64 34h16.03v1.04h-16.03zM87 34h6.03v1.04h-6.03zM23 35h5.03v1.04h-5.03zM35 35h5.03v1.04h-5.03zM47 35h5.03v1.04h-5.03zM64 35h16.03v1.04h-16.03zM86 35h6.03v1.04h-6.03zM23 36h5.03v1.04h-5.03zM36 36h5.03v1.04h-5.03zM46 36h5.03v1.04h-5.03zM64 36h16.03v1.04h-16.03zM85 36h5.03v1.04h-5.03zM103 36h2.03v1.04h-2.03zM108 36h2.03v1.04h-2.03zM111 36h1.03v1.04h-1.03zM23 37h5.03v1.04h-5.03zM36 37h5.03v1.04h-5.03zM46 37h5.03v1.04h-5.03zM73 37h5.03v1.04h-5.03zM84 37h5.03v1.04h-5.03zM105 37h1.03v1.04h-1.03zM108 37h1.03v1.04h-1.03zM110 37h1.03v1.04h-1.03zM112 37h1.03v1.04h-1.03zM23 38h5.03v1.04h-5.03zM36 38h6.03v1.04h-6.03zM45 38h6.03v1.04h-6.03zM55 38h5.03v1.04h-5.03zM73 38h5.03v1.04h-5.03zM84 38h5.03v1.04h-5.03zM103 38h3.03v1.04h-3.03zM108 38h1.03v1.04h-1.03zM110 38h1.03v1.04h-1.03zM112 38h1.03v1.04h-1.03zM23 39h5.03v1.04h-5.03zM37 39h13.03v1.04h-13.03zM55 39h5.03v1.04h-5.03zM73 39h5.03v1.04h-5.03zM83 39h16.03v1.04h-16.03zM102 39h1.03v1.04h-1.03zM105 39h1.03v1.04h-1.03zM108 39h1.03v1.04h-1.03zM110 39h1.03v1.04h-1.03zM112 39h1.03v1.04h-1.03zM23 40h5.03v1.04h-5.03zM37 40h13.03v1.04h-13.03zM55 40h5.03v1.04h-5.03zM73 40h5.03v1.04h-5.03zM83 40h16.03v1.04h-16.03zM103 40h4.03v1.04h-4.03zM108 40h1.03v1.04h-1.03zM110 40h1.03v1.04h-1.03zM112 40h1.03v1.04h-1.03zM23 41h5.03v1.04h-5.03zM38 41h11.03v1.04h-11.03zM55 41h5.03v1.04h-5.03zM73 41h5.03v1.04h-5.03zM83 41h16.03v1.04h-16.03zM23 42h5.03v1.04h-5.03zM40 42h7.03v1.04h-7.03zM55 42h5.03v1.04h-5.03zM73 42h5.03v1.04h-5.03zM83 42h16.03v1.04h-16.03zM0 60h76.03v1.04h-76.03zM0 61h76.03v1.04h-76.03zM0 62h128.03v1.04h-128.03z"/></svg></div><figcaption><b>Clock</b> The time in big digits, the date above it, and a bar that fills across each minute.</figcaption></figure>
@@ -530,7 +585,7 @@ html{scroll-behavior:smooth}
 
 <!-- ============================ 07 TRIES ============================ -->
 <section class="ch" id="tries">
-  <span class="lbl">Guide · 07</span>
+  <span class="lbl">Guide · 10</span>
   <h2>Things to try</h2>
   <p>Some of what the pet does only shows up when you go looking for it.</p>
   <div class="tries">
@@ -542,23 +597,28 @@ html{scroll-behavior:smooth}
         <dt>Check on it late at night.</dt><dd>After 11 pm it falls asleep after only 10 seconds and shows the time while it sleeps, so it works as a night clock.</dd>
         <dt>Double tap.</dt><dd>It walks through the clock, the weather, the timer and the status screen, then comes back to the face by itself.</dd>
         <dt>Hold it on the timer.</dt><dd>The timer pauses and blinks. Hold again to carry on.</dd>
+        <dt>Tap your card on its right cheek.</dt><dd>A hidden folder opens. Tap again and it closes.</dd>
       </dl>
       <h3>With Aminal</h3>
       <dl>
         <dt>Talk while the clock is up.</dt><dd>It flips back to the face to listen.</dd>
         <dt>Speak up.</dt><dd>The eyes grow with your voice.</dd>
-        <dt>Close Aminal.</dt><dd>Eight seconds later the pet is on its own, clock still running.</dd>
-        <dt>Pull the cable out.</dt><dd>If the pet is on a charger, Aminal finds it over Bluetooth within 15 seconds. Plug the cable back in and it moves back to USB by itself.</dd>
+        <dt>Ask for a selfie.</dt><dd>It counts down with the voice and flashes at the exact moment of the photo.</dd>
+        <dt>Close Aminal.</dt><dd>The pet keeps following your music, code and games. Only the listening, thinking and speaking stop.</dd>
+        <dt>Run it from a charger.</dt><dd>The bridge finds it over WiFi within about 30 seconds. Plug the cable back in and it moves back to USB by itself.</dd>
       </dl>
     </div>
     <div>
-      <h3>With sound</h3>
+      <h3>With the PC</h3>
       <dl>
         <dt>Play a long playlist.</dt><dd>The mood changes every 25 to 45 seconds: headphones, dancing, or the visualizer.</dd>
         <dt>Watch the headphones.</dt><dd>Every nine seconds or so it peeks out.</dd>
         <dt>Skip a track.</dt><dd>A gap shorter than 6 seconds doesn't stop the dance.</dd>
         <dt>Get a message during a film.</dt><dd>The chime doesn't take the popcorn away.</dd>
-        <dt>Join a video call, or play a game.</dt><dd>Nothing happens, on purpose.</dd>
+        <dt>Open VS Code and type.</dt><dd>Glasses on, paws on the keys, code flying off the keyboard.</dd>
+        <dt>Code with music on.</dt><dd>The headphones go on over the glasses.</dd>
+        <dt>Start a game.</dt><dd>It picks up a controller. Loud moments make sparks.</dd>
+        <dt>Join a video call.</dt><dd>Nothing happens, on purpose.</dd>
       </dl>
       <h3>Small details</h3>
       <dl>
@@ -574,9 +634,9 @@ html{scroll-behavior:smooth}
 
 <!-- ============================ 08 SYSTEM ============================ -->
 <section class="ch" id="system">
-  <span class="lbl">Inside · 08</span>
+  <span class="lbl">Inside · 11</span>
   <h2>How it fits together</h2>
-  <p>Aminal never talks to the pet itself. A small bridge program runs beside it, reads what Aminal is doing 25 times a second, and turns every change into one short line of text. The pet reads those lines, keeps what they say in one shared state it calls the World, and draws that state 50 times a second.</p>
+  <p>Aminal never talks to the pet itself. A small bridge program reads what Aminal is doing 25 times a second, and what's playing and what's in front of you once a second, and turns every change into one short line of text. The pet reads those lines, keeps what they say in one shared state it calls the World, and draws that state 50 times a second.</p>
   <div class="dwrap">
     <svg class="diagram" viewBox="0 0 1000 448" role="img" aria-label="Aminal, the pet bridge and the pet, and the links between them">
       <defs>
@@ -591,8 +651,8 @@ html{scroll-behavior:smooth}
       <text class="d-t" x="42" y="80">Aminal</text>
       <text class="d-s" x="42" y="104">state · voice · answers · timers</text>
       <rect class="d-box" x="26" y="138" width="258" height="72" rx="6"/>
-      <text class="d-t" x="42" y="168">What's playing</text>
-      <text class="d-s" x="42" y="192">the app and its window title</text>
+      <text class="d-t" x="42" y="168">What's playing, what's in front</text>
+      <text class="d-s" x="42" y="192">the app, its folder, its window title</text>
       <rect class="d-box" x="26" y="226" width="258" height="72" rx="6"/>
       <text class="d-t" x="42" y="256">The speakers</text>
       <text class="d-s" x="42" y="280">16 bars · beats · sudden jumps</text>
@@ -607,6 +667,7 @@ html{scroll-behavior:smooth}
       <text class="d-l" x="348" y="184">WX  TI  AL</text>
       <text class="d-l" x="348" y="208">EM  GO  MD</text>
       <text class="d-l" x="348" y="232">VZ  BE  JS</text>
+      <text class="d-l" x="348" y="256">AC  SF  IP</text>
       <text class="d-s" x="348" y="290">heartbeat 2 s</text>
       <text class="d-s" x="348" y="312">time every 10 min</text>
       <text class="d-s" x="348" y="334">weather every 20 min</text>
@@ -620,16 +681,16 @@ html{scroll-behavior:smooth}
       <text class="d-p" x="514" y="110">USB cable</text>
       <text class="d-s" x="514" y="144">always first</text>
       <path class="d-arrow" d="M500 236 H652" marker-start="url(#ah)" marker-end="url(#ah)" stroke-dasharray="6 4"/>
-      <text class="d-p" x="514" y="224">Bluetooth</text>
-      <text class="d-s" x="514" y="258">HC-05 · 9600 baud</text>
+      <text class="d-p" x="514" y="224">WiFi</text>
+      <text class="d-s" x="514" y="258">ESP-01 · port 7676</text>
       <text class="d-s" x="514" y="276">without the cable</text>
 
       <rect class="d-box" x="660" y="50" width="314" height="56" rx="6"/>
       <text class="d-t" x="676" y="74">Link</text>
-      <text class="d-s" x="676" y="95">reads USB and Bluetooth alike</text>
+      <text class="d-s" x="676" y="95">reads USB and WiFi alike</text>
       <rect class="d-box" x="660" y="124" width="314" height="56" rx="6"/>
       <text class="d-t" x="676" y="148">World</text>
-      <text class="d-s" x="676" y="169">time · weather · timer · Aminal · media</text>
+      <text class="d-s" x="676" y="169">time · weather · Aminal · media · activity</text>
       <rect class="d-box" x="660" y="198" width="314" height="56" rx="6"/>
       <text class="d-t" x="676" y="222">Face, screens, cards</text>
       <text class="d-s" x="676" y="243">eased toward targets every frame</text>
@@ -644,33 +705,34 @@ html{scroll-behavior:smooth}
       <path class="d-dash" d="M817 342 V372"/>
       <rect class="d-box2" x="660" y="372" width="314" height="64" rx="6" stroke-dasharray="5 4"/>
       <text class="d-t" x="676" y="398">ESP-01 WiFi</text>
-      <text class="d-s" x="676" y="421">its own time and weather, PC off</text>
+      <text class="d-s" x="676" y="421">the link, and its own time and weather</text>
       <text class="d-s" x="514" y="318">button presses come</text>
       <text class="d-s" x="514" y="336">back the same way</text>
     </svg>
   </div>
   <h3>Finding the pet</h3>
   <ul class="tick">
-    <li>The bridge only talks to a port that answers <code>HI</code> with <code>PET</code>, so it never sends lines to the wrong device.</li>
-    <li>USB always wins. While the cable isn't there it tries the Bluetooth port every 15 seconds; opening the port of a pet that is switched off keeps Windows busy for seconds, so it doesn't try more often.</li>
-    <li>It sends a heartbeat every 2 seconds. After 8 seconds of silence the pet decides it is on its own.</li>
-    <li>It follows Aminal's process. When Aminal exits, the bridge says goodbye to the pet and exits too.</li>
+    <li>The bridge starts when you log in and runs whether Aminal is open or not. Only one copy ever runs; Aminal starts it if it isn't running, and never stops it.</li>
+    <li>It only talks to a port that answers <code>HI</code> with <code>PET</code>, so it never sends lines to the wrong device.</li>
+    <li>USB always wins. Without the cable it tries WiFi every 15 seconds, at the address the pet gave last time it was plugged in. If that doesn't answer, it searches the home network for the pet's port 7676, at most every 2 minutes.</li>
+    <li>It sends a heartbeat every 2 seconds. After 8 seconds of silence the pet decides it is on its own and drops any music, code or game face. Over WiFi the bridge drops a pet that hasn't answered for 20 seconds, since a pet that lost its power cord leaves the connection looking open.</li>
+    <li>The card is handled here too: the pet reports a tap, and the bridge opens or closes the folder.</li>
     <li>Nothing is sent twice: each kind of line goes out only when its value changes, apart from the time, which is refreshed every 10 minutes.</li>
   </ul>
 </section>
 
 <!-- ============================ 09 WIRING ============================ -->
 <section class="ch" id="wiring">
-  <span class="lbl">Inside · 09</span>
+  <span class="lbl">Inside · 12</span>
   <h2>Wiring</h2>
   <div class="tscroll"><table>
     <thead><tr><th>Part</th><th>What it's for</th></tr></thead>
     <tbody>
       <tr><td class="f">WeAct Black Pill</td><td>The brain: an STM32F401CC or F411CE, USB-C, the KEY and NRST buttons, and a blue LED on PC13.</td></tr>
       <tr><td class="f">0.96" SSD1306 OLED</td><td>The face: 128 × 64 pixels over I2C, at address 0x3C.</td></tr>
-      <tr><td class="f">HC-05</td><td>Optional. The Bluetooth link to Aminal.</td></tr>
-      <tr><td class="f">ESP-01</td><td>Optional. Its own time and weather over WiFi.</td></tr>
-      <tr><td class="f">AMS1117-3.3, 470 µF</td><td>Power for the ESP-01, from the 5 V pin.</td></tr>
+      <tr><td class="f">ESP-01</td><td>WiFi: the link to the PC without a cable, and its own time and weather.</td></tr>
+      <tr><td class="f">RC522</td><td>Optional. The RFID card reader.</td></tr>
+      <tr><td class="f">TTP223</td><td>Optional. A touch pad under the top of the head.</td></tr>
     </tbody>
   </table></div>
 
@@ -693,64 +755,79 @@ html{scroll-behavior:smooth}
     </figure>
     <figure class="fig">
       <div class="dwrap">
-        <svg class="diagram" viewBox="0 0 520 176" role="img" aria-label="HC-05 wiring">
-          <rect class="d-box2" x="4" y="14" width="150" height="148" rx="6"/>
+        <svg class="diagram" viewBox="0 0 520 242" role="img" aria-label="RC522 wiring">
+          <rect class="d-box2" x="4" y="14" width="150" height="222" rx="6"/>
           <text class="d-f" x="18" y="38">BLACK PILL</text>
-          <rect class="d-box" x="362" y="14" width="154" height="148" rx="6"/>
-          <text class="d-f" x="440" y="38">HC-05</text>
-          <g class="d-p" text-anchor="end"><text x="140" y="66">5V</text><text x="140" y="92">G</text><text x="140" y="118">A3</text><text x="140" y="144">A2</text></g>
-          <g class="d-p"><text x="376" y="66">VCC</text><text x="376" y="92">GND</text><text x="376" y="118">TXD</text><text x="376" y="144">RXD</text></g>
+          <rect class="d-pcb" x="362" y="14" width="154" height="222" rx="6"/>
+          <text class="d-f" x="438" y="38" style="fill:rgba(255,255,255,.7)">RC522</text>
+          <g class="d-p" text-anchor="end"><text x="140" y="66">3V3</text><text x="140" y="92">G</text><text x="140" y="118">A4</text><text x="140" y="144">A5</text><text x="140" y="170">A6</text><text x="140" y="196">A7</text><text x="140" y="222">B1</text></g>
+          <g class="d-p" style="fill:#fff"><text x="376" y="66">3.3V</text><text x="376" y="92">GND</text><text x="376" y="118">SDA</text><text x="376" y="144">SCK</text><text x="376" y="170">MISO</text><text x="376" y="196">MOSI</text><text x="376" y="222">RST</text></g>
           <path class="d-warm" d="M154 62 H362"/><path class="d-gnd" d="M154 88 H362"/>
-          <path class="d-lit" d="M154 114 H362"/><path class="d-lit" d="M154 140 H362"/>
-          <g class="d-s" text-anchor="middle"><text x="258" y="57">5 V</text><text x="258" y="109">pet listens</text><text x="258" y="135">pet talks</text></g>
+          <path class="d-lit" d="M154 114 H362"/><path class="d-lit" d="M154 140 H362"/><path class="d-lit" d="M154 166 H362"/>
+          <path class="d-lit" d="M154 192 H362"/><path class="d-lit" d="M154 218 H362"/>
+          <g class="d-s" text-anchor="middle"><text x="258" y="57">3.3 V, never 5</text><text x="258" y="109">chip select</text><text x="258" y="135">clock</text>
+            <text x="258" y="161">reader talks</text><text x="258" y="187">pet talks</text><text x="258" y="213">held awake by the pet</text></g>
         </svg>
       </div>
-      <figcaption><b>The HC-05</b> Six pins in a row; STATE and EN stay empty. Its red LED blinks fast when it is ready to pair. Pair it with the PC (PIN 1234 or 0000), not a phone.</figcaption>
+      <figcaption><b>The RC522</b> Eight pins along one edge; IRQ stays empty. MISO and MOSI are the easiest pair to swap. The pet drives RST itself: left floating, the chip can sleep and stop answering.</figcaption>
     </figure>
   </div>
   <figure class="fig">
     <div class="dwrap">
-      <svg class="diagram" viewBox="0 0 700 268" role="img" aria-label="ESP-01 wiring through an AMS1117 regulator">
+      <svg class="diagram" viewBox="0 0 700 268" role="img" aria-label="ESP-01 wiring">
         <rect class="d-box2" x="4" y="14" width="150" height="246" rx="6"/>
         <text class="d-f" x="18" y="38">BLACK PILL</text>
         <rect class="d-box" x="542" y="14" width="154" height="246" rx="6"/>
         <text class="d-f" x="614" y="38">ESP-01</text>
-        <g class="d-p" text-anchor="end"><text x="140" y="66">5V</text><text x="140" y="144">G</text><text x="140" y="170">A10</text><text x="140" y="196">A9</text><text x="140" y="222">B12</text><text x="140" y="248">B13</text></g>
+        <g class="d-p" text-anchor="end"><text x="140" y="66">3V3</text><text x="140" y="92">A8</text><text x="140" y="144">G</text><text x="140" y="170">A10</text><text x="140" y="196">A9</text><text x="140" y="222">B12</text><text x="140" y="248">B13</text></g>
         <g class="d-p"><text x="556" y="66">3V3</text><text x="556" y="92">EN</text><text x="556" y="144">GND</text><text x="556" y="170">TX</text><text x="556" y="196">RX</text><text x="556" y="222">RST</text><text x="556" y="248">GPIO0</text></g>
         <text class="d-s" x="556" y="118">GPIO2 · empty</text>
-        <rect class="d-litbox" x="218" y="40" width="200" height="48" rx="6" style="fill:rgba(255,138,92,.1);stroke:var(--warm)"/>
-        <text class="d-p" x="318" y="60" text-anchor="middle">AMS1117-3.3</text>
-        <text class="d-s" x="318" y="78" text-anchor="middle">+ 470 µF at the ESP</text>
-        <path class="d-warm" d="M154 62 H218"/>
-        <path class="d-warm" d="M418 62 H542"/>
-        <path class="d-warm" d="M470 62 V88 H542"/>
-        <circle class="d-dot" cx="470" cy="62" r="3.5"/>
+        <path class="d-warm" d="M154 62 H542"/>
+        <path class="d-lit" d="M154 88 H542"/>
         <path class="d-gnd" d="M154 140 H542"/>
         <path class="d-lit" d="M154 166 H542"/><path class="d-lit" d="M154 192 H542"/>
         <path class="d-lit" d="M154 218 H542" style="stroke-dasharray:6 4"/><path class="d-lit" d="M154 244 H542" style="stroke-dasharray:6 4"/>
-        <g class="d-s" text-anchor="middle"><text x="186" y="56">5 V in</text><text x="480" y="56">3.3 V out</text>
-          <text x="348" y="135">ground, shared by all three</text><text x="348" y="161">pet listens</text><text x="348" y="187">pet talks</text>
+        <g class="d-s" text-anchor="middle"><text x="348" y="57">3.3 V, on short wires</text><text x="348" y="83">held high by the pet: switches it on</text>
+          <text x="348" y="135">ground</text><text x="348" y="161">pet listens</text><text x="348" y="187">pet talks</text>
           <text x="348" y="213">lets the pet restart it</text><text x="348" y="239">lets the pet start its bootloader</text></g>
       </svg>
     </div>
     <figcaption><b>The ESP-01</b> Eight pins in two rows of four. With the chips facing you and the antenna up, one row holds GND, GPIO2, GPIO0 and RX, the other TX, EN, RST and 3V3. GND and 3V3 sit in opposite corners.</figcaption>
   </figure>
   <div class="note warn">
-    <span class="lbl">Power the ESP-01 on its own</span>
-    <p>The ESP-01 is a 3.3 V part, and 5 V damages it. The Black Pill's 3.3 V pin can't feed it either: the radio pulls bursts of about 300 mA, and on this unit that made the module garble its replies and restart halfway through a network scan, even at lowered transmit power. An AMS1117-3.3 regulator fed from the 5 V pin, with a 470 µF capacitor across the module's 3.3 V and ground, gives it the current it needs.</p>
+    <span class="lbl">Power, and short wires</span>
+    <p>Three 3V3 and three G pins (two on the long headers, one of each on the small 4-pin header): one pair each for the OLED, the ESP-01 and the RC522. EN goes to A8, which the pet holds high, and the touch pad runs off B14 and B15 with its output on B0 (not A0, which the bootloader reads). Both 5 V pins stay empty: the ESP-01 and the RC522 are 3.3 V parts. Keep the ESP-01's wires short: its radio pulls 300 mA bursts, and long breadboard jumpers made it brown out.</p>
   </div>
+</section>
+
+<!-- ============================ 13 HEAD ============================ -->
+<section class="ch" id="head">
+  <span class="lbl">Inside · 13</span>
+  <h2>The head</h2>
+  <p>A 3D-printable head, 66 × 89.5 × 58 mm: a soft cube with the screen behind a black visor, the Black Pill up on a stand inside, the touch pad under the top and the RFID reader inside the right side. Three parts, printed without supports. The STL files, print settings and how to put it together are in the <code>enclosure</code> folder of the repository.</p>
+  <figure class="fig"><img class="render" src="shots/head_hero.png" alt="The pet in its printed head" width="1200" height="900" loading="lazy"><figcaption><b>The head</b> The screen clamped behind the visor, the USB-C port lined up with the Black Pill's connector at the back.</figcaption></figure>
+  <div class="grid g2">
+    <figure class="fig"><img class="render" src="shots/head_side.png" alt="The right side of the head" width="1200" height="900" loading="lazy"><figcaption><b>The right side</b> Smooth on purpose: nothing shows where the card goes.</figcaption></figure>
+    <figure class="fig"><img class="render" src="shots/head_reader.png" alt="Inside the right wall, the RFID reader in its holder" width="1200" height="900" loading="lazy"><figcaption><b>Inside the right wall</b> The RC522, antenna end at the front, its plugs toward the back.</figcaption></figure>
+  </div>
+  <ul class="tick">
+    <li>The reader hangs without screws: its top edge in a slot under the roof, its bottom edge in a groove whose inner side slopes at 45°. Tilt it, push the top into the slot, swing the bottom in and let it drop. A card reads through about 6 mm of plastic.</li>
+    <li>The head was 70 mm deep until the reader went in. The board, its plugs and room for the wires to turn have to fit between the round corners, so the depth is worked out from them.</li>
+    <li>The Black Pill sits 23.5 mm up, held only by its edges on four springy posts, so every jumper plug hangs free underneath.</li>
+    <li>The touch pad senses your finger through 1 mm of the top.</li>
+  </ul>
 </section>
 
 <!-- ============================ 10 FIRMWARE ============================ -->
 <section class="ch" id="firmware">
-  <span class="lbl">Inside · 10</span>
+  <span class="lbl">Inside · 14</span>
   <h2>The firmware</h2>
   <p>C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit's SSD1306 and GFX libraries draw the screen, and FreeSans Bold sets the big digits.</p>
   <h3>One pass of the loop</h3>
   <ol class="steps">
-    <li>Read every line waiting on USB and Bluetooth, up to 512 bytes a port per pass, so a flood of lines can't starve the animation.</li>
-    <li>Move the WiFi module's state machine on by one step. It never waits for the module.</li>
-    <li>If 20 ms have passed since the last frame: read the button, check the link and the timer, update the face, draw the screen and any card, and send the 1,024-byte frame to the OLED over I2C.</li>
+    <li>Read every line waiting on USB and WiFi, up to 512 bytes a port per pass, so a flood of lines can't starve the animation.</li>
+    <li>Move the WiFi module's state machine on by one step: what the bridge said, what the pet answers, the weather request. It never waits for the module.</li>
+    <li>If 20 ms have passed since the last frame: read the button and the touch pad, ask the card reader whether a card is there (every 60 ms), check the link and the timer, update the face, draw the screen and any card, and send the 1,024-byte frame to the OLED over I2C.</li>
   </ol>
   <p>That comes to about 50 frames a second, as fast as the I2C bus carries them.</p>
   <h3>Easing</h3>
@@ -760,13 +837,15 @@ height  += (target - height)  × 0.6    <span class="c">// blinking, or closing 
 height  += (target - height)  × 0.45   <span class="c">// while listening, to keep up with the voice</span></pre>
   <p>So glances glide, blinks snap shut, and falling asleep is a slow droop. Every face in this handbook is just a different set of targets.</p>
   <h3>Who gets the face</h3>
-  <p>The first of these that applies decides what the eyes do. Music and films step aside whenever Aminal is listening, thinking or speaking.</p>
+  <p>The first of these that applies decides what the eyes do. Everything below Aminal steps aside while it is listening, thinking or speaking, and music only adds its headphones when code or a game is in front.</p>
   <ol class="ladder">
+    <li>A selfie: the whole screen becomes the camera</li>
     <li>A face Aminal asked for</li>
     <li>Happy, after a tap</li>
     <li>Listening</li>
     <li>Thinking</li>
     <li>Speaking</li>
+    <li>Code or a game in front</li>
     <li>Music</li>
     <li>A film</li>
     <li>Asleep</li>
@@ -782,6 +861,7 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
       <tr><td>Happy after a tap</td><td class="n">2.5 s</td><td>Back to the face</td><td class="n">after 20 s</td></tr>
       <tr><td>Hearts</td><td class="n">3 taps under 1.5 s apart</td><td>Link lost</td><td class="n">8 s of silence</td></tr>
       <tr><td>Falls asleep</td><td class="n">30 s; 10 s, 11 pm–7 am</td><td>Hold / double tap</td><td class="n">0.7 s / 0.35 s</td></tr>
+      <tr><td>Code or a game</td><td class="n">3 s in, 8 s out</td><td>Next card tap</td><td class="n">after 1.5 s away</td></tr>
     </tbody>
   </table></div>
   <p>Every timer is compared with <code>reached(now, t)</code> rather than <code>now &gt; t</code>, so the pet keeps blinking when the millisecond counter wraps round after 49.7 days.</p>
@@ -789,13 +869,13 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
 
 <!-- ============================ 11 PROTOCOL ============================ -->
 <section class="ch" id="protocol">
-  <span class="lbl">Inside · 11</span>
+  <span class="lbl">Inside · 15</span>
   <h2>The protocol</h2>
-  <p>One short line of text per message, the same on USB and Bluetooth, and simple enough to type into a serial monitor. A line longer than 159 characters is dropped whole rather than read in pieces.</p>
+  <p>One short line of text per message, the same on USB and WiFi, and simple enough to type into a serial monitor. A line longer than 159 characters is dropped whole rather than read in pieces.</p>
   <div class="tscroll"><table>
     <thead><tr><th>Line</th><th>Meaning</th></tr></thead>
     <tbody>
-      <tr><td class="f">HI</td><td>Who are you? The pet answers <code>PET desktop-pet 6</code>.</td></tr>
+      <tr><td class="f">HI</td><td>Who are you? The pet answers <code>PET desktop-pet 10</code>.</td></tr>
       <tr><td class="f">PG</td><td>Heartbeat, answered <code>PO</code>.</td></tr>
       <tr><td class="f">ST idle|listening|thinking|speaking|off</td><td>What Aminal is doing</td></tr>
       <tr><td class="f">LV 0–100</td><td>How loud the voice is, for the eyes and the mouth</td></tr>
@@ -808,17 +888,21 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
       <tr><td class="f">MD music [style] | watch | -</td><td>What's playing. A music style (headphones, dance, bars) can be asked for by name.</td></tr>
       <tr><td class="f">VZ &lt;16 hex digits&gt;</td><td>Spectrum bars, 0 to f each, low notes first</td></tr>
       <tr><td class="f">BE</td><td>A beat</td></tr>
-      <tr><td class="f">JS</td><td>A sudden loud moment in a film</td></tr>
+      <tr><td class="f">JS</td><td>A sudden loud moment in a film or a game</td></tr>
+      <tr><td class="f">AC code [typing] | game | -</td><td>What's in front on the PC</td></tr>
+      <tr><td class="f">SF ready | count &lt;ms&gt; | shot | -</td><td>A selfie: the camera opening, the spoken countdown, the shutter, done</td></tr>
       <tr><td class="f">SN</td><td>Answered <code>SN &lt;hex&gt;</code>: exactly what is on the OLED</td></tr>
+      <tr><td class="f">IP</td><td>Answered <code>IP &lt;address&gt;</code> or <code>IP -</code>: where it is on WiFi</td></tr>
+      <tr><td class="f">RF, RF test, RF poll</td><td>The card reader: its chip version, a wiring test, one try at reading a card</td></tr>
       <tr><td class="f">LO &lt;lat&gt; &lt;lon&gt; &lt;place&gt;</td><td>Where the weather is for, kept in flash for the WiFi</td></tr>
       <tr><td class="f">WF &lt;ssid&gt;&lt;tab&gt;&lt;password&gt;</td><td>USB only: join a WiFi network</td></tr>
       <tr><td class="f">ES talk|flash [baud], ES reset</td><td>USB only: the cable straight through to the ESP-01, for debugging</td></tr>
     </tbody>
   </table></div>
-  <p>The pet sends events back up whichever link spoke last: <code>EV pet</code>, <code>EV next &lt;screen&gt;</code>, <code>EV hold</code>, <code>EV hold timer</code>, <code>EV dismiss</code>, <code>EV wifi ok &lt;ip&gt;</code> and <code>EV wifi fail</code>.</p>
+  <p>The pet sends events back up whichever link spoke last: <code>EV pet</code>, <code>EV next &lt;screen&gt;</code>, <code>EV hold</code>, <code>EV hold timer</code>, <code>EV dismiss</code>, <code>EV wifi ok &lt;ip&gt;</code>, <code>EV wifi fail</code> and <code>EV card &lt;uid&gt; tap</code>.</p>
   <h3>A few seconds of conversation</h3>
 <pre><span class="a">→</span> HI
-<span class="a">←</span> PET desktop-pet 6
+<span class="a">←</span> PET desktop-pet 10
 <span class="a">→</span> TM 1790658725 19800          <span class="c">// 10:42 on 29 Sep, India's +5:30</span>
 <span class="a">→</span> WX 29 2 32 24 Mumbai
 <span class="a">→</span> ST listening
@@ -826,6 +910,7 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
 <span class="a">→</span> ST speaking
 <span class="a">→</span> MD music dance
 <span class="a">→</span> BE
+<span class="a">→</span> AC code typing                   <span class="c">// VS Code in front, keys going</span>
 <span class="a">←</span> EV pet                           <span class="c">// someone tapped it</span></pre>
   <div class="pb">
   
@@ -835,7 +920,7 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
    <span class="c">… page 3, from column 24:</span>
    ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f1f000000000000000000
    <span class="c">… 2,048 digits in all</span></pre>
-  <p>Over USB one snapshot takes about 36 ms, so the pet can be filmed at 28 frames a second while it keeps drawing its own 50. Over Bluetooth, at 9600 baud, one takes about 2 seconds. Each strip in this handbook is a run of those frames, decoded and drawn back pixel for pixel.</p>
+  <p>Over USB one snapshot takes about 36 ms, so the pet can be filmed at 28 frames a second while it keeps drawing its own 50. Over WiFi one takes about 0.4 seconds. Each strip in this handbook is a run of those frames, decoded and drawn back pixel for pixel.</p>
   <div class="dwrap">
     <svg class="diagram" viewBox="0 0 680 236" role="img" aria-label="The frame buffer: 8 pages of 128 bytes, each byte a column of 8 pixels">
       <g>
@@ -871,22 +956,22 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
 
 <!-- ============================ 12 HEARING ============================ -->
 <section class="ch" id="hearing">
-  <span class="lbl">Inside · 12</span>
+  <span class="lbl">Inside · 16</span>
   <h2>How it hears music</h2>
   <p>All of this runs on the PC, inside the bridge. The pet only ever receives the results as <code>MD</code>, <code>VZ</code>, <code>BE</code> and <code>JS</code> lines.</p>
   <div class="tscroll"><table>
     <thead><tr><th>Step</th><th>What happens</th></tr></thead>
     <tbody>
       <tr><td class="f">1 · What's playing</td><td>Once a second, Windows' per-app volume meters list the apps making sound (a peak above 2%). Each is named by its app, then its window title, then the file it plays. The loudest one that gets a name wins.</td></tr>
-      <tr><td class="f">2 · Listening in</td><td>Only while music or a film is on, the bridge records what the speakers play through WASAPI loopback (PyAudioWPatch).</td></tr>
-      <tr><td class="f">3 · Bars</td><td>Each block of 1,024 samples, about 23 ms, goes through an FFT into 16 bands spaced by pitch from 50 Hz to 12 kHz. The top end is lifted 4.5 dB per octave so the treble moves as much as the bass, and the bars show the loudest 40 dB under an automatic gain. Sent as <code>VZ</code> 20 times a second, 10 over Bluetooth.</td></tr>
+      <tr><td class="f">2 · Listening in</td><td>Only while music or a film is on, or a game is in front, the bridge records what the speakers play through WASAPI loopback (PyAudioWPatch).</td></tr>
+      <tr><td class="f">3 · Bars</td><td>Each block of 1,024 samples, about 23 ms, goes through an FFT into 16 bands spaced by pitch from 50 Hz to 12 kHz. The top end is lifted 4.5 dB per octave so the treble moves as much as the bass, and the bars show the loudest 40 dB under an automatic gain. Sent as <code>VZ</code> 20 times a second.</td></tr>
       <tr><td class="f">4 · Beats</td><td>Energy between 40 and 150 Hz rising to 1.45 times its average over the last second, at least 0.28 s after the last beat. Sent as <code>BE</code>.</td></tr>
-      <tr><td class="f">5 · Jumps</td><td>A block 4 times louder than the median of the last 5 seconds, at most once every 8 seconds. Sent as <code>JS</code>, for films only.</td></tr>
+      <tr><td class="f">5 · Jumps</td><td>A block 4 times louder than the median of the last 5 seconds, at most once every 8 seconds. Sent as <code>JS</code>, for films and games.</td></tr>
     </tbody>
   </table></div>
   <div class="note">
     <span class="lbl">The sound stays put</span>
-    <p>Each block becomes 16 numbers and two yes-or-no flags and is thrown away. Nothing is recorded, saved or sent anywhere, and the listener only runs while the pet has music or a film to show.</p>
+    <p>Each block becomes 16 numbers and two yes-or-no flags and is thrown away. Nothing is recorded, saved or sent anywhere, and the listener only runs while the pet has music, a film or a game to show.</p>
   </div>
   <h3>Named for certain, or not at all</h3>
   <div class="tscroll"><table>
@@ -902,32 +987,33 @@ height  += (target - height)  × 0.45   <span class="c">// while listening, to k
 
 <!-- ============================ 13 WIFI ============================ -->
 <section class="ch" id="wifi">
-  <span class="lbl">Inside · 13</span>
+  <span class="lbl">Inside · 17</span>
   <h2>WiFi</h2>
   <p>The ESP-01 keeps the factory AT firmware it shipped with, and the pet drives it with plain text commands. Once it has joined a network it makes one plain HTTP request to Open-Meteo every 20 minutes. That single reply carries the time (in its Date header), the UTC offset and today's weather, so a pet on a charger keeps its clock and forecast with the PC switched off.</p>
-<pre>start → ATE0 → AT+CWMODE_DEF? → AT+CIPMUX=0 → AT+CIFSR → idle
-idle  → AT+CIPSTART="TCP","api.open-meteo.com",80 → AT+CIPSEND → GET → +IPD … CLOSED
-      <span class="c">// every 20 min; again after 5 min if it failed; connection checked every minute</span></pre>
+  <p>It also listens on port 7676, and whoever connects there, the bridge on the PC when the pet has only a power cord, speaks the same protocol as USB. The module's multi-link mode makes that possible: the weather request goes out on link 4 while the bridge comes in on another. While the bridge is connected it brings the time and weather itself, so the pet skips its own request.</p>
+<pre>start → reset → ATE0 → AT+CWMODE_DEF? → AT+CIPMUX=1 → AT+CIPSERVER=1,7676 → AT+CIFSR → idle
+idle  → AT+CIPSTART=4,"TCP","api.open-meteo.com",80 → AT+CIPSEND=4,… → GET → +IPD,4,… → 4,CLOSED
+      <span class="c">// every 20 min while no bridge is connected; again after 5 min if it failed</span>
+idle  ↔ +IPD,0,… in from the bridge, AT+CIPSEND=0,… back to it</pre>
   <div class="cols">
     <div>
       <h3>Joining</h3>
-      <p>Close Aminal and run the bridge's WiFi setup. It offers the network the PC is on, asks for the password without showing it, and sends both down the USB cable only: the pet refuses them over Bluetooth. The module remembers the network and rejoins by itself. It only sees 2.4 GHz networks.</p>
+      <p>Run the bridge's WiFi setup with the pet on USB. It offers the network the PC is on, asks for the password without showing it, and sends both down the USB cable only: the pet refuses them over WiFi. The module remembers the network and rejoins by itself. It only sees 2.4 GHz networks.</p>
     </div>
     <div>
       <h3>What it keeps</h3>
       <p>Where the weather is for (sent by Aminal as <code>LO</code>) and the UTC offset are saved in the last sector of the Black Pill's flash, so they survive a power cut. The WiFi password isn't: only the module holds it.</p>
     </div>
   </div>
-  <div class="note warn">
-    <span class="lbl">Status on 29 Sep 2026</span>
-    <p>The code is finished and the module answers, but on this unit its radio browns out on the Black Pill's 3.3 V (chapter 09). WiFi starts working once the module has its own regulator.</p>
-    <p>Talking to Aminal over WiFi as well needs the ESP-01 reflashed with a small relay program. Reflashing it through the pet failed, because its ROM loader restarts on every sync, so that waits for a USB-serial adapter.</p>
+  <div class="note">
+    <span class="lbl">A clean start</span>
+    <p>The pet resets the module at every power-up, and again whenever it stops answering, so a bad power-up can't leave the WiFi stuck. Anyone on the same network can reach port 7676 too, so it's meant for a home network; joining a network and the passthrough to the module stay USB only.</p>
   </div>
 </section>
 
 <!-- ============================ 14 BUILD ============================ -->
 <section class="ch" id="build">
-  <span class="lbl">Inside · 14</span>
+  <span class="lbl">Inside · 18</span>
   <h2>Building and uploading</h2>
   <p>WeAct boards ship with the WeAct HID bootloader in their first 16 KB. Windows sees it as a plain HID device (<code>0483:572A</code>), so it needs no driver, and it avoids the chip's own USB bootloader, which often fails with Device Descriptor Request Failed.</p>
   <ol class="steps">
@@ -943,12 +1029,12 @@ idle  → AT+CIPSTART="TCP","api.open-meteo.com",80 → AT+CIPSEND → GET → +
   <div class="dwrap">
     <svg class="diagram" viewBox="0 0 900 112" role="img" aria-label="Flash layout of the STM32F401CC">
       <rect x="2" y="40" width="56" height="32" class="d-box2"/>
-      <rect x="58" y="40" width="336" height="32" class="d-litbox"/>
-      <rect x="394" y="40" width="56" height="32" class="d-box"/>
+      <rect x="58" y="40" width="366" height="32" class="d-litbox"/>
+      <rect x="424" y="40" width="26" height="32" class="d-box"/>
       <rect x="450" y="40" width="448" height="32" class="d-box2"/>
       <text class="d-p" x="4" y="30">HID bootloader</text>
-      <text class="d-p" x="226" y="30" text-anchor="middle">Desktop-pet, 96 KB</text>
-      <text class="d-s" x="422" y="30" text-anchor="middle">16 KB free</text>
+      <text class="d-p" x="241" y="30" text-anchor="middle">Desktop-pet, 104 KB</text>
+      <text class="d-s" x="437" y="30" text-anchor="middle">8 KB</text>
       <text class="d-p" x="674" y="30" text-anchor="middle">last sector: the saved place and offset</text>
       <text class="d-s" x="30" y="61" text-anchor="middle">16 KB</text>
       <text class="d-s" x="674" y="61" text-anchor="middle">128 KB sector, nearly empty</text>
@@ -956,12 +1042,12 @@ idle  → AT+CIPSTART="TCP","api.open-meteo.com",80 → AT+CIPSEND → GET → +
         <text x="450" y="92" text-anchor="middle">0x08020000</text><text x="898" y="92" text-anchor="end">0x08040000</text></g>
     </svg>
   </div>
-  <p>That is the F401CC's 256 KB, drawn to scale. The app is linked to start right after the bootloader, at 0x08004000, and has 16 KB of room before it would meet the saved settings.</p>
+  <p>That is the F401CC's 256 KB, drawn to scale. The app is linked to start right after the bootloader, at 0x08004000, and has about 8 KB of room before it would meet the saved settings. The build refuses to grow past them: PlatformIO is told where flash ends for the app.</p>
 </section>
 
 <!-- ============================ 15 TROUBLE ============================ -->
 <section class="ch" id="trouble">
-  <span class="lbl">Inside · 15</span>
+  <span class="lbl">Inside · 19</span>
   <h2>When something's off</h2>
   <div class="tscroll"><table>
     <thead><tr><th>What you see</th><th>Likely cause</th></tr></thead>
@@ -970,28 +1056,32 @@ idle  → AT+CIPSTART="TCP","api.open-meteo.com",80 → AT+CIPSEND → GET → +
       <tr><td><b>Upload can't find the board</b></td><td>It isn't in the bootloader. Hold KEY, tap NRST, let go when the LED blinks.</td></tr>
       <tr><td><b>No HID device at all, even holding KEY</b></td><td>The bootloader was erased by a DFU or ST-Link upload to 0x08000000. Reflash it from WeAct's repository, or build without the flash offset.</td></tr>
       <tr><td><b>Garbage on the screen</b></td><td>The module may be an SH1106, common on 1.3 inch boards, which needs a different library.</td></tr>
-      <tr><td><b>Eyes never react to Aminal</b></td><td>The status screen says Link none: the bridge isn't running, or a serial monitor has the port.</td></tr>
-      <tr><td><b>No light on the HC-05</b></td><td>Almost always a loose VCC or GND wire.</td></tr>
-      <tr><td><b>ESP-01 answers AT, then garbles and restarts</b></td><td>A brownout. Give it its own AMS1117-3.3 and a 470 µF capacitor (chapter 09).</td></tr>
+      <tr><td><b>The pet never follows the PC</b></td><td>The status screen says Link none: the bridge isn't running (it starts at login), or something else has the port.</td></tr>
+      <tr><td><b>ESP-01 answers AT, then garbles and restarts</b></td><td>A brownout, usually from long jumper wires. Use short direct ones (chapter 12).</td></tr>
+      <tr><td><b>The card does nothing</b></td><td>Send <code>RF test</code> over USB. A value written to the reader should read back the same, <code>rw 5a/5a a5/a5</code>. If every read is the same number, a wire to the RC522 is wrong or loose; check SDA, SCK and RST first.</td></tr>
     </tbody>
   </table></div>
   <h3>A map of the code</h3>
   <div class="tscroll"><table>
     <thead><tr><th>File</th><th>What's in it</th></tr></thead>
     <tbody>
-      <tr><td class="f">src/pet.h</td><td>The shared World: time, weather, timer, Aminal's state, media, the current card</td></tr>
+      <tr><td class="f">src/pet.h</td><td>The shared World: time, weather, timer, Aminal's state, media, what's in front, a selfie, the current card</td></tr>
       <tr><td class="f">src/main.cpp</td><td>Setup, the frame loop, the button, switching screens</td></tr>
       <tr><td class="f">src/face.cpp</td><td>Eyes, moods, habits, and the listening, thinking, speaking, music and film faces</td></tr>
       <tr><td class="f">src/media.cpp</td><td>Headphones, music notes, the visualizer and the popcorn</td></tr>
+      <tr><td class="f">src/activity.cpp</td><td>Glasses, the keyboard and paws, the controller and the sparks</td></tr>
+      <tr><td class="f">src/camera.cpp</td><td>The camera face for a selfie: countdown, flash and shutter</td></tr>
+      <tr><td class="f">src/rfid.cpp</td><td>The card reader, and turning a card's arrival into a tap</td></tr>
       <tr><td class="f">src/screens.cpp</td><td>Clock, weather icons, timer, status and the cards</td></tr>
-      <tr><td class="f">src/link.cpp</td><td>The protocol, read from USB and Bluetooth alike, and the ESP-01 passthrough</td></tr>
-      <tr><td class="f">src/wifi.cpp</td><td>The ESP-01 driven through its AT firmware: joining, the request, reading the reply</td></tr>
+      <tr><td class="f">src/link.cpp</td><td>The protocol, read from USB and WiFi alike, and the ESP-01 passthrough</td></tr>
+      <tr><td class="f">src/wifi.cpp</td><td>The ESP-01 driven through its AT firmware: joining, the weather request, and the bridge's link on port 7676</td></tr>
     </tbody>
   </table></div>
   <h3>Document history</h3>
   <div class="tscroll"><table>
     <thead><tr><th>Revision</th><th>Date</th><th>What changed</th></tr></thead>
     <tbody>
+      <tr><td class="f">Rev. 2</td><td class="f">2 Oct 2026</td><td>For firmware v10: coding and gaming faces, the selfie camera, the RFID card, WiFi as the link to the PC, a bridge that runs without Aminal, Bluetooth taken out, new wiring for the ESP-01, the RC522 and the touch pad, and a chapter on the printed head.</td></tr>
       <tr><td class="f">Rev. 1</td><td class="f">29 Sep 2026</td><td>First edition, for firmware v6: the user guide, the technical notes, and real captures of every face and screen.</td></tr>
     </tbody>
   </table></div>

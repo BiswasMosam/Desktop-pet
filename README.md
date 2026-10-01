@@ -2,17 +2,17 @@
 
 A tiny desk companion with a face. Two rounded eyes on a 0.96" OLED that glance around, blink, fidget, light up when you pet it and doze off when you ignore it. Plugged into the PC it becomes the physical face of [Aminal](https://github.com/BiswasMosam/Aminal-Public), my voice assistant: its eyes listen, think and talk along with it, and it shows the time, the weather, timers and reminders.
 
-It runs on its own too. Unplug it from the PC and it carries on being a pet, keeping the clock it was last given.
+It follows the PC too: it dances to your music, eats popcorn through films, puts on glasses while you code, picks up a controller when you play, and counts down your selfies. And it doesn't need the cable: on a charger it reaches the PC over WiFi, and with the PC off it fetches its own time and weather.
 
 <p>
   <img src="docs/shots/idle.gif" width="32%" alt="Idle: glancing around and blinking">
   <img src="docs/shots/dance.gif" width="32%" alt="Dancing to music, notes floating up">
-  <img src="docs/shots/watch.gif" width="32%" alt="Watching a film with a bucket of popcorn">
+  <img src="docs/shots/code_type.gif" width="32%" alt="Coding: glasses on, paws typing">
 </p>
 
-Real captures from the pet's own frame buffer: idle, dancing, and eating popcorn through a film.
+Real captures from the pet's own frame buffer: idle, dancing, and typing along while you code.
 
-**[The handbook](https://www.mosambiswas.com/Desktop-pet/)** is the full user guide and technical notes: every face, trick and screen, the wiring, the firmware, the protocol and how it hears music. It's also a 19-page [PDF](docs/Desktop-pet-Handbook.pdf).
+**[The handbook](https://www.mosambiswas.com/Desktop-pet/)** is the full user guide and technical notes: every face, trick and screen, the wiring, the firmware, the protocol and how it hears music. It's also a 25-page [PDF](docs/Desktop-pet-Handbook.pdf).
 
 ## What it does
 

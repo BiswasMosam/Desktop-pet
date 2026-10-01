@@ -69,6 +69,17 @@ if __name__ == "__main__":
     for name in ("partly", "clear", "overcast", "fog", "rain", "snow", "storm", "night"):
         made.append(gif(f"wx_{name}"))
     made.append(gif("card", hold_last=2.5))
+    for name in ("code_read", "code_type", "code_music", "game", "selfie"):
+        made.append(gif(name))
+    made.append(gif("card_open", hold_last=2.5))
+
+    # The printed head, from the enclosure's own renders
+    for name in ("hero", "side", "reader"):
+        src = f"../../enclosure/renders/{name}.png"
+        if os.path.exists(src):
+            path = f"{OUT}/head_{name}.png"
+            Image.open(src).convert("RGB").resize((1200, 900), Image.LANCZOS).save(path, optimize=True)
+            made.append((path,))
     made.append(gif("timesup", invert_every=0.5))
     made.append((png("clock"),))
     made.append((png("status"),))
