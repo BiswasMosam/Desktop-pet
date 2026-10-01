@@ -144,7 +144,7 @@ The default build targets the F401CC and also runs on an F411CE. For the F411's 
 
 ### Connecting it to Aminal
 
-Nothing to set up: Aminal starts a small bridge beside itself, which finds the pet on USB by its identity (`0483:5740`) and starts talking. With Aminal closed the bridge can be run on its own and still gives the pet the time, weather and timers. It can also save exactly what the OLED shows as a PNG (`SN`) or send the pet a single line. Aminal's code is private; its own README has the exact commands.
+A small bridge on the PC finds the pet on USB by its identity (`0483:5740`) and starts talking. It starts at login and runs whether Aminal is open or not, so the pet follows the music, films, code and games on the PC all day and gets the time, weather and timers; Aminal only adds its listening, thinking and speaking faces. If the bridge isn't running, Aminal starts it. It can also save exactly what the OLED shows as a PNG (`SN`) or send the pet a single line. Aminal's code is private; its own README has the exact commands.
 
 ### Bluetooth
 
