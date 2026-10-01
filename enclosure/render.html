@@ -11,7 +11,7 @@
 <body>
 <script type="module">
 // Renders assembly.glb (written by check.py) from a few angles.
-// render.html#hero | #back | #cutaway | #exploded
+// render.html#hero | #back | #cutaway | #exploded | #tray | #tray-board | #side | #reader
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -60,7 +60,7 @@ const MATS = {
   'USB plug mould': mat(0x3a3b3f, 0.55),
   'OLED pcb': mat(0x1f4fa3, 0.5), 'OLED glass': mat(0x050506, 0.15, 0.2), 'OLED header': mat(0x111111, 0.6),
   'OLED jumpers': mat(0x222222, 0.6), 'touch board': mat(0xc0392b, 0.5), 'touch pins': mat(0x222222, 0.6),
-  'HC-05': mat(0x2f6fd0, 0.5), 'ESP-01': mat(0x1b1b1b, 0.5), 'AMS1117': mat(0x2e8b57, 0.5),
+  'ESP-01': mat(0x1b1b1b, 0.5), 'RC522': mat(0x1d58b8, 0.5), 'RC522 jumpers': mat(0x222222, 0.6),
 };
 const ENCLOSURE = ['shell', 'base', 'visor'];
 
@@ -83,8 +83,9 @@ face.rotation.x = Math.PI / 2;
 face.position.set(0, 0.78, 33.5);
 root.add(face);
 
-const clip = view === 'cutaway' ? [new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0)] : [];
-const hideInside = view === 'hero' || view === 'exploded';
+const clip = view === 'cutaway' ? [new THREE.Plane(new THREE.Vector3(-1, 0, 0), 0)]
+  : view === 'reader' ? [new THREE.Plane(new THREE.Vector3(1, 0, 0), -6)] : [];
+const hideInside = view === 'hero' || view === 'exploded' || view === 'side';
 const explode = {
   'base': [0, 0, -40], 'visor': [0, -30, 0],
 };
@@ -97,6 +98,8 @@ for (const [name, mesh] of Object.entries(byName)) {
   if (TRAY[view] && !TRAY[view].includes(name)) continue;
   if (hideInside && !ENCLOSURE.includes(name)) continue;
   if (view === 'hero' && name === 'USB plug mould') continue;
+  // the reader view looks at the inside of the right wall, past where the Black Pill sits
+  if (view === 'reader' && ['Black Pill', 'BP jumpers', 'SWD + plug', 'USB plug mould'].includes(name)) continue;
   const m = mesh.clone();
   // the export carries no normals: smooth the curves, keep edges over 35 degrees sharp
   const g = mesh.geometry.clone();
@@ -122,12 +125,14 @@ if (view === 'exploded') face.position.y += -30;
 const cam = new THREE.PerspectiveCamera(24, W / H, 1, 2000);
 const target = new THREE.Vector3(0, 30, -35);        // (x, z, -y) in three's axes
 const shots = {
-  hero:     { pos: [-150, 115, 205], target: [0, 30, -33] },
-  back:     { pos: [95, 85, -275],   target: [0, 24, -40] },
-  cutaway:  { pos: [235, 120, 90],   target: [0, 26, -35] },
-  exploded: { pos: [-190, 140, 250], target: [0, 26, -33] },
-  tray:         { pos: [-150, 125, 150], target: [0, 10, -36] },
-  'tray-board': { pos: [-150, 125, 150], target: [0, 12, -36] },
+  hero:     { pos: [-170, 120, 215], target: [0, 30, -43] },
+  back:     { pos: [105, 90, -315],  target: [0, 24, -50] },
+  cutaway:  { pos: [265, 125, 85],   target: [0, 26, -45] },
+  exploded: { pos: [-210, 145, 265], target: [0, 26, -43] },
+  tray:         { pos: [-170, 135, 160], target: [0, 10, -46] },
+  'tray-board': { pos: [-170, 135, 160], target: [0, 12, -46] },
+  side:     { pos: [230, 105, 150],  target: [0, 28, -44] },
+  reader:   { pos: [-245, 95, -25],  target: [22, 30, -44] },
 };
 const s = shots[view];
 cam.position.set(...s.pos);

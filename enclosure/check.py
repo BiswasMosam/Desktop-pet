@@ -88,10 +88,27 @@ def touch():
 
 
 def loose():
-    hc05 = box(-28.5, -13.0, 16, 53.3, M.FLOOR, M.FLOOR + 3.6)
-    esp = box(13.0, 27.3, 20, 44.8, M.FLOOR, M.FLOOR + 3.0)
-    ams = box(15.0, 26.0, 48, 60, M.FLOOR, M.FLOOR + 6.0)
-    return hc05, esp, ams
+    return box(13.0, 27.3, 20, 44.8, M.FLOOR, M.FLOOR + 3.0)      # the ESP-01
+
+
+def rfid():
+    """The RC522 seated in its holder, component side facing in. Its header
+    sits somewhere along the back end between 7.5 and 32.5 mm up (it's off
+    centre, and the board goes in either way up), so the header, its plugs
+    and the crystal are modelled for both ways round."""
+    xb, xf = M.RFID_X_BACK, M.RFID_X_FRONT
+    y0, y1, z0, z1 = M.RFID_Y0, M.RFID_Y1 - 0.5, M.RFID_Z0, M.RFID_Z1
+    board = box(xf, xb, y0, y1, z0, z1)
+    header = box(xf - 2.5, xf, y1 - 2.5, y1, z0 + 7.5, z0 + 32.5)
+    plugs = box(xf - 2.54, xf, y1, y1 + M.RFID_PLUGS, z0 + 7.5, z0 + 32.5)
+    # the wires turning in toward the middle as they leave the plugs
+    bend = box(xf - 8.0, xf - 0.5, y1 + M.RFID_PLUGS, y1 + M.RFID_PLUGS + M.RFID_BEND - 0.2,
+               z0 + 7.5, z0 + 32.5)
+    crystal = box(xf - 4.0, xf, y1 - 15, y1 - 3, z0 + 1.5, z0 + 6.0) + \
+        box(xf - 4.0, xf, y1 - 15, y1 - 3, z1 - 6.0, z1 - 1.5)
+    # solder stubs on the back, behind the header
+    stubs = box(xb, xb + 1.5, y1 - 2.5, y1, z0 + 7.5, z0 + 32.5)
+    return board + header + crystal + stubs, plugs + bend
 
 
 # ---------------------------------------------------------------- checks
@@ -106,7 +123,8 @@ if __name__ == "__main__":
     plug_shell, plug_mould = usb_plug()
     pcb, glass, solder, header, oled_dup = oled()
     touch_board, touch_pins = touch()
-    hc05, esp, ams = loose()
+    esp = loose()
+    rfid_board, rfid_plugs = rfid()
 
     solids = {"shell": shell, "visor": visor, "base": base}
     swd_straight, swd_right = swd()
@@ -114,7 +132,8 @@ if __name__ == "__main__":
               "SWD + plug": swd_straight, "SWD right-angle": swd_right,
               "OLED pcb": pcb, "OLED glass": glass, "OLED solder": solder,
               "OLED header": header, "OLED jumpers": oled_dup, "touch board": touch_board,
-              "touch pins": touch_pins, "HC-05": hc05, "ESP-01": esp, "AMS1117": ams}
+              "touch pins": touch_pins, "ESP-01": esp,
+              "RC522": rfid_board, "RC522 jumpers": rfid_plugs}
 
     print("overlaps (mm3), anything over ~0.01 is a clash:")
     bad = 0
@@ -151,8 +170,8 @@ if __name__ == "__main__":
               "SWD + plug": [30, 30, 30, 255], "SWD right-angle": [30, 30, 30, 255],
               "OLED glass": [8, 8, 10, 255], "OLED header": [20, 20, 20, 255],
               "OLED jumpers": [30, 30, 30, 255], "touch board": [200, 40, 40, 255],
-              "touch pins": [30, 30, 30, 255], "HC-05": [30, 90, 200, 255], "ESP-01": [20, 20, 20, 255],
-              "AMS1117": [30, 110, 60, 255]}
+              "touch pins": [30, 30, 30, 255], "ESP-01": [20, 20, 20, 255],
+              "RC522": [29, 88, 184, 255], "RC522 jumpers": [30, 30, 30, 255]}
     for name, m in allm.items():
         if name in ("OLED solder", "SWD right-angle"):     # a what-if, not drawn
             continue

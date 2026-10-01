@@ -8,7 +8,8 @@ back, z up from the desk (0).
     python model.py            writes stl/*.stl in print orientation
 
 Parts (none needs supports):
-    shell       the head; printed upside down, top on the bed
+    shell       the head, with the RFID reader's holder inside its right
+                wall; printed upside down, top on the bed
     visor       the black screen bezel; printed face down
     base        the floor, with the Black Pill up on its stand; printed flat
 """
@@ -21,12 +22,42 @@ from manifold3d import CrossSection, Manifold
 SEG = 64            # segments in a full circle
 
 # ---------------------------------------------------------------- the head
-W, D, H = 66.0, 70.0, 58.0      # outside width, depth, height
+W, H = 66.0, 58.0               # outside width and height (the depth, D, follows
+                                # from the RFID reader below)
 R_SIDE = 10.0                   # radius of the four vertical edges
 R_TOP = 6.0                     # radius where the top meets the sides
 WALL = 2.4                      # side walls (6 lines of a 0.4 mm nozzle)
 ROOF = 2.0                      # the top
 FIT = 0.25                      # clearance between parts that slide together
+
+# ---------------------------------------------------------------- RFID reader
+# RFID-RC522: PCB 60 x 40, its 8-pin header right-angled off one short
+# edge, so the jumper plugs carry on in line 16 mm past it. It stands
+# inside the right wall (x > 0), long side front to back, antenna end at
+# the front and plugs toward the back, so a card tapped on the outside of
+# the head reads through about 6 mm of plastic. It's what sets the head's
+# depth: the board, its plugs and room for the wires to turn have to fit
+# between the round corners.
+RFID_L, RFID_H, RFID_T = 60.0, 40.0, 1.6
+RFID_GAP = 2.0          # back of the PCB to the inside of the wall: clears the
+                        # header's solder stubs and lets the board's front end
+                        # reach into the round corner
+RFID_PLUGS = 16.0       # header plastic and jumper plugs past the board's end
+RFID_BEND = 5.0         # then room for the wires to turn
+RFID_FLOOR = 8.6        # lowest the holder reaches: the base's rim comes up to 8.0
+RFID_LIFT = 2.0         # how far it slides up into its top slot to swing in
+RFID_GRIP = 34.0        # the groove and the top lip run along the antenna end
+                        # only, clear of the parts at the header end
+
+_ri = R_SIDE - WALL                                   # inside corner radius
+RFID_X_BACK = W / 2 - WALL - RFID_GAP                 # the PCB's back face
+RFID_X_FRONT = RFID_X_BACK - RFID_T
+RFID_Y0 = (WALL + _ri) - math.sqrt(_ri ** 2 - (RFID_X_BACK - (W / 2 - WALL - _ri)) ** 2) + 0.4
+RFID_Y1 = RFID_Y0 + RFID_L + 0.5
+D = math.ceil((RFID_Y1 + RFID_PLUGS + RFID_BEND + WALL) * 2) / 2   # outside depth
+RFID_GROOVE = RFID_FLOOR + 0.4                        # the groove's bottom, at the wall
+RFID_Z0 = RFID_GROOVE + RFID_T                        # the board's bottom, seated
+RFID_Z1 = RFID_Z0 + RFID_H                            # and its top
 
 # ---------------------------------------------------------------- the OLED
 # 0.96" SSD1306 I2C module: PCB 27.3 x 27.8, M2 holes 2 mm in from each edge
@@ -170,7 +201,60 @@ def shell():
     s += frame
     s -= box(-pw / 2, pw / 2, TOUCH_Y - pl / 2, TOUCH_Y + pl / 2, top_in - 0.1,
              H - TOUCH_ROOF)
+
+    s += rfid_holder(outer)
+    # a faint ring on the outside, over the antenna: tap here
+    ring_y, ring_z = RFID_Y0 + 19.0, (RFID_Z0 + RFID_Z1) / 2
+    ring = Manifold.cylinder(2.0, 12.0, 12.0, SEG) - \
+        Manifold.cylinder(2.0, 10.8, 10.8, SEG).translate((0, 0, -0.5))
+    ring = ring.rotate((0, 90, 0)).translate((W / 2 - 0.6, ring_y, ring_z))
+    s -= ring
     return s
+
+
+def rfid_holder(outer):
+    """The RC522 inside the right wall, held without screws.
+
+    It hangs with its top edge in a slot and its bottom edge in a groove.
+    To fit it, tilt it, push its top up into the slot, swing the bottom in
+    over the groove's edge and let it drop. The groove's inner side slopes
+    at 45 degrees and the slot's lip runs up into the roof, so both print
+    without support with the head upside down. Everything is trimmed to the
+    head's outside, which is what joins it to the round front corner.
+
+    The groove and the lip only run along the antenna end of the board
+    (RFID_GRIP): the crystal and the header sit at the other end, close to
+    the edges, on the side facing in."""
+    xb, xf = RFID_X_BACK, RFID_X_FRONT
+    y0, y1 = RFID_Y0, RFID_Y1
+    out = W / 2 + 1                       # past the outside, trimmed later
+    grip = y0 + RFID_GRIP
+
+    # the groove: solid up to the wall behind the board, and a 45 degree
+    # slope in front of it that the board's bottom edge rests against
+    h = box(xb, out, y0, grip, RFID_FLOOR, RFID_GROOVE)
+    h += Manifold.batch_hull([
+        box(xb - 3.0, xb, y0, grip, RFID_FLOOR, RFID_FLOOR + 0.01),
+        box(xb - 3.0, xb - 2.99, y0, grip, RFID_FLOOR, RFID_GROOVE + 3.0),
+        box(xb - 0.01, xb, y0, grip, RFID_FLOOR, RFID_GROOVE)])
+
+    # the top: solid behind the board up into the roof, a lip in front of
+    # it, and the slot between them deep enough to lift the board into
+    slot_top = RFID_Z1 + RFID_LIFT + 0.4
+    lip_in = xf - 0.35
+    top = box(lip_in - 1.2, out, y0, grip, RFID_Z1 - 2.0, H)
+    top -= box(lip_in, xb, y0 - 1, grip + 1, RFID_Z1 - 3.0, slot_top)
+    h += top
+
+    # behind the board: two ribs it leans on, between the groove and the top
+    for yc in (y0 + 18.0, y0 + 40.0):
+        h += box(xb, out, yc - 1.0, yc + 1.0, RFID_FLOOR, RFID_Z1)
+
+    # in front of its antenna end, a rib it stops against; and behind its
+    # other end, a short one low down, under where the header sits
+    h += box(xf - 1.0, out, y0 - 2.0, y0 - 0.3, RFID_FLOOR, slot_top)
+    h += box(xf - 1.0, out, y1 + 0.3, y1 + 2.3, RFID_FLOOR, RFID_Z0 + 5.0)
+    return h ^ outer
 
 
 def visor():
