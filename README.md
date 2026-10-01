@@ -53,7 +53,18 @@ When Aminal hears Spotify playing, the pet joins in, in one of three moods picke
 
 Put on Netflix, Prime Video or Hotstar and it looks up at the screen with a bucket of **popcorn**, flicking a kernel into its mouth and chewing every few seconds. When a scene suddenly gets loud it jumps, and the popcorn flies out of the bucket.
 
-Aminal decides music or film by the app and the tab title, never by guesswork, so a game or a video call gets no reaction at all. The beats and bars come from Aminal listening to the speakers; without them the pet dances to a steady 115 bpm of its own.
+Aminal decides music or film by the app and the tab title, never by guesswork, so a video call gets no reaction at all. The beats and bars come from Aminal listening to the speakers; without them the pet dances to a steady 115 bpm of its own.
+
+### Coding and gaming
+
+The pet also follows what's in front on the PC:
+
+| In front | What you see |
+| --- | --- |
+| **Code** (VS Code, Cursor, a JetBrains IDE, a terminal, GitHub or Colab in a browser) | Glasses on, reading along each line and down the page. While you type, two paws tap on a little keyboard and code flies off its ends |
+| **A game** (anything from a Steam, Epic, Riot, Xbox, EA, Ubisoft, GOG or Rockstar library, a few by name, or any exclusive full screen 3D app) | Eyes narrowed in focus and darting after the action, a controller in its hands with the buttons getting mashed. When the game gets loud, sparks burst out and the eyes pop wide |
+
+With music playing as well it keeps the coding or gaming face and puts the headphones on over it, nodding on the beat. An editor nobody has touched for five minutes isn't coding, and a few seconds in front are needed before either counts, so alt-tabbing past VS Code changes nothing. Aminal goes by the program, its folder and the window title only, never by what's in the window or what's typed.
 
 ### The button
 
@@ -158,7 +169,7 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 
 | Line | Meaning |
 | --- | --- |
-| `HI` | Who are you? The pet answers `PET desktop-pet 6` |
+| `HI` | Who are you? The pet answers `PET desktop-pet 7` |
 | `PG` | Heartbeat, answered `PO`. Eight silent seconds and the pet is on its own again |
 | `ST idle\|listening\|thinking\|speaking\|off` | What Aminal is doing |
 | `LV 0-100` | Voice level, for the eyes and the mouth |
@@ -172,7 +183,8 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 | `MD music [headphones\|dance\|bars]`, `MD watch`, `MD -` | What's playing; a mood can be asked for by name |
 | `VZ <16 hex digits>` | Spectrum bars, 0 to f each, low to high |
 | `BE` | A beat |
-| `JS` | A sudden loud moment in a film |
+| `JS` | A sudden loud moment in a film or a game |
+| `AC code [typing]`, `AC game`, `AC -` | What's in front on the PC |
 | `LO <lat> <lon> <place>` | Where the weather is for; kept in flash for the WiFi to use |
 | `WF <ssid><tab><password>` | USB only: join a WiFi network (the ESP-01 keeps it) |
 | `ES talk\|flash [baud]`, `ES reset` | USB only: the cable straight through to the ESP-01, in its own program or its bootloader, until 12-30 s of quiet |
@@ -201,12 +213,13 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | `src/face.cpp` | Eyes, moods, fidgets, and the listening, thinking and speaking faces |
 | `src/screens.cpp` | Clock, weather icons, timer, status, and the alert card |
 | `src/media.cpp` | Headphones, music notes, the visualizer, and the popcorn |
+| `src/activity.cpp` | Glasses, the keyboard and paws, the controller, and the sparks |
 | `src/link.cpp` | The protocol, read from USB and the HC-05 alike, and the ESP-01 passthrough |
 | `src/wifi.cpp` | The ESP-01 driven through its AT firmware: joining, the HTTP request, reading the reply |
 
 All timers compare with `reached(now, t)` instead of `now > t`, so the pet keeps blinking after `millis()` wraps around at about 49.7 days.
 
-The saved location lives in the chip's last flash sector (0x08020000 on the F401CC). The app starts at 0x08004000 and is about 96 KB, so it has about 16 KB of room before the two would meet.
+The saved location lives in the chip's last flash sector (0x08020000 on the F401CC). The app starts at 0x08004000 and is about 98 KB, so it has about 14 KB of room before the two would meet.
 
 ## Stack
 

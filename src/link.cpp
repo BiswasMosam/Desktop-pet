@@ -4,7 +4,7 @@
 // which one Aminal is on. Replies go back down the port the command came in
 // on; events (a tap, a hold) go to whichever port spoke last.
 //
-//   HI                          -> PET desktop-pet 6
+//   HI                          -> PET desktop-pet 7
 //   PG                          -> PO            (heartbeat)
 //   ST idle|listening|thinking|speaking|off
 //   LV <0-100>                  voice level
@@ -18,7 +18,8 @@
 //   MD music [headphones|dance|bars] | watch | -   what's playing on the PC
 //   VZ <16 hex digits>          spectrum bars, 0-f each, low to high
 //   BE                          a beat
-//   JS                          a sudden loud moment in a film
+//   JS                          a sudden loud moment in a film or a game
+//   AC code [typing] | game | -   what's in front on the PC
 //   LO <lat> <lon> <place>      where the weather is for (kept across power cuts)
 //   WF <ssid>\t<password>      USB only: join a WiFi network (the ESP-01 keeps it)
 //   ES flash|talk [baud] | reset   USB only: pass USB straight through to the
@@ -288,6 +289,16 @@ static void setMedia(char *a, uint32_t now) {
   if (style && world.media == MEDIA_MUSIC) faceMusicStyle(style, now);
 }
 
+// AC code [typing] | AC game | AC -
+static void setActivity(char *a) {
+  char *more = strchr(a, ' ');
+  if (more) *more++ = 0;
+  if      (!strcmp(a, "code")) world.act = ACT_CODE;
+  else if (!strcmp(a, "game")) world.act = ACT_GAME;
+  else                         world.act = ACT_NONE;
+  world.typing = more && !strcmp(more, "typing");
+}
+
 static void setBars(const char *a, uint32_t now) {
   for (int i = 0; i < VZ_BARS && a[i]; i++) {
     char c = a[i];
@@ -320,7 +331,7 @@ static void handleLine(Port &p, uint32_t now) {
   replyTo = &p;
 
   bool hello = false, known = true;
-  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 6"); hello = true; }
+  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 7"); hello = true; }
   else if (!strcmp(cmd, "PG")) reply("PO");
   else if (!strcmp(cmd, "ST")) setState(args, now);
   else if (!strcmp(cmd, "LV")) world.level = constrain(atoi(args), 0, 100);
@@ -334,7 +345,11 @@ static void handleLine(Port &p, uint32_t now) {
   else if (!strcmp(cmd, "MD")) setMedia(args, now);
   else if (!strcmp(cmd, "VZ")) setBars(args, now);
   else if (!strcmp(cmd, "BE")) world.beatAt = now;
-  else if (!strcmp(cmd, "JS")) { world.jumpAt = now; faceEmote(EM_SURPRISED, 1500, now); }
+  else if (!strcmp(cmd, "JS")) {
+    world.jumpAt = now;
+    if (world.act == ACT_NONE) faceEmote(EM_SURPRISED, 1500, now);   // a game has its own
+  }
+  else if (!strcmp(cmd, "AC")) setActivity(args);
   else if (!strcmp(cmd, "LO")) wifiSetPlace(args, now);
   else if (!strcmp(cmd, "WF") && p.kind == LINK_USB) wifiJoin(args);   // never over the air
   else if (!strcmp(cmd, "ES") && p.kind == LINK_USB) {
@@ -389,6 +404,8 @@ void linkTick(uint32_t now) {
     world.link = LINK_NONE;
     world.am = AM_OFF;
     world.level = 0;
+    world.media = MEDIA_NONE;      // nobody left to say when it stops
+    world.act = ACT_NONE;
     active = nullptr;
   }
   if (world.timerOn && !world.timerPaused && timerLeftMs(now) == 0) timerDone(now);

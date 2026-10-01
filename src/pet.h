@@ -31,6 +31,9 @@ enum Emote : uint8_t {
 enum Media : uint8_t { MEDIA_NONE, MEDIA_MUSIC, MEDIA_WATCH };
 #define VZ_BARS 16
 
+// ---------- What's in front on the PC ----------
+enum Activity : uint8_t { ACT_NONE, ACT_CODE, ACT_GAME };
+
 // ---------- Screens, in the order a double tap walks through them ----------
 enum Screen : uint8_t { SCR_FACE, SCR_CLOCK, SCR_WEATHER, SCR_TIMER, SCR_STATUS, SCR_COUNT };
 
@@ -73,6 +76,10 @@ struct World {
   uint32_t beatAt = 0;           // millis() of the last beat heard
   uint32_t jumpAt = 0;           // millis() of the last sudden loud moment
 
+  // Code or a game in front on the PC, and whether the keys are going
+  Activity act = ACT_NONE;
+  bool     typing = false;
+
   // A card drawn over whatever screen is up
   bool     alertOn = false;
   bool     alertLoud = false;    // flashes until tapped (timer done)
@@ -107,6 +114,16 @@ void bucketDraw();
 void kernelDraw(uint32_t eatT, int mouthX, int mouthY);
 void chewDraw(uint32_t now, int mouthX, int mouthY);
 void burstDraw(uint32_t sinceJump);
+
+// activity.cpp: the props for coding and gaming
+void glassesDraw(int lx, int rx, int cy, int eyeW, int lensH);
+void pawTap(uint32_t now);
+void keyboardDraw();
+void pawsDraw(uint32_t now, bool typing);
+void glyphsDraw();
+void controllerPress(uint32_t now);
+void controllerDraw(int dx, int dy, uint32_t now);
+void sparksDraw(uint32_t since);
 
 // screens.cpp
 void drawClock(uint32_t now);

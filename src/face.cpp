@@ -48,13 +48,28 @@ static uint32_t lastBeat = 0, nextSynthBeat = 0;
 static uint16_t beatNo = 0;
 static uint32_t eatStart = 0, nextEat = 0, nextDrift = 0;
 
+// Coding and gaming
+static uint32_t lineStart = 0, lineLen = 1500, nextKey = 0, nextDart = 0, nextPress = 0;
+static uint8_t lineNo = 0;
+static float lensH = 30;          // the glasses follow the eye's open height
+
 static bool aminalBusy() {
   return world.am == AM_LISTENING || world.am == AM_THINKING || world.am == AM_SPEAKING;
 }
 
-// Music or a film is on and Aminal isn't using the face for itself
+// Code or a game is in front and Aminal isn't using the face for itself
+static bool actShown() {
+  return world.act != ACT_NONE && !aminalBusy();
+}
+
+// Music or a film is on, nothing is in front of it, and Aminal isn't
+// using the face. Music while coding or gaming only adds the headphones.
 static bool mediaShown() {
-  return world.media != MEDIA_NONE && !aminalBusy();
+  return world.media != MEDIA_NONE && world.act == ACT_NONE && !aminalBusy();
+}
+
+static bool gameWhoa(uint32_t now) {
+  return world.act == ACT_GAME && world.jumpAt && now - world.jumpAt < 700;
 }
 
 // ---------- Moods and triggers ----------
@@ -191,7 +206,7 @@ static void tickBeat(uint32_t now) {
   }
   if (!beat) return;
   beatNo++;
-  if (style == MS_DANCE && beatNo % 2 == 0) notesSpawn(now);
+  if (style == MS_DANCE && beatNo % 2 == 0 && world.act == ACT_NONE) notesSpawn(now);
 }
 
 static void musicTargets(uint32_t now) {
@@ -229,6 +244,56 @@ static void watchTargets(uint32_t now) {
   blinkNaturally(now, 3000, 7000);
 }
 
+// ---------- Coding and gaming ----------
+
+// Headphones on over whatever it's doing: a nod on every beat
+static void nodToMusic(uint32_t now) {
+  if (world.media != MEDIA_MUSIC) return;
+  tickBeat(now);
+  if (now - lastBeat < 140) tgtY += 2;
+}
+
+static void codeTargets(uint32_t now) {
+  tgtW = 32; tgtH = 24;
+  if (world.typing) {
+    // Eyes on the keys, paws going
+    tgtX = 0; tgtY = -4;
+    if (reached(now, nextKey)) {
+      pawTap(now);
+      nextKey = now + random(70, 190);
+    }
+  } else {
+    // Reading: along a line, a quick hop back, and on down the page
+    uint32_t t = now - lineStart;
+    if (t > lineLen) {
+      lineStart = now;
+      lineLen = random(1200, 2400);
+      lineNo++;
+      t = 0;
+    }
+    tgtX = -7 + 14 * (int32_t)t / (int32_t)lineLen;
+    tgtY = -7 + lineNo % 3;
+  }
+  blinkNaturally(now, 3500, 8000);
+  nodToMusic(now);
+}
+
+static void gameTargets(uint32_t now) {
+  // Darting after the action, barely blinking, thumbs never still
+  if (reached(now, nextDart)) {
+    tgtX = random(-12, 13);
+    nextDart = now + random(250, 900);
+  }
+  tgtW = 34; tgtY = -8;
+  tgtH = gameWhoa(now) ? 32 : 22;
+  if (reached(now, nextPress)) {
+    controllerPress(now);
+    nextPress = now + random(90, 280);
+  }
+  blinkNaturally(now, 5000, 10000);
+  nodToMusic(now);
+}
+
 static void emoteTargets() {
   tgtX = 0;
   tgtY = 0;
@@ -248,7 +313,7 @@ void faceUpdate(uint32_t now) {
   if (emote != EM_NONE && reached(now, emoteUntil)) emote = EM_NONE;
   if (mood == HAPPY && reached(now, happyUntil)) mood = NORMAL;
 
-  if (aminalBusy() || world.media != MEDIA_NONE) faceWake(now);
+  if (aminalBusy() || world.media != MEDIA_NONE || world.act != ACT_NONE) faceWake(now);
 
   // Something new started playing
   if (world.media != shownMedia) {
@@ -287,6 +352,10 @@ void faceUpdate(uint32_t now) {
     tgtY = -6 - world.level * 3 / 100;
     tgtH = 34 - world.level * 4 / 100;
     blinkNaturally(now, 3000, 7000);
+  } else if (world.act == ACT_CODE) {
+    codeTargets(now);
+  } else if (world.act == ACT_GAME) {
+    gameTargets(now);
   } else if (world.media == MEDIA_MUSIC) {
     musicTargets(now);
   } else if (world.media == MEDIA_WATCH) {
@@ -296,6 +365,8 @@ void faceUpdate(uint32_t now) {
   } else {
     idleTargets(now);
   }
+
+  lensH += (tgtH + 6 - lensH) * 0.25f;      // before a blink shuts the target
 
   if (blinking && reached(now, blinkEnd)) blinking = false;
   if (blinking) tgtH = 2;
@@ -314,7 +385,8 @@ void faceUpdate(uint32_t now) {
 
 // ---------- Drawing ----------
 
-enum Look : uint8_t { LOOK_PLAIN, LOOK_HAPPY, LOOK_LOVE, LOOK_SAD, LOOK_ANGRY, LOOK_CLOSED };
+enum Look : uint8_t { LOOK_PLAIN, LOOK_HAPPY, LOOK_LOVE, LOOK_SAD, LOOK_ANGRY, LOOK_CLOSED,
+                      LOOK_FOCUS };
 
 static Look currentLook() {
   switch (emote) {
@@ -326,6 +398,10 @@ static Look currentLook() {
     default:       return LOOK_PLAIN;
   }
   if (mood == HAPPY) return LOOK_HAPPY;
+  if (actShown()) {
+    // Game face: lids slanted in, until something big makes them pop open
+    return world.act == ACT_GAME && !gameWhoa(millis()) ? LOOK_FOCUS : LOOK_PLAIN;
+  }
   if (mediaShown() && world.media == MEDIA_MUSIC) {
     // Lost in it, with a peek around every nine seconds or so
     if (style == MS_HEADPHONES) return (millis() / 1500) % 6 == 0 ? LOOK_PLAIN : LOOK_HAPPY;
@@ -374,6 +450,11 @@ static void drawEye(int cx, int cy, int w, int h, int side, Look look, uint32_t 
     int inner = side < 0 ? x0 + w : x0 - 1;
     int across = side < 0 ? x0 + w * 3 / 10 : x0 + w * 7 / 10;
     display.fillTriangle(inner, y0 - 1, across, y0 - 1, inner, y0 + h / 2, SSD1306_BLACK);
+  } else if (look == LOOK_FOCUS) {
+    // A lid slanting down across the whole eye toward the nose
+    int inner = side < 0 ? x0 + w : x0 - 1;
+    int outer = side < 0 ? x0 - 1 : x0 + w;
+    display.fillTriangle(outer, y0 - 1, inner, y0 - 1, inner, y0 + h / 3, SSD1306_BLACK);
   }
 }
 
@@ -391,10 +472,26 @@ void faceDraw(uint32_t now) {
   int lx = SCREEN_W / 2 - EYE_GAP / 2 - EYE_W / 2 + (int)curX;
   int rx = SCREEN_W / 2 + EYE_GAP / 2 + EYE_W / 2 + (int)curX;
 
+  bool act = actShown();
+  if (act && world.act == ACT_CODE) {        // under the eyes, in case a big emote overlaps
+    keyboardDraw();
+    pawsDraw(now, world.typing);
+    glyphsDraw();
+  }
+
   drawEye(lx, cy, w, h, -1, look, now);
   drawEye(rx, cy, w, h, +1, emote == EM_WINK ? LOOK_CLOSED : look, now);
 
-  if (media && world.media == MEDIA_MUSIC) {
+  if (act) {
+    if (world.act == ACT_CODE) {
+      glassesDraw(lx, rx, cy, w, (int)lensH);
+    } else {
+      bool jolt = world.jumpAt && now - world.jumpAt < 150;
+      controllerDraw((int)curX / 4, jolt ? -2 : 0, now);
+      if (world.jumpAt) sparksDraw(now - world.jumpAt);
+    }
+    if (world.media == MEDIA_MUSIC) drawHeadphones(lx, rx, cy, w);
+  } else if (media && world.media == MEDIA_MUSIC) {
     if (style == MS_HEADPHONES) drawHeadphones(lx, rx, cy, w);
     if (style == MS_DANCE) notesDraw();
   } else if (media && world.media == MEDIA_WATCH) {
