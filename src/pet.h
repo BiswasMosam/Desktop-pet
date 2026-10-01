@@ -34,6 +34,9 @@ enum Media : uint8_t { MEDIA_NONE, MEDIA_MUSIC, MEDIA_WATCH };
 // ---------- What's in front on the PC ----------
 enum Activity : uint8_t { ACT_NONE, ACT_CODE, ACT_GAME };
 
+// ---------- Aminal taking a selfie ----------
+enum Cam : uint8_t { CAM_NONE, CAM_READY, CAM_COUNT, CAM_SHOT };
+
 // ---------- Screens, in the order a double tap walks through them ----------
 enum Screen : uint8_t { SCR_FACE, SCR_CLOCK, SCR_WEATHER, SCR_TIMER, SCR_STATUS, SCR_COUNT };
 
@@ -80,6 +83,12 @@ struct World {
   Activity act = ACT_NONE;
   bool     typing = false;
 
+  // A selfie in progress: which moment, since when, and how long the
+  // spoken countdown takes
+  Cam      cam = CAM_NONE;
+  uint32_t camAt = 0;
+  uint16_t camCountMs = 0;
+
   // A card drawn over whatever screen is up
   bool     alertOn = false;
   bool     alertLoud = false;    // flashes until tapped (timer done)
@@ -125,12 +134,17 @@ void controllerPress(uint32_t now);
 void controllerDraw(int dx, int dy, uint32_t now);
 void sparksDraw(uint32_t since);
 
+// camera.cpp: the camera face during a selfie
+void cameraTick(uint32_t now);
+void cameraDraw(uint32_t now);
+
 // screens.cpp
 void drawClock(uint32_t now);
 void drawWeather(uint32_t now);
 void drawTimer(uint32_t now);
 void drawStatus(uint32_t now);
 void drawAlert(uint32_t now);
+void bigDigit(const char *s, int cx, int baseline);   // the timer's font
 void showAlert(const char *title, const char *text, uint32_t secs, bool loud, uint32_t now);
 void dismissAlert();
 

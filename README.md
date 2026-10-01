@@ -66,6 +66,12 @@ The pet also follows what's in front on the PC:
 
 With music playing as well it keeps the coding or gaming face and puts the headphones on over it, nodding on the beat. An editor nobody has touched for five minutes isn't coding, and a few seconds in front are needed before either counts, so alt-tabbing past VS Code changes nothing. Aminal goes by the program, its folder and the window title only, never by what's in the window or what's typed.
 
+### Selfies
+
+Ask Aminal for a selfie and the pet turns into a camera. While the webcam opens and meters, its lens focuses and searches for you ("smile please!"). As Aminal says "Hold still - three, two, one", the numbers count down inside the lens, then "cheese!". The moment the photo is actually taken, the screen flashes white and the shutter blinks closed and open ("click!"), and it says "developing" until Aminal has the picture ready.
+
+The flash is the real shutter, not a timer: the photo burst starts the instant "three, two, one" ends, and the bridge flashes the pet on exactly that, because the voice takes anywhere from 1.9 to 2.4 s to say it.
+
 ### The button
 
 KEY (PA0) is the only input, or a TTP223 touch pad on B0 under the top of the [enclosure](enclosure/), which does exactly the same:
@@ -173,7 +179,7 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 
 | Line | Meaning |
 | --- | --- |
-| `HI` | Who are you? The pet answers `PET desktop-pet 8` |
+| `HI` | Who are you? The pet answers `PET desktop-pet 9` |
 | `IP` | Its WiFi address: `IP 192.168.1.12`, or `IP -` when it isn't online |
 | `PG` | Heartbeat, answered `PO`. Eight silent seconds and the pet is on its own again |
 | `ST idle\|listening\|thinking\|speaking\|off` | What Aminal is doing |
@@ -190,6 +196,7 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 | `BE` | A beat |
 | `JS` | A sudden loud moment in a film or a game |
 | `AC code [typing]`, `AC game`, `AC -` | What's in front on the PC |
+| `SF ready`, `SF count <ms>`, `SF shot`, `SF -` | A selfie: the camera opening, the spoken countdown, the shutter, done |
 | `LO <lat> <lon> <place>` | Where the weather is for; kept in flash for the WiFi to use |
 | `WF <ssid><tab><password>` | USB only: join a WiFi network (the ESP-01 keeps it) |
 | `ES talk\|flash [baud]`, `ES reset` | USB only: the cable straight through to the ESP-01, in its own program or its bootloader, until 12-30 s of quiet |
@@ -219,6 +226,7 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | `src/screens.cpp` | Clock, weather icons, timer, status, and the alert card |
 | `src/media.cpp` | Headphones, music notes, the visualizer, and the popcorn |
 | `src/activity.cpp` | Glasses, the keyboard and paws, the controller, and the sparks |
+| `src/camera.cpp` | The camera face for a selfie: countdown, flash and shutter |
 | `src/link.cpp` | The protocol, read from USB and the HC-05 alike, and the ESP-01 passthrough |
 | `src/wifi.cpp` | The ESP-01 driven through its AT firmware: joining, the HTTP request, reading the reply |
 
@@ -233,4 +241,3 @@ C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD13
 ## Next
 
 - RFID cards on an RC522
-- A selfie countdown when Aminal takes a photo

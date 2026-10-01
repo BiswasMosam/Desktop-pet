@@ -39,6 +39,10 @@ static int bigCentered(const char *s, int cx, int baseline, const GFXfont *f) {
   return x + x1 + w;
 }
 
+void bigDigit(const char *s, int cx, int baseline) {
+  bigCentered(s, cx, baseline, &FreeSansBold12pt7b);
+}
+
 static const char *linkName() {
   switch (world.link) {
     case LINK_USB:  return "USB";

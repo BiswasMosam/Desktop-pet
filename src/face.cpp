@@ -313,7 +313,9 @@ void faceUpdate(uint32_t now) {
   if (emote != EM_NONE && reached(now, emoteUntil)) emote = EM_NONE;
   if (mood == HAPPY && reached(now, happyUntil)) mood = NORMAL;
 
-  if (aminalBusy() || world.media != MEDIA_NONE || world.act != ACT_NONE) faceWake(now);
+  cameraTick(now);
+  if (aminalBusy() || world.media != MEDIA_NONE || world.act != ACT_NONE ||
+      world.cam != CAM_NONE) faceWake(now);
 
   // Something new started playing
   if (world.media != shownMedia) {
@@ -459,6 +461,11 @@ static void drawEye(int cx, int cy, int w, int h, int side, Look look, uint32_t 
 }
 
 void faceDraw(uint32_t now) {
+  // A selfie takes the whole face over, Aminal's speaking face included
+  if (world.cam != CAM_NONE) {
+    cameraDraw(now);
+    return;
+  }
   bool media = mediaShown();
   bool plain = emote == EM_NONE && mood != HAPPY;
   if (media && plain && world.media == MEDIA_MUSIC && style == MS_VISUALIZER) {

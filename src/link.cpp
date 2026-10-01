@@ -4,7 +4,7 @@
 // protocol, so the pet doesn't care which one Aminal is on. Replies go back down the port the command came in
 // on; events (a tap, a hold) go to whichever port spoke last.
 //
-//   HI                          -> PET desktop-pet 8
+//   HI                          -> PET desktop-pet 9
 //   IP                          -> IP <its WiFi address> | IP -
 //   PG                          -> PO            (heartbeat)
 //   ST idle|listening|thinking|speaking|off
@@ -21,6 +21,8 @@
 //   BE                          a beat
 //   JS                          a sudden loud moment in a film or a game
 //   AC code [typing] | game | -   what's in front on the PC
+//   SF ready | count <ms> | shot | -   a selfie: the camera opening, the
+//                               spoken countdown, the shutter, done
 //   LO <lat> <lon> <place>      where the weather is for (kept across power cuts)
 //   WF <ssid>\t<password>      USB only: join a WiFi network (the ESP-01 keeps it)
 //   ES flash|talk [baud] | reset   USB only: pass USB straight through to the
@@ -301,6 +303,21 @@ static void setActivity(char *a) {
   world.typing = more && !strcmp(more, "typing");
 }
 
+// SF ready | SF count <ms> | SF shot | SF -
+static void setSelfie(char *a, uint32_t now) {
+  char *ms = strchr(a, ' ');
+  if (ms) *ms++ = 0;
+  if      (!strcmp(a, "ready")) world.cam = CAM_READY;
+  else if (!strcmp(a, "count")) {
+    world.cam = CAM_COUNT;
+    world.camCountMs = ms ? constrain(atoi(ms), 600, 6000) : 2100;
+  }
+  else if (!strcmp(a, "shot"))  world.cam = CAM_SHOT;
+  else { world.cam = CAM_NONE; return; }
+  world.camAt = now;
+  goScreen(SCR_FACE, 0, now);
+}
+
 static void setBars(const char *a, uint32_t now) {
   for (int i = 0; i < VZ_BARS && a[i]; i++) {
     char c = a[i];
@@ -333,7 +350,7 @@ static void handleLine(Port &p, uint32_t now) {
   replyTo = &p;
 
   bool hello = false, known = true;
-  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 8"); hello = true; }
+  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 9"); hello = true; }
   else if (!strcmp(cmd, "PG")) reply("PO");
   else if (!strcmp(cmd, "IP")) {
     char b[24];
@@ -357,6 +374,7 @@ static void handleLine(Port &p, uint32_t now) {
     if (world.act == ACT_NONE) faceEmote(EM_SURPRISED, 1500, now);   // a game has its own
   }
   else if (!strcmp(cmd, "AC")) setActivity(args);
+  else if (!strcmp(cmd, "SF")) setSelfie(args, now);
   else if (!strcmp(cmd, "LO")) wifiSetPlace(args, now);
   else if (!strcmp(cmd, "WF") && p.kind == LINK_USB) wifiJoin(args);   // never over the air
   else if (!strcmp(cmd, "ES") && p.kind == LINK_USB) {
@@ -413,6 +431,7 @@ void linkTick(uint32_t now) {
     world.level = 0;
     world.media = MEDIA_NONE;      // nobody left to say when it stops
     world.act = ACT_NONE;
+    world.cam = CAM_NONE;
     active = nullptr;
   }
   if (world.timerOn && !world.timerPaused && timerLeftMs(now) == 0) timerDone(now);
