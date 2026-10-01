@@ -97,7 +97,6 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 - **ESP-01** WiFi module (optional): its own time and weather when the PC is off, and the link to the PC with no cable
 - **RC522** RFID reader (optional): tap a card to open a hidden folder
 - **TTP223** touch sensor (optional): pet it by touching the top of its head
-- **HC-05** Bluetooth module (optional, and no longer fitted here: WiFi does its job faster and frees its pins)
 - USB-C cable
 
 ### Wiring
@@ -136,13 +135,6 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 | GND | B15 |
 | I/O | B0 (not A0: the bootloader reads A0 at reset, and the pad's output sits low) |
 
-| HC-05 (optional, not fitted) | Black Pill |
-| --- | --- |
-| VCC | 5V |
-| GND | G |
-| TXD | A3 |
-| RXD | A2 |
-
 The board has three 3V3 pins and three G pins (two on the long headers, one each on the small 4-pin header): one pair each for the OLED, the ESP-01 and the RC522. Both 5V pins stay empty.
 
 The ESP-01's pins aren't labelled on top. With the chips facing you and the antenna up, one row holds GND, GPIO2, GPIO0 and RX, the other TX, EN, RST and 3V3; GND and 3V3 sit at opposite corners. GPIO2 stays empty.
@@ -172,14 +164,7 @@ The default build targets the F401CC and also runs on an F411CE. For the F411's 
 
 A small bridge on the PC finds the pet on USB by its identity (`0483:5740`) and starts talking. It starts at login and runs whether Aminal is open or not, so the pet follows the music, films, code and games on the PC all day and gets the time, weather and timers; Aminal only adds its listening, thinking and speaking faces. If the bridge isn't running, Aminal starts it.
 
-The cable isn't needed. With only a power cord on the pet, the bridge reaches it over WiFi: the ESP-01 listens on port 7676 and the bridge speaks the same protocol to it as over USB. It learns the pet's address whenever it's plugged in, and searches the home network for it if that address stops answering. USB always wins when it's plugged in, then WiFi, then Bluetooth. Anyone on the same network can reach that port too, so it's meant for a home network; joining WiFi (`WF`) and the ESP passthrough (`ES`) stay USB only. It can also save exactly what the OLED shows as a PNG (`SN`) or send the pet a single line. Aminal's code is private; its own README has the exact commands.
-
-### Bluetooth
-
-1. **Wire the HC-05** (the board with 6 pins in a row, not the ESP-01 with 8 in two rows): VCC to **5V**, GND to G, TXD to A3, RXD to A2. Its red LED blinks fast when it's powered and ready to pair. No light at all is almost always a loose VCC or GND wire.
-2. **Pair it with the PC**, not a phone: the HC-05 holds one connection at a time. Windows 11's own *Add device* list often shows it as *Unknown device*; press Win+R and run `DevicePairingWizard`, the old wizard, which shows it as **HC-05**. PIN `1234` (or `0000`).
-3. **Find its outgoing COM port.** Pairing makes two. The outgoing one is listed under Bluetooth > More Bluetooth settings > COM Ports as *Outgoing 'HC-05'*; it's the one whose device ID carries the module's address.
-4. **Give that port to Aminal** as the pet's Bluetooth port.
+The cable isn't needed. With only a power cord on the pet, the bridge reaches it over WiFi: the ESP-01 listens on port 7676 and the bridge speaks the same protocol to it as over USB. It learns the pet's address whenever it's plugged in, and searches the home network for it if that address stops answering. USB always wins when it's plugged in. Anyone on the same network can reach that port too, so it's meant for a home network; joining WiFi (`WF`) and the ESP passthrough (`ES`) stay USB only. It can also save exactly what the OLED shows as a PNG (`SN`) or send the pet a single line. Aminal's code is private; its own README has the exact commands.
 
 ### WiFi
 
@@ -191,11 +176,11 @@ To connect it, run the bridge's WiFi setup with the pet on USB. It offers the ne
 
 Reflashing the ESP-01 with firmware of its own, through the pet, was tried and failed: its ROM loader restarts on every esptool SYNC. The pet can still talk to it directly for debugging (`ES talk`), and every reset it does reports the ROM's own start-up line (`ES boot ets Jan 8 2013,rst cause:2, boot mode:(3,6)`), read at 74880 baud.
 
-USB always wins. The bridge tries the cable first, then WiFi and the Bluetooth port every 15 s while the pet isn't plugged in (opening the port of a pet that's off makes Windows try for seconds), and plugging the cable back in moves the link to USB by itself. Running the pet from a phone charger or power bank is how it goes wireless: within 15 s of losing the cable, the bridge reaches it over the air. Everything works over Bluetooth, just slower: a full `SN` snapshot takes about 2 s at 9600 baud.
+USB always wins. The bridge tries the cable first and WiFi every 15 s while the pet isn't plugged in, and plugging the cable back in moves the link to USB by itself. Running the pet from a phone charger or power bank is how it goes wireless: about 20 to 30 s after it powers up, the bridge reaches it over WiFi. Everything works over WiFi: a full `SN` snapshot takes about 0.4 s.
 
 ## The protocol
 
-One short line per message, the same on USB and Bluetooth, simple enough to type into a serial monitor:
+One short line per message, the same on USB and WiFi, simple enough to type into a serial monitor:
 
 | Line | Meaning |
 | --- | --- |
@@ -249,7 +234,7 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | `src/activity.cpp` | Glasses, the keyboard and paws, the controller, and the sparks |
 | `src/camera.cpp` | The camera face for a selfie: countdown, flash and shutter |
 | `src/rfid.cpp` | The RC522: polling for a card, and turning a card's arrival into a tap |
-| `src/link.cpp` | The protocol, read from USB and the HC-05 alike, and the ESP-01 passthrough |
+| `src/link.cpp` | The protocol, read from USB and WiFi alike, and the ESP-01 passthrough |
 | `src/wifi.cpp` | The ESP-01 driven through its AT firmware: joining, the HTTP request, reading the reply |
 
 All timers compare with `reached(now, t)` instead of `now > t`, so the pet keeps blinking after `millis()` wraps around at about 49.7 days.
