@@ -142,9 +142,11 @@ void wifiTick(uint32_t now);
 void wifiRestart(uint32_t now);
 void wifiSetPlace(char *args, uint32_t now);   // LO <lat> <lon> <place>
 void wifiJoin(char *args);                     // WF <ssid>\t<password>
+extern Stream &wifiLink;                       // the bridge, over the network
 
 // link.cpp
 void linkBegin();
 void linkPoll(uint32_t now);
 void linkTick(uint32_t now);
 void linkEvent(const char *text);         // tell the host something happened
+void espReset(bool bootloader);           // pulse the ESP-01's reset pin

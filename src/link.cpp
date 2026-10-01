@@ -1,10 +1,11 @@
 // The link to Aminal: short text commands, one per line, from any port.
 //
-// USB and the HC-05 speak exactly the same protocol, so the pet doesn't care
-// which one Aminal is on. Replies go back down the port the command came in
+// USB, the HC-05 and the WiFi module (port 7676) speak exactly the same
+// protocol, so the pet doesn't care which one Aminal is on. Replies go back down the port the command came in
 // on; events (a tap, a hold) go to whichever port spoke last.
 //
-//   HI                          -> PET desktop-pet 7
+//   HI                          -> PET desktop-pet 8
+//   IP                          -> IP <its WiFi address> | IP -
 //   PG                          -> PO            (heartbeat)
 //   ST idle|listening|thinking|speaking|off
 //   LV <0-100>                  voice level
@@ -52,8 +53,9 @@ struct Port {
 };
 
 static Port ports[] = {
-  {&Serial,   LINK_USB, {0}, 0, false},
-  {&SerialBT, LINK_BT,  {0}, 0, false},
+  {&Serial,   LINK_USB,  {0}, 0, false},
+  {&SerialBT, LINK_BT,   {0}, 0, false},
+  {&wifiLink, LINK_WIFI, {0}, 0, false},
 };
 static Port *replyTo = nullptr;   // where the current command came from
 static Port *active  = nullptr;   // where events go
@@ -71,7 +73,7 @@ void linkBegin() {
 
 // Reset it, in its bootloader (GPIO0 low, and held low: several ESP-01
 // guides keep it grounded for the whole flash) or its own program.
-static void espReset(bool bootloader) {
+void espReset(bool bootloader) {
   digitalWrite(ESP_BOOT_PIN, bootloader ? LOW : HIGH);
   digitalWrite(ESP_RST_PIN, LOW);
   delay(60);
@@ -331,8 +333,13 @@ static void handleLine(Port &p, uint32_t now) {
   replyTo = &p;
 
   bool hello = false, known = true;
-  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 7"); hello = true; }
+  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 8"); hello = true; }
   else if (!strcmp(cmd, "PG")) reply("PO");
+  else if (!strcmp(cmd, "IP")) {
+    char b[24];
+    snprintf(b, sizeof(b), "IP %s", world.wifi == 3 ? world.wifiIp : "-");
+    reply(b);
+  }
   else if (!strcmp(cmd, "ST")) setState(args, now);
   else if (!strcmp(cmd, "LV")) world.level = constrain(atoi(args), 0, 100);
   else if (!strcmp(cmd, "TM")) setTime(args, now);

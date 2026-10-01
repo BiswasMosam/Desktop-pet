@@ -144,7 +144,9 @@ The default build targets the F401CC and also runs on an F411CE. For the F411's 
 
 ### Connecting it to Aminal
 
-A small bridge on the PC finds the pet on USB by its identity (`0483:5740`) and starts talking. It starts at login and runs whether Aminal is open or not, so the pet follows the music, films, code and games on the PC all day and gets the time, weather and timers; Aminal only adds its listening, thinking and speaking faces. If the bridge isn't running, Aminal starts it. It can also save exactly what the OLED shows as a PNG (`SN`) or send the pet a single line. Aminal's code is private; its own README has the exact commands.
+A small bridge on the PC finds the pet on USB by its identity (`0483:5740`) and starts talking. It starts at login and runs whether Aminal is open or not, so the pet follows the music, films, code and games on the PC all day and gets the time, weather and timers; Aminal only adds its listening, thinking and speaking faces. If the bridge isn't running, Aminal starts it.
+
+The cable isn't needed. With only a power cord on the pet, the bridge reaches it over WiFi: the ESP-01 listens on port 7676 and the bridge speaks the same protocol to it as over USB. It learns the pet's address whenever it's plugged in, and searches the home network for it if that address stops answering. USB always wins when it's plugged in, then WiFi, then Bluetooth. Anyone on the same network can reach that port too, so it's meant for a home network; joining WiFi (`WF`) and the ESP passthrough (`ES`) stay USB only. It can also save exactly what the OLED shows as a PNG (`SN`) or send the pet a single line. Aminal's code is private; its own README has the exact commands.
 
 ### Bluetooth
 
@@ -157,11 +159,13 @@ A small bridge on the PC finds the pet on USB by its identity (`0483:5740`) and 
 
 The ESP-01 keeps its factory **AT firmware**, and the pet drives it with plain text commands: join the network, then one plain-HTTP request to Open-Meteo every 20 minutes. That single reply carries the time (its `Date` header), the UTC offset and today's weather, so a pet running from a charger keeps its clock and forecast with the PC off. Where the weather is for (`LO`, sent by Aminal) and the UTC offset are kept in the Black Pill's flash across power cuts.
 
-To connect it, close Aminal and run its bridge's WiFi setup. It offers the network the PC is on, asks for the password without showing it, and sends both down the USB cable only. The module keeps them and rejoins by itself from then on. The ESP8266 only does **2.4 GHz** networks.
+It also listens on port **7676** for the bridge, which is how the pet works with only a power cord (above). The module's multi-link mode makes that possible: the weather request goes out on link 4 while the bridge comes in on another. While the bridge is connected over WiFi it sends the time and weather itself, so the pet skips its own request. The pet resets the module at every boot, and again if it stops answering, so a bad power-up can't leave the WiFi stuck.
+
+To connect it, run the bridge's WiFi setup with the pet on USB. It offers the network the PC is on, asks for the password without showing it, and sends both down the USB cable only. The module keeps them and rejoins by itself from then on. The ESP8266 only does **2.4 GHz** networks.
 
 Reflashing the ESP-01 with firmware of its own, through the pet, was tried and failed: its ROM loader restarts on every esptool SYNC. The pet can still talk to it directly for debugging (`ES talk`), and every reset it does reports the ROM's own start-up line (`ES boot ets Jan 8 2013,rst cause:2, boot mode:(3,6)`), read at 74880 baud.
 
-USB always wins. The bridge tries the cable first and the Bluetooth port every 15 s while the pet isn't plugged in (opening the port of a pet that's off makes Windows try for seconds), and plugging the cable back in moves the link to USB by itself. Running the pet from a phone charger or power bank is how it goes wireless: within 15 s of losing the cable, Aminal reaches it over the air. Everything works over Bluetooth, just slower: a full `SN` snapshot takes about 2 s at 9600 baud.
+USB always wins. The bridge tries the cable first, then WiFi and the Bluetooth port every 15 s while the pet isn't plugged in (opening the port of a pet that's off makes Windows try for seconds), and plugging the cable back in moves the link to USB by itself. Running the pet from a phone charger or power bank is how it goes wireless: within 15 s of losing the cable, the bridge reaches it over the air. Everything works over Bluetooth, just slower: a full `SN` snapshot takes about 2 s at 9600 baud.
 
 ## The protocol
 
@@ -169,7 +173,8 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 
 | Line | Meaning |
 | --- | --- |
-| `HI` | Who are you? The pet answers `PET desktop-pet 7` |
+| `HI` | Who are you? The pet answers `PET desktop-pet 8` |
+| `IP` | Its WiFi address: `IP 192.168.1.12`, or `IP -` when it isn't online |
 | `PG` | Heartbeat, answered `PO`. Eight silent seconds and the pet is on its own again |
 | `ST idle\|listening\|thinking\|speaking\|off` | What Aminal is doing |
 | `LV 0-100` | Voice level, for the eyes and the mouth |
@@ -227,4 +232,5 @@ C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD13
 
 ## Next
 
-- Aminal over WiFi, which needs the ESP-01 reflashed with a relay (a USB-serial adapter would do it)
+- RFID cards on an RC522
+- A selfie countdown when Aminal takes a photo

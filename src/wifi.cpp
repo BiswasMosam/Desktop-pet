@@ -8,6 +8,11 @@
 // minutes, and that one reply carries everything it needs: the time (the
 // Date header), the UTC offset, and today's weather.
 //
+// The module also listens on port 7676, and whoever connects there (the
+// bridge on the PC, when the pet has only a power cord) speaks the same
+// protocol as USB and Bluetooth. That needs the module's multi-link mode,
+// so the weather goes out on link 4 and the bridge comes in on 0-3.
+//
 // Nothing here blocks: every command is sent, then answered a line at a
 // time from wifiTick(), so the face keeps moving while a request is out.
 
@@ -21,6 +26,8 @@ const uint32_t FETCH_EVERY_MS  = 20UL * 60 * 1000;
 const uint32_t FETCH_RETRY_MS  = 5UL * 60 * 1000;
 const uint32_t CHECK_ONLINE_MS = 60000;    // is it still connected?
 const uint32_t CHECK_OFFLINE_MS = 10000;   // has it joined yet?
+#define LINK_PORT 7676                     // where the bridge connects
+#define FETCH_ID  4                        // the link the weather uses
 
 // ---------- Saved across power cuts ----------
 // Where the weather is for (sent by Aminal) and its UTC offset, so a pet
@@ -61,7 +68,48 @@ static char line[128];
 static uint8_t lineLen;
 static char http[1500];              // one whole reply: headers and body
 static uint16_t httpLen;
-static int16_t ipdLeft = -1;         // payload bytes of "+IPD,n:" still coming
+static int16_t ipdLeft = -1;         // payload bytes of "+IPD,id,n:" still coming
+static int8_t ipdId = -1;            // and which link they're for
+
+// ---------- The bridge, connected over the network ----------
+
+static int8_t clientId = -1;         // its link, -1 when nobody's connected
+static uint8_t rx[512];              // what it sent, waiting for linkPoll
+static uint16_t rxHead, rxTail;
+static uint8_t tx[2600];             // what goes back: a snapshot is 2052
+static uint16_t txLen, sending;
+
+class WifiLink : public Stream {
+ public:
+  int available() override { return (rxHead - rxTail) & (sizeof(rx) - 1); }
+  int peek() override { return rxHead == rxTail ? -1 : rx[rxTail]; }
+  int read() override {
+    if (rxHead == rxTail) return -1;
+    uint8_t c = rx[rxTail];
+    rxTail = (rxTail + 1) & (sizeof(rx) - 1);
+    return c;
+  }
+  size_t write(uint8_t c) override {
+    if (clientId < 0 || txLen >= sizeof(tx)) return 0;
+    tx[txLen++] = c;
+    return 1;
+  }
+};
+static WifiLink wifiLinkStream;
+Stream &wifiLink = wifiLinkStream;
+
+static void rxPut(char c) {
+  uint16_t next = (rxHead + 1) & (sizeof(rx) - 1);
+  if (next != rxTail) { rx[rxHead] = c; rxHead = next; }
+}
+
+// A new connection replaces the old: the bridge reconnecting, or its
+// search knocking on the door and leaving
+static void clientOpened(int8_t id) {
+  clientId = id;
+  rxHead = rxTail = 0;
+  txLen = 0;
+}
 
 static bool online = false;
 static char ip[16] = "";
@@ -71,7 +119,11 @@ static void onLine(uint32_t now);
 
 static void espChar(char c, uint32_t now) {
   if (ipdLeft > 0) {                 // inside a +IPD payload: raw bytes
-    if (httpLen < sizeof(http) - 1) http[httpLen++] = c;
+    if (ipdId == FETCH_ID) {
+      if (httpLen < sizeof(http) - 1) http[httpLen++] = c;
+    } else if (ipdId == clientId) {
+      rxPut(c);
+    }
     ipdLeft--;
     return;
   }
@@ -89,18 +141,21 @@ static void espChar(char c, uint32_t now) {
     got |= R_PROMPT;
     lineLen = 0;
   } else if (c == ':' && !strncmp(line, "+IPD,", 5)) {
-    ipdLeft = atoi(line + 5);
+    const char *comma = strchr(line + 5, ',');
+    ipdId = atoi(line + 5);
+    ipdLeft = comma ? atoi(comma + 1) : 0;
     lineLen = 0;
   }
 }
 
 // ---------- The conversation ----------
 
-enum State : uint8_t { S_START, S_ECHO, S_MODEQ, S_MODE, S_MUX, S_IP, S_IDLE,
-                       S_JOIN, S_TCP, S_LEN, S_RECV };
+enum State : uint8_t { S_START, S_ECHO, S_MODEQ, S_MODE, S_MUX, S_SERVER, S_STO, S_IP,
+                       S_IDLE, S_JOIN, S_TCP, S_LEN, S_RECV, S_CSEND, S_CSENT };
 static State state = S_START;
 static uint32_t deadline, nextStart, nextFetch, nextCheck;
 static bool joinPending = false, everOnline = false;
+static uint8_t silent = 0;           // tries in a row the module didn't answer
 static char joinCmd[180];
 static char request[280];
 
@@ -112,11 +167,26 @@ static void send(const char *cmd, uint32_t timeout, uint32_t now) {
 }
 
 static void onLine(uint32_t now) {
+  // "<id>,CONNECT" and "<id>,CLOSED": a link opening or closing
+  if (line[0] >= '0' && line[0] <= '4' && line[1] == ',') {
+    int8_t id = line[0] - '0';
+    const char *what = line + 2;
+    if (id == FETCH_ID) {
+      if (!strcmp(what, "CONNECT")) got |= R_CONNECT;
+      else if (!strncmp(what, "CLOSED", 6)) got |= R_CLOSED;
+    } else if (!strcmp(what, "CONNECT")) {
+      clientOpened(id);
+    } else if (!strncmp(what, "CLOSED", 6) && id == clientId) {
+      clientId = -1;
+      txLen = 0;
+    }
+    return;
+  }
   if      (!strcmp(line, "OK")) got |= R_OK;
-  else if (!strcmp(line, "ERROR") || !strcmp(line, "FAIL") || strstr(line, "DNS Fail")) got |= R_ERR;
+  else if (!strcmp(line, "ERROR") || !strcmp(line, "FAIL") || !strcmp(line, "SEND FAIL") ||
+           strstr(line, "DNS Fail")) got |= R_ERR;
   else if (!strcmp(line, "SEND OK")) got |= R_SENT;
-  else if (!strcmp(line, "CLOSED")) got |= R_CLOSED;
-  else if (strstr(line, "CONNECT") && strncmp(line, "WIFI", 4)) got |= R_CONNECT;
+  else if (!strcmp(line, "ALREADY CONNECTED")) got |= R_CONNECT;
   else if (!strcmp(line, "WIFI DISCONNECT")) { online = false; world.wifi = 1; }
   else if (!strncmp(line, "+CWMODE_DEF:", 12)) modeDef = atoi(line + 12);
   else if (!strncmp(line, "+CIFSR:STAIP,\"", 14)) {
@@ -128,6 +198,8 @@ static void onLine(uint32_t now) {
     // The module restarted (a power dip, or the pet reset it): start over
     state = S_START;
     nextStart = now + 500;
+    clientId = -1;
+    txLen = 0;
   }
 }
 
@@ -178,7 +250,7 @@ static void startFetch(uint32_t now) {
            "&forecast_days=1&timezone=auto HTTP/1.0\r\n"
            "Host: api.open-meteo.com\r\n\r\n", lat, lon);
   httpLen = 0;
-  send("AT+CIPSTART=\"TCP\",\"api.open-meteo.com\",80", 10000, now);
+  send("AT+CIPSTART=4,\"TCP\",\"api.open-meteo.com\",80", 10000, now);
   state = S_TCP;
 }
 
@@ -297,6 +369,9 @@ void wifiJoin(char *args) {
 
 void wifiBegin() {
   SerialESP.begin(ESP_BAUD);
+  // Whatever the module was doing (still serving a link from before the
+  // pet restarted, or stuck after a bad power-up), it starts clean
+  espReset(false);
   loadSaved();
   // A pet waking with the PC off still knows its timezone
   if (saved.magic == SAVED_MAGIC && saved.offsetKnown) world.tzOffset = saved.offset;
@@ -318,20 +393,42 @@ void wifiTick(uint32_t now) {
       if (reached(now, nextStart)) { send("ATE0", 1500, now); state = S_ECHO; }
       break;
     case S_ECHO:
-      if (got & R_OK) { modeDef = -1; send("AT+CWMODE_DEF?", 2000, now); state = S_MODEQ; }
-      else if (late) { world.wifi = 0; nextStart = now + 15000; state = S_START; }   // no module
+      if (got & R_OK) {
+        silent = 0;
+        modeDef = -1;
+        send("AT+CWMODE_DEF?", 2000, now);
+        state = S_MODEQ;
+      } else if (late) {
+        // No module, or one that came up wrong: reset it every other try
+        world.wifi = 0;
+        if (++silent % 2 == 0) espReset(false);
+        nextStart = now + 15000;
+        state = S_START;
+      }
       break;
     case S_MODEQ:
       if (got & (R_OK | R_ERR) || late) {
         // Station only: the factory default also broadcasts an open network
         if (modeDef != 1) { send("AT+CWMODE_DEF=1", 3000, now); state = S_MODE; }
-        else { send("AT+CIPMUX=0", 2000, now); state = S_MUX; }
+        else { send("AT+CIPMUX=1", 2000, now); state = S_MUX; }
       }
       break;
     case S_MODE:
-      if (got & (R_OK | R_ERR) || late) { send("AT+CIPMUX=0", 2000, now); state = S_MUX; }
+      if (got & (R_OK | R_ERR) || late) { send("AT+CIPMUX=1", 2000, now); state = S_MUX; }
       break;
     case S_MUX:
+      if (got & (R_OK | R_ERR) || late) {
+        char cmd[28];
+        snprintf(cmd, sizeof(cmd), "AT+CIPSERVER=1,%d", LINK_PORT);
+        send(cmd, 2000, now);
+        state = S_SERVER;
+      }
+      break;
+    case S_SERVER:
+      // A bridge that vanishes without closing is let go after 30 quiet s
+      if (got & (R_OK | R_ERR) || late) { send("AT+CIPSTO=30", 2000, now); state = S_STO; }
+      break;
+    case S_STO:
       if (got & (R_OK | R_ERR) || late) askAddress(now);
       break;
     case S_IP:
@@ -351,7 +448,15 @@ void wifiTick(uint32_t now) {
         send(joinCmd, 20000, now);
         memset(joinCmd, 0, sizeof(joinCmd));        // the password is the module's now
         state = S_JOIN;
-      } else if (online && saved.magic == SAVED_MAGIC && reached(now, nextFetch)) {
+      } else if (clientId >= 0 && txLen > 0) {
+        char cmd[32];
+        sending = min<uint16_t>(txLen, 2048);
+        snprintf(cmd, sizeof(cmd), "AT+CIPSEND=%d,%u", clientId, (unsigned)sending);
+        send(cmd, 2000, now);
+        state = S_CSEND;
+      } else if (online && clientId < 0 && saved.magic == SAVED_MAGIC &&
+                 reached(now, nextFetch)) {
+        // With the bridge connected it brings the time and weather itself
         startFetch(now);
       } else if (reached(now, nextCheck)) {
         askAddress(now);
@@ -393,8 +498,29 @@ void wifiTick(uint32_t now) {
       if (got & R_CLOSED) {
         fetchDone(parseReply(now), now);
       } else if (late) {
-        send("AT+CIPCLOSE", 2000, now);
+        send("AT+CIPCLOSE=4", 2000, now);
         fetchDone(parseReply(now), now);
+      }
+      break;
+    case S_CSEND:
+      if (got & R_PROMPT) {
+        got = 0;
+        SerialESP.write(tx, sending);
+        deadline = now + 3000;
+        state = S_CSENT;
+      } else if (got & R_ERR || late) {
+        txLen = 0;                                  // the bridge has gone
+        state = S_IDLE;
+      }
+      break;
+    case S_CSENT:
+      if (got & R_SENT) {
+        txLen -= sending;
+        memmove(tx, tx + sending, txLen);
+        state = S_IDLE;
+      } else if (got & R_ERR || late) {
+        txLen = 0;
+        state = S_IDLE;
       }
       break;
   }
