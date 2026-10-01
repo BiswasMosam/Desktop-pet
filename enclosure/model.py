@@ -202,13 +202,9 @@ def shell():
     s -= box(-pw / 2, pw / 2, TOUCH_Y - pl / 2, TOUCH_Y + pl / 2, top_in - 0.1,
              H - TOUCH_ROOF)
 
+    # The outside stays smooth: the card opens a hidden folder, and a mark
+    # showing where to tap would give it away
     s += rfid_holder(outer)
-    # a faint ring on the outside, over the antenna: tap here
-    ring_y, ring_z = RFID_Y0 + 19.0, (RFID_Z0 + RFID_Z1) / 2
-    ring = Manifold.cylinder(2.0, 12.0, 12.0, SEG) - \
-        Manifold.cylinder(2.0, 10.8, 10.8, SEG).translate((0, 0, -0.5))
-    ring = ring.rotate((0, 90, 0)).translate((W / 2 - 0.6, ring_y, ring_z))
-    s -= ring
     return s
 
 

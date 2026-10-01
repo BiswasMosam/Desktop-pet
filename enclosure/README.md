@@ -1,6 +1,6 @@
 # The enclosure
 
-A head for the face: a soft cube, the screen behind a black visor, the Black Pill up on a stand inside, a touch pad under the top so you pet it where you'd pet a pet, and the RFID reader inside its right side, so you tap your card on its cheek.
+A head for the face: a soft cube, the screen behind a black visor, the Black Pill up on a stand inside, a touch pad under the top so you pet it where you'd pet a pet, and the RFID reader hidden inside its right side, so you tap your card on its cheek. Nothing on the outside gives it away.
 
 ![The pet in its head](renders/hero.png)
 
@@ -12,9 +12,9 @@ A head for the face: a soft cube, the screen behind a black visor, the Black Pil
 | --- | --- |
 | The base: four posts that hold the Black Pill by its edges, the front two wrapping round its corners | The board on them, chip side up, its plugs and the SWD header hanging free underneath |
 
-| ![The right side, with the ring where the card goes](renders/side.png) | ![Inside the right wall: the reader in its holder](renders/reader.png) |
+| ![The right side: smooth, with the reader behind it](renders/side.png) | ![Inside the right wall: the reader in its holder](renders/reader.png) |
 | --- | --- |
-| The right side: a faint ring marks where to tap the card | Inside the right wall: the RC522 in its holder, antenna end at the front, its plugs toward the back |
+| The right side: smooth, the reader behind it. Tap the card near the front half | Inside the right wall: the RC522 in its holder, antenna end at the front, its plugs toward the back |
 
 ![Exploded](renders/exploded.png)
 
@@ -32,7 +32,7 @@ Nothing reaches over the board's top except those four clips, so the buttons and
 
 ## The RFID reader's holder
 
-The RC522 stands inside the right wall, long side front to back, its component side facing in. A card tapped on the outside reads through about 6 mm: the 2.4 mm wall, a 2 mm gap, and the board.
+The RC522 stands inside the right wall, long side front to back, its component side facing in. A card tapped on the outside reads through about 6 mm: the 2.4 mm wall, a 2 mm gap, and the board. There's no mark on the outside on purpose, since the card opens a hidden folder: the antenna is behind the front half of the side, about halfway up.
 
 - **It hangs, it isn't screwed.** Its top edge sits in a slot under the roof, its bottom edge in a groove whose inner side slopes at 45°. To fit it, tilt it, push its top up into the slot (there's 2 mm to spare), swing the bottom in past the groove's edge and let it drop. A bit of tape behind it if you want it to never rattle.
 - **The groove and the slot only grip the antenna end.** The crystal and the header sit at the other end, close to the edges, so nothing reaches over them.
