@@ -134,6 +134,13 @@ void controllerPress(uint32_t now);
 void controllerDraw(int dx, int dy, uint32_t now);
 void sparksDraw(uint32_t since);
 
+// rfid.cpp: the RC522, one card as a key with three gestures
+void rfidBegin();
+void rfidTick(uint32_t now);
+const char *rfidStatus();                 // its chip version in hex, or "-"
+const char *rfidTest();                   // RF test: is the SPI wiring sound
+const char *rfidPoll();                   // RF poll: one try at a card
+
 // camera.cpp: the camera face during a selfie
 void cameraTick(uint32_t now);
 void cameraDraw(uint32_t now);

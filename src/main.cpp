@@ -15,6 +15,8 @@
 #define LED_PIN    PC13   // onboard LED, on when LOW
 #define KEY_PIN    PA0    // onboard KEY button, LOW when pressed
 #define TOUCH_PIN  PB0    // TTP223 touch pad (optional), HIGH while touched.
+#define TOUCH_VCC  PB14   // and its power: it draws a few microamps, so two
+#define TOUCH_GND  PB15   // pins feed it and the 3V3/G pins go further
                           // Not PA0: the bootloader reads PA0 at reset, and a
                           // TTP223 holds its output LOW when nobody's touching.
 
@@ -121,11 +123,16 @@ static void handleKey(uint32_t now) {
 void setup() {
   pinMode(KEY_PIN, INPUT_PULLUP);
   pinMode(TOUCH_PIN, INPUT_PULLDOWN);   // reads "not touched" with no pad fitted
+  pinMode(TOUCH_VCC, OUTPUT);
+  digitalWrite(TOUCH_VCC, HIGH);
+  pinMode(TOUCH_GND, OUTPUT);
+  digitalWrite(TOUCH_GND, LOW);
   pinMode(LED_PIN, OUTPUT);
   digitalWrite(LED_PIN, HIGH);  // LED off
 
   linkBegin();
   wifiBegin();
+  rfidBegin();
 
   Wire.setSDA(PB7);
   Wire.setSCL(PB6);
@@ -156,6 +163,7 @@ void loop() {
   lastFrame = now;
 
   handleKey(now);
+  rfidTick(now);
   linkTick(now);
   if (screenUntil && reached(now, screenUntil)) goScreen(SCR_FACE, 0, now);
   if (world.alertOn && reached(now, world.alertUntil)) dismissAlert();

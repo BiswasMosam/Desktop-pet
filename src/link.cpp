@@ -4,7 +4,9 @@
 // protocol, so the pet doesn't care which one Aminal is on. Replies go back down the port the command came in
 // on; events (a tap, a hold) go to whichever port spoke last.
 //
-//   HI                          -> PET desktop-pet 9
+//   HI                          -> PET desktop-pet 10
+//   RF [test|poll]              -> RF <RC522 chip version, hex> | RF -;
+//                               test: SPI read-back; poll: one try at a card
 //   IP                          -> IP <its WiFi address> | IP -
 //   PG                          -> PO            (heartbeat)
 //   ST idle|listening|thinking|speaking|off
@@ -43,6 +45,7 @@ static Uart SerialBT(PA_3, PA_2);
 // out of reset puts it in its ROM bootloader.
 #define ESP_RST_PIN  PB12
 #define ESP_BOOT_PIN PB13
+#define ESP_EN_PIN   PA8    // its enable: held high from here, not a 3V3 pin
 
 const uint32_t LINK_TIMEOUT_MS = 8000;    // no line for this long -> on our own
 
@@ -69,6 +72,8 @@ void linkBegin() {
   pinMode(ESP_BOOT_PIN, OUTPUT);
   digitalWrite(ESP_RST_PIN, HIGH);
   digitalWrite(ESP_BOOT_PIN, HIGH);
+  pinMode(ESP_EN_PIN, OUTPUT);
+  digitalWrite(ESP_EN_PIN, HIGH);
 }
 
 // ---------- Reflashing the ESP-01 through the pet ----------
@@ -350,8 +355,15 @@ static void handleLine(Port &p, uint32_t now) {
   replyTo = &p;
 
   bool hello = false, known = true;
-  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 9"); hello = true; }
+  if      (!strcmp(cmd, "HI")) { reply("PET desktop-pet 10"); hello = true; }
   else if (!strcmp(cmd, "PG")) reply("PO");
+  else if (!strcmp(cmd, "RF")) {
+    char b[104];
+    const char *r = !strcmp(args, "test") ? rfidTest() :
+                    !strcmp(args, "poll") ? rfidPoll() : rfidStatus();
+    snprintf(b, sizeof(b), "RF %s", r);
+    reply(b);
+  }
   else if (!strcmp(cmd, "IP")) {
     char b[24];
     snprintf(b, sizeof(b), "IP %s", world.wifi == 3 ? world.wifiIp : "-");

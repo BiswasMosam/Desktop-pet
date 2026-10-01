@@ -66,6 +66,12 @@ The pet also follows what's in front on the PC:
 
 With music playing as well it keeps the coding or gaming face and puts the headphones on over it, nodding on the beat. An editor nobody has touched for five minutes isn't coding, and a few seconds in front are needed before either counts, so alt-tabbing past VS Code changes nothing. Aminal goes by the program, its folder and the window title only, never by what's in the window or what's typed.
 
+### The card
+
+Tap the RFID card on the reader and a hidden folder opens on the PC (`C:\Users\<you>\Vault`, hidden and marked as a system folder so it stays out of sight even with hidden files shown). Tap again and it closes. The first card ever tapped becomes the key; any other card gets a sad face. It works with Aminal closed, since the bridge does it.
+
+A tap is the card arriving after being away for 1.5 s, so a card left lying on the reader counts once. Gestures (double tap, hold to lock) and a "hotel key slot" came first and both glitched: a card resting on the reader drops out of reading for over a second now and then. Hidden is not locked: anyone who types the path can open the folder.
+
 ### Selfies
 
 Ask Aminal for a selfie and the pet turns into a camera. While the webcam opens and meters, its lens focuses and searches for you ("smile please!"). As Aminal says "Hold still - three, two, one", the numbers count down inside the lens, then "cheese!". The moment the photo is actually taken, the screen flashes white and the shutter blinks closed and open ("click!"), and it says "developing" until Aminal has the picture ready.
@@ -88,9 +94,10 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 
 - **WeAct Black Pill**, STM32F401CC or STM32F411CE
 - **0.96" SSD1306 OLED**, 128x64, I2C
-- **HC-05** Bluetooth module (optional): a wireless link to Aminal
-- **ESP-01** WiFi module (optional): its own time and weather when the PC is off
+- **ESP-01** WiFi module (optional): its own time and weather when the PC is off, and the link to the PC with no cable
+- **RC522** RFID reader (optional): tap a card to open a hidden folder
 - **TTP223** touch sensor (optional): pet it by touching the top of its head
+- **HC-05** Bluetooth module (optional, and no longer fitted here: WiFi does its job faster and frees its pins)
 - USB-C cable
 
 ### Wiring
@@ -102,28 +109,41 @@ A tap also dismisses a card. A screen you flipped to returns to the face after 2
 | SCL | B6 |
 | SDA | B7 |
 
-| HC-05 | Black Pill |
-| --- | --- |
-| VCC | 5V |
-| GND | GND |
-| TXD | A3 |
-| RXD | A2 |
-
 | ESP-01 | Black Pill |
 | --- | --- |
-| 3V3 (VCC) | 3.3 V from an **AMS1117-3.3** regulator fed by the 5V pin, with a 470 µF capacitor across it. **Never 5V**, and not the Black Pill's own 3V3, which browns out under the radio |
-| GND | GND |
-| EN (CH_PD) | the same 3.3 V |
+| 3V3 (VCC) | 3V3, with **short direct wires**. **Never 5V**. Long breadboard jumpers made it brown out whenever its radio worked; short ones on the Black Pill's own 3V3 are fine |
+| GND | G |
+| EN (CH_PD) | A8 (the pet holds it high, which saves a 3V3 pin) |
 | TX | A10 |
 | RX | A9 |
 | RST | B12 (lets the pet restart it) |
 | GPIO0 | B13 (lets the pet start its bootloader) |
 
+| RC522 | Black Pill |
+| --- | --- |
+| 3.3V | 3V3. **Never 5V** |
+| GND | G |
+| SDA | A4 |
+| SCK | A5 |
+| MISO | A6 |
+| MOSI | A7 |
+| RST | B1 (the pet drives it; left floating, the chip can sleep and stop answering) |
+| IRQ | not connected |
+
 | TTP223 | Black Pill |
 | --- | --- |
-| VCC | 3.3 |
-| GND | G |
+| VCC | B14 (it draws microamps, so a pin powers it) |
+| GND | B15 |
 | I/O | B0 (not A0: the bootloader reads A0 at reset, and the pad's output sits low) |
+
+| HC-05 (optional, not fitted) | Black Pill |
+| --- | --- |
+| VCC | 5V |
+| GND | G |
+| TXD | A3 |
+| RXD | A2 |
+
+The board has three 3V3 pins and three G pins (two on the long headers, one each on the small 4-pin header): one pair each for the OLED, the ESP-01 and the RC522. Both 5V pins stay empty.
 
 The ESP-01's pins aren't labelled on top. With the chips facing you and the antenna up, one row holds GND, GPIO2, GPIO0 and RX, the other TX, EN, RST and 3V3; GND and 3V3 sit at opposite corners. GPIO2 stays empty.
 
@@ -179,7 +199,7 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 
 | Line | Meaning |
 | --- | --- |
-| `HI` | Who are you? The pet answers `PET desktop-pet 9` |
+| `HI` | Who are you? The pet answers `PET desktop-pet 10` |
 | `IP` | Its WiFi address: `IP 192.168.1.12`, or `IP -` when it isn't online |
 | `PG` | Heartbeat, answered `PO`. Eight silent seconds and the pet is on its own again |
 | `ST idle\|listening\|thinking\|speaking\|off` | What Aminal is doing |
@@ -191,6 +211,7 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 | `EM <happy\|love\|surprised\|sad\|angry\|wink\|sleepy> [ms]` | Pull a face |
 | `GO <face\|clock\|weather\|timer\|status> [secs]` | Show a screen |
 | `SN` | Answered `SN <hex>`: the 1024-byte frame buffer, exactly what's on the OLED |
+| `RF`, `RF test`, `RF poll` | The RC522: its chip version; a wiring test (a register written and read back, and whether anything drives MISO); one try at reading a card |
 | `MD music [headphones\|dance\|bars]`, `MD watch`, `MD -` | What's playing; a mood can be asked for by name |
 | `VZ <16 hex digits>` | Spectrum bars, 0 to f each, low to high |
 | `BE` | A beat |
@@ -201,7 +222,7 @@ One short line per message, the same on USB and Bluetooth, simple enough to type
 | `WF <ssid><tab><password>` | USB only: join a WiFi network (the ESP-01 keeps it) |
 | `ES talk\|flash [baud]`, `ES reset` | USB only: the cable straight through to the ESP-01, in its own program or its bootloader, until 12-30 s of quiet |
 
-The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold timer`, `EV dismiss`, `EV wifi ok <ip>`, `EV wifi fail`.
+The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold timer`, `EV dismiss`, `EV wifi ok <ip>`, `EV wifi fail`, `EV card <uid> tap`.
 
 ## Troubleshooting
 
@@ -214,7 +235,7 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | Don't install WinUSB over *WeAct Studio HID Bootloader* in Zadig | The uploader talks to it as HID. If you already did, uninstall that device in Device Manager and replug. |
 | Garbage or noise on screen | Module may be an SH1106 (common on 1.3" boards), which needs a different library. |
 | Eyes never react to Aminal | Status screen says `Link none`: the bridge isn't running, or something else (a serial monitor) has the port open. |
-| ESP-01 answers `AT` but garbles its replies, restarts or goes silent while joining or scanning | Brownout. Its radio pulls ~300 mA bursts the Black Pill's 3.3 V regulator can't deliver: serial turns to garbage (`AT+CWLAP` echoed as `AfWLAP`), then it crashes. Lowering its transmit power (`AT+RFPOWER`) didn't help. Feed it from an **AMS1117-3.3** regulator on the 5V pin, with a 470 µF capacitor across its 3V3 and GND. |
+| ESP-01 answers `AT` but garbles its replies, restarts or goes silent while joining or scanning | Brownout. Its radio pulls ~300 mA bursts: serial turns to garbage (`AT+CWLAP` echoed as `AfWLAP`), then it crashes. Lowering its transmit power (`AT+RFPOWER`) didn't help. The cause here was the wiring, not the regulator: long breadboard jumpers drop too much voltage under those bursts, and short direct wires fixed it. If it still drops out on short wires, give it its own **AMS1117-3.3** on the 5V pin with a 470 µF capacitor. |
 
 ## How the code is laid out
 
@@ -227,6 +248,7 @@ The pet sends events back: `EV pet`, `EV next <screen>`, `EV hold`, `EV hold tim
 | `src/media.cpp` | Headphones, music notes, the visualizer, and the popcorn |
 | `src/activity.cpp` | Glasses, the keyboard and paws, the controller, and the sparks |
 | `src/camera.cpp` | The camera face for a selfie: countdown, flash and shutter |
+| `src/rfid.cpp` | The RC522: polling for a card, and turning a card's arrival into a tap |
 | `src/link.cpp` | The protocol, read from USB and the HC-05 alike, and the ESP-01 passthrough |
 | `src/wifi.cpp` | The ESP-01 driven through its AT firmware: joining, the HTTP request, reading the reply |
 
@@ -240,4 +262,4 @@ C++ on the Arduino framework (STM32duino), built with PlatformIO. Adafruit SSD13
 
 ## Next
 
-- RFID cards on an RC522
+- The touch pad, once it arrives (the firmware already powers and reads it)
